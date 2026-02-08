@@ -1,0 +1,378 @@
+---
+import PublicLayout from "../layouts/PublicLayout.astro";
+import Navbar from "../components/landing/Navbar.astro";
+import Footer from "../components/landing/Footer.astro";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "../components/ui/card";
+import { Badge } from "../components/ui/badge";
+import { Button } from "../components/ui/button";
+import { Separator } from "../components/ui/separator";
+---
+
+<PublicLayout
+  title="Privacy Policy | Witnes"
+  description="How we handle your data. GDPR compliant, secure, and transparent. Your information stays yours."
+  canonical="/privacy"
+>
+  <div
+    class="min-h-screen flex flex-col selection:bg-[#A68B6A] selection:text-white relative"
+  >
+    <div class="relative z-10">
+      <Navbar />
+      <main class="flex-grow">
+        <!-- Header Section -->
+        <section
+          class="relative overflow-hidden pb-20 pt-32 md:pb-32 md:pt-44 border-b"
+        >
+          <!-- Subtle grid background -->
+          <div
+            class="pointer-events-none absolute inset-0 opacity-[0.4]"
+            style="background-image: linear-gradient(hsl(var(--border)) 1px, transparent 1px), linear-gradient(to right, hsl(var(--border)) 1px, transparent 1px); background-size: 60px 60px;"
+          >
+          </div>
+
+          <!-- Glow effect -->
+          <div
+            class="pointer-events-none absolute left-1/2 top-0 -translate-x-1/2 h-[500px] w-[800px] rounded-full bg-muted blur-[120px]"
+          >
+          </div>
+
+          <div class="relative mx-auto max-w-6xl px-6">
+            <div class="mx-auto max-w-3xl text-center">
+              <!-- Badge -->
+              <div
+                class="mb-8 inline-flex items-center gap-2 rounded-full border border-border bg-secondary px-4 py-1.5 text-sm text-foreground"
+              >
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="h-3.5 w-3.5"
+                >
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                </svg>
+                <span>Legal</span>
+              </div>
+
+              <h1
+                class="text-balance text-4xl font-bold leading-tight tracking-tight text-foreground md:text-6xl lg:text-7xl"
+              >
+                Privacy Policy
+              </h1>
+
+              <p
+                class="mx-auto mt-6 max-w-2xl text-pretty text-lg leading-relaxed text-muted-foreground md:text-xl"
+              >
+                How we collect, use, and protect your personal and business data
+                under EU General Data Protection Regulation (GDPR).
+              </p>
+
+              <p class="mt-8 text-sm text-muted-foreground">
+                Last updated: January 2026
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <!-- Main Privacy Content -->
+        <section class="section-frame py-32 md:py-48 px-6 md:px-12 bg-white">
+          <div class="max-w-4xl mx-auto space-y-12">
+            <!-- Section 01: Scope & Controller -->
+            <Card className="border-zinc-200">
+              <CardHeader>
+                <div class="flex items-center gap-3 mb-2">
+                  <Badge variant="outline" className="text-sm">01</Badge>
+                  <CardTitle className="text-xl uppercase tracking-widest"
+                    >Scope & Controller</CardTitle
+                  >
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <p class="text-base leading-relaxed text-zinc-600">
+                  This Policy applies to all users of the Witnes platform,
+                  website, and related services.
+                </p>
+                <div
+                  class="p-6 bg-[#F9F9F7] rounded-2xl border border-zinc-100"
+                >
+                  <p
+                    class="text-xs uppercase tracking-widest text-zinc-500 mb-4 font-bold"
+                  >
+                    Controller Information
+                  </p>
+                  <p class="text-base text-black font-medium">
+                    ZITA CH Single Member Private Company<br />
+                    Promitheos 33, 54629 Thessaloniki, Greece<br />
+                    Email: support@witnes.io
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+
+            <!-- Section 02: Data Collection -->
+            <Card className="border-zinc-200">
+              <CardHeader>
+                <div class="flex items-center gap-3 mb-2">
+                  <Badge variant="outline" className="text-sm">02</Badge>
+                  <CardTitle className="text-xl uppercase tracking-widest"
+                    >Data We Collect</CardTitle
+                  >
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-8">
+                <div>
+                  <h3
+                    class="text-base font-bold text-black uppercase tracking-tight mb-4"
+                  >
+                    a) Data you provide
+                  </h3>
+                  <ul class="list-disc pl-6 space-y-2 text-zinc-600">
+                    <li>Account information (name, email, password)</li>
+                    <li>Business and product data entered into the platform</li>
+                    <li>
+                      Billing and payment details (handled securely via payment
+                      processor)
+                    </li>
+                  </ul>
+                </div>
+                <div>
+                  <h3
+                    class="text-base font-bold text-black uppercase tracking-tight mb-4"
+                  >
+                    b) Automatically collected
+                  </h3>
+                  <ul class="list-disc pl-6 space-y-2 text-zinc-600">
+                    <li>
+                      Device and browser information, IP address, usage logs
+                    </li>
+                    <li>
+                      Cookies and similar technologies for session management
+                    </li>
+                  </ul>
+                </div>
+                <div>
+                  <h3
+                    class="text-base font-bold text-black uppercase tracking-tight mb-4"
+                  >
+                    c) Business activity data
+                  </h3>
+                  <p class="text-base leading-relaxed text-zinc-600">
+                    Operational or environmental data (e.g., electricity use,
+                    production volumes) remains the user's property; we process
+                    it solely to provide calculations.
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+
+            <!-- Section 03: Legal Bases -->
+            <Card className="border-zinc-200">
+              <CardHeader>
+                <div class="flex items-center gap-3 mb-2">
+                  <Badge variant="outline" className="text-sm">03</Badge>
+                  <CardTitle className="text-xl uppercase tracking-widest"
+                    >Purpose & Legal Bases</CardTitle
+                  >
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div class="overflow-x-auto rounded-2xl border border-zinc-100">
+                  <table class="w-full text-left text-sm">
+                    <thead class="bg-zinc-50 border-b border-zinc-100">
+                      <tr>
+                        <th
+                          class="p-4 font-black uppercase text-[10px] tracking-widest text-zinc-500"
+                          >Purpose</th
+                        >
+                        <th
+                          class="p-4 font-black uppercase text-[10px] tracking-widest text-zinc-500"
+                          >Legal Basis</th
+                        >
+                      </tr>
+                    </thead>
+                    <tbody class="text-zinc-600 font-medium">
+                      <tr class="border-b border-zinc-100">
+                        <td class="p-4">Provide and maintain Service</td>
+                        <td class="p-4">Contract Art. 6 (1)(b) GDPR</td>
+                      </tr>
+                      <tr class="border-b border-zinc-100">
+                        <td class="p-4">Billing and payments</td>
+                        <td class="p-4">Contract + Legal obligation</td>
+                      </tr>
+                      <tr class="border-b border-zinc-100">
+                        <td class="p-4">Communications and support</td>
+                        <td class="p-4">Legitimate interest</td>
+                      </tr>
+                      <tr class="border-b border-zinc-100">
+                        <td class="p-4">Platform analytics</td>
+                        <td class="p-4">Legitimate interest</td>
+                      </tr>
+                      <tr class="border-b border-zinc-100">
+                        <td class="p-4">Marketing (optional)</td>
+                        <td class="p-4">Consent</td>
+                      </tr>
+                      <tr>
+                        <td class="p-4">Compliance with law</td>
+                        <td class="p-4">Legal obligation</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </CardContent>
+            </Card>
+
+            <!-- Section 04: Sharing & Transfers -->
+            <Card className="border-zinc-200">
+              <CardHeader>
+                <div class="flex items-center gap-3 mb-2">
+                  <Badge variant="outline" className="text-sm">04</Badge>
+                  <CardTitle className="text-xl uppercase tracking-widest"
+                    >Sharing & Transfers</CardTitle
+                  >
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <p class="text-base leading-relaxed text-zinc-600">
+                  We share data only with hosting, infrastructure, and payment
+                  providers; professional advisors; and authorities when legally
+                  obliged. All third-party processors are GDPR-bound.
+                </p>
+                <p class="text-base leading-relaxed text-zinc-600">
+                  If data is transferred outside the EU/EEA, we use Standard
+                  Contractual Clauses (SCCs) or equivalent safeguards.
+                </p>
+              </CardContent>
+            </Card>
+
+            <!-- Section 05: Retention & Security -->
+            <Card className="border-zinc-200">
+              <CardHeader>
+                <div class="flex items-center gap-3 mb-2">
+                  <Badge variant="outline" className="text-sm">05</Badge>
+                  <CardTitle className="text-xl uppercase tracking-widest"
+                    >Retention & Security</CardTitle
+                  >
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <p class="text-base leading-relaxed text-zinc-600">
+                  We keep personal data only as long as necessary for operation,
+                  legal retention, or security. Data is anonymized or erased
+                  within 90 days of termination unless legally required
+                  otherwise.
+                </p>
+                <p class="text-base leading-relaxed text-zinc-600">
+                  We employ encryption, access controls, and monitoring. Users
+                  are responsible for maintaining password confidentiality.
+                </p>
+              </CardContent>
+            </Card>
+
+            <!-- Section 06: Your Rights -->
+            <Card className="border-zinc-200">
+              <CardHeader>
+                <div class="flex items-center gap-3 mb-2">
+                  <Badge variant="outline" className="text-sm">06</Badge>
+                  <CardTitle className="text-xl uppercase tracking-widest"
+                    >Your GDPR Rights</CardTitle
+                  >
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <ul class="grid grid-cols-2 gap-4 text-zinc-600 font-medium">
+                  <li class="flex gap-2">
+                    <span class="text-[#A68B6A]">•</span>
+                    <span>Access your data</span>
+                  </li>
+                  <li class="flex gap-2">
+                    <span class="text-[#A68B6A]">•</span>
+                    <span>Rectify inaccuracies</span>
+                  </li>
+                  <li class="flex gap-2">
+                    <span class="text-[#A68B6A]">•</span>
+                    <span>Request erasure</span>
+                  </li>
+                  <li class="flex gap-2">
+                    <span class="text-[#A68B6A]">•</span>
+                    <span>Restrict processing</span>
+                  </li>
+                  <li class="flex gap-2">
+                    <span class="text-[#A68B6A]">•</span>
+                    <span>Data portability</span>
+                  </li>
+                  <li class="flex gap-2">
+                    <span class="text-[#A68B6A]">•</span>
+                    <span>Object to processing</span>
+                  </li>
+                </ul>
+                <p class="text-base leading-relaxed text-zinc-600">
+                  To exercise these rights, email <strong
+                    >support@witnes.io</strong
+                  >. You can also contact the Hellenic Data Protection Authority
+                  (https://www.dpa.gr).
+                </p>
+              </CardContent>
+            </Card>
+
+            <!-- Section 07: Liability & Cookies -->
+            <Card className="border-zinc-200">
+              <CardHeader>
+                <div class="flex items-center gap-3 mb-2">
+                  <Badge variant="outline" className="text-sm">07</Badge>
+                  <CardTitle className="text-xl uppercase tracking-widest"
+                    >Liability & Cookies</CardTitle
+                  >
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <p class="text-base leading-relaxed text-zinc-600">
+                  Witnes processes user-provided data and third-party factors.
+                  All results are <strong>estimates</strong> for informational purposes
+                  and must not be represented as externally audited unless verified.
+                </p>
+                <p class="text-base leading-relaxed text-zinc-600">
+                  We only use essential session tokens required for secure
+                  authentication and functionality.
+                </p>
+              </CardContent>
+            </Card>
+
+            <!-- Closing -->
+            <Separator className="my-12" />
+            <div class="flex flex-col items-center gap-8">
+              <Button variant="outline" className="gap-2" asChild client:load>
+                <a href="/">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d="m12 19-7-7 7-7"></path>
+                    <path d="M19 12H5"></path>
+                  </svg>
+                  Back to Home
+                </a>
+              </Button>
+            </div>
+          </div>
+        </section>
+      </main>
+      <Footer />
+    </div>
+  </div>
+</PublicLayout>

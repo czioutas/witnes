@@ -1,0 +1,28 @@
+---
+export interface Props {
+  items: Array<{
+    name: string;
+    url: string;
+  }>;
+}
+
+const { items } = Astro.props;
+const siteUrl = "https://witnes.io";
+
+const breadcrumbList = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: items.map((item, index) => ({
+    "@type": "ListItem",
+    position: index + 1,
+    name: item.name,
+    item: `${siteUrl}${item.url}`,
+  })),
+};
+---
+
+<script
+  type="application/ld+json"
+  is:inline
+  set:html={JSON.stringify(breadcrumbList)}
+/>

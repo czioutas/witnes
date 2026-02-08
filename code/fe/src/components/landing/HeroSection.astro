@@ -1,0 +1,73 @@
+---
+import HeroButtons from "./HeroButtons";
+---
+
+<section class="relative overflow-hidden pb-20 pt-32 md:pb-32 md:pt-44">
+  <!-- Subtle grid background -->
+  <div
+    class="pointer-events-none absolute inset-0 opacity-[0.4]"
+    style="background-image: linear-gradient(hsl(var(--border)) 1px, transparent 1px), linear-gradient(to right, hsl(var(--border)) 1px, transparent 1px); background-size: 60px 60px;"
+  >
+  </div>
+
+  <!-- Glow effect -->
+  <div
+    class="pointer-events-none absolute left-1/2 top-0 -translate-x-1/2 h-[500px] w-[800px] rounded-full bg-muted blur-[120px]"
+  >
+  </div>
+
+  <div class="relative mx-auto max-w-6xl px-6">
+    <div class="mx-auto max-w-3xl text-center">
+      <!-- Badge -->
+      <div
+        class="mb-8 inline-flex items-center gap-2 rounded-full border border-border bg-secondary px-4 py-1.5 text-sm text-foreground"
+      >
+        <svg
+          width="14"
+          height="14"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          class="h-3.5 w-3.5"
+        >
+          <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+        </svg>
+        <span>Diagnostic tool for the whole company</span>
+      </div>
+
+      <h1
+        class="text-balance text-4xl font-bold leading-tight tracking-tight text-foreground md:text-6xl lg:text-7xl"
+      >
+        Eliminate the guesswork from support tickets
+      </h1>
+
+      <p
+        class="mx-auto mt-6 max-w-2xl text-pretty text-lg leading-relaxed text-muted-foreground md:text-xl"
+      >
+        Stop asking users for screenshots of the Network Tab. Witnes gives your
+        CS team an{" "}
+        <span class="text-foreground font-medium">X-ray link</span> to see exactly
+        why a session was slow — Wi-Fi, API, or frontend.
+      </p>
+
+      <!-- X-Ray URL preview -->
+      <div
+        class="mx-auto mt-8 max-w-md rounded-lg border border-border bg-card px-4 py-3 font-mono text-sm"
+      >
+        <span class="text-muted-foreground">witnes.io/</span>
+        <span class="text-foreground">acme-corp</span>
+        <span class="text-muted-foreground">/</span>
+        <span class="text-foreground">user-4821</span>
+      </div>
+
+      <HeroButtons client:load />
+
+      <p class="mt-4 text-sm text-muted-foreground">
+        No credit card required. Full retention for 7 days.
+      </p>
+    </div>
+  </div>
+</section>

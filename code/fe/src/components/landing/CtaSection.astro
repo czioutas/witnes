@@ -1,0 +1,29 @@
+---
+import CtaButtons from "./CtaButtons";
+---
+
+<section id="cta" class="relative py-24 md:py-32">
+  <div class="pointer-events-none absolute left-1/2 top-0 -translate-x-1/2 h-px w-2/3 bg-border"></div>
+
+  <div class="mx-auto max-w-6xl px-6">
+    <div class="relative overflow-hidden rounded-2xl border border-border bg-card p-12 text-center md:p-20">
+      <!-- Background glow -->
+      <div class="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 h-64 w-64 rounded-full bg-muted blur-[100px]"></div>
+
+      <div class="relative">
+        <p class="mb-4 text-sm font-semibold uppercase tracking-widest text-muted-foreground">
+          Ready to see clearly?
+        </p>
+        <h2 class="mx-auto max-w-2xl text-balance text-3xl font-bold tracking-tight text-foreground md:text-4xl lg:text-5xl">
+          Your CS team deserves better than "Can you send a screenshot?"
+        </h2>
+        <p class="mx-auto mt-6 max-w-xl text-lg leading-relaxed text-muted-foreground">
+          Start your 7-day full-retention trial today. No credit card required.
+          See every page load, every API call, every slow moment — with one link.
+        </p>
+
+        <CtaButtons client:load />
+      </div>
+    </div>
+  </div>
+</section>

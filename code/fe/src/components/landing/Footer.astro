@@ -1,0 +1,67 @@
+---
+// New footer design for CS diagnostic tool landing page
+---
+
+<footer class="border-t border-border py-12">
+  <div class="mx-auto max-w-6xl px-6">
+    <div class="flex flex-col items-center justify-between gap-6 md:flex-row">
+      <div class="flex items-center gap-2">
+        <div
+          class="flex h-7 w-7 items-center justify-center rounded-lg bg-primary"
+        >
+          <svg
+            width="14"
+            height="14"
+            viewBox="0 0 16 16"
+            fill="none"
+            class="text-primary-foreground"
+          >
+            <path
+              d="M2 8a6 6 0 1112 0A6 6 0 012 8z"
+              stroke="currentColor"
+              stroke-width="1.5"
+              fill="none"></path>
+            <path
+              d="M8 4v4l2.5 2.5"
+              stroke="currentColor"
+              stroke-width="1.5"
+              stroke-linecap="round"></path>
+          </svg>
+        </div>
+        <span class="text-sm font-bold text-foreground">Witnes</span>
+      </div>
+
+      <div class="flex items-center gap-6">
+        <a
+          href="/integration"
+          class="text-sm text-muted-foreground transition-colors hover:text-foreground"
+          >Integration</a
+        >
+        <a
+          href="/privacy"
+          class="text-sm text-muted-foreground transition-colors hover:text-foreground"
+          >Privacy</a
+        >
+        <a
+          href="/terms"
+          class="text-sm text-muted-foreground transition-colors hover:text-foreground"
+          >Terms</a
+        >
+        <a
+          href="/imprint"
+          class="text-sm text-muted-foreground transition-colors hover:text-foreground"
+          >Imprint</a
+        >
+        <a
+          href="mailto:support@witnes.io"
+          class="text-sm text-muted-foreground transition-colors hover:text-foreground"
+          >Contact</a
+        >
+      </div>
+
+      <p class="text-sm text-muted-foreground">
+        &copy; {new Date().getFullYear()} Witnes. All rights reserved.
+      </p>
+    </div>
+  </div>
+</footer>

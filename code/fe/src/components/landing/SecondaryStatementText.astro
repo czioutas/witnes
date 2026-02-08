@@ -1,0 +1,19 @@
+---
+// Secondary Statement Text Component
+// Used for closing statements in sections (e.g. Principles)
+interface Props {
+  className?: string;
+  lead?: string;
+  highlight?: string;
+}
+
+const { 
+  className = "",
+  lead = "",
+  highlight = ""
+} = Astro.props;
+---
+
+<p class={`text-base md:text-xl lg:text-2xl xl:text-3xl font-light text-zinc-500 leading-relaxed ${className}`}>
+  {lead} <span class="text-black font-bold">{highlight}</span>
+</p>

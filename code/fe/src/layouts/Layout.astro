@@ -1,0 +1,45 @@
+---
+import "../styles/dashboard.css";
+
+export interface Props {
+  title: string;
+}
+
+const { title } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="description" content="Energy Grid Dashboard" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="generator" content={Astro.generator} />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <style>
+      /* Force font-weight consistency */
+      .font-black {
+        font-weight: 900 !important;
+      }
+    </style>
+    <title>{title}</title>
+    <!-- <script is:inline define:vars={{ projectKey: import.meta.env.PUBLIC_WITNES_PROJECT_KEY }}>
+      if (projectKey) {
+        window.witnesConfig = { projectKey };
+      }
+    </script> -->
+    <!-- <script src="https://cdn.witnes.io/track.js" async is:inline></script> -->
+    <script is:inline>
+      window.witnesConfig = {
+        projectKey: "pk_fdc73fe1997647ed9c7a11d4e9574497",
+        debug: true,
+      };
+    </script>
+    <script src="http://localhost:4321/track.js" async is:inline></script>
+  </head>
+  <body>
+    <slot />
+  </body>
+</html>

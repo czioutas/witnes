@@ -1,0 +1,18 @@
+---
+import PublicLayout from "../../layouts/PublicLayout.astro";
+import { LoginWrapper } from "../../components/landing/LoginWrapper";
+import Navbar from "../../components/landing/Navbar.astro";
+---
+
+<PublicLayout
+  title="Login - Witnes"
+  description="Sign in to your Witnes account"
+  canonical="/authenticate/login"
+>
+  <Navbar />
+  <main class="flex min-h-svh w-full items-center justify-center p-6 md:p-10">
+    <div class="w-full max-w-sm">
+      <LoginWrapper client:load />
+    </div>
+  </main>
+</PublicLayout>

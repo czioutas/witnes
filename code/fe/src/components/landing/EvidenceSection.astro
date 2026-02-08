@@ -1,0 +1,161 @@
+---
+const timelineData = [
+  {
+    day: "Monday",
+    time: "09:14 AM",
+    page: "/dashboard",
+    loadTime: 1.2,
+    status: "good" as const,
+    detail: "All clear",
+  },
+  {
+    day: "Monday",
+    time: "09:17 AM",
+    page: "/reports",
+    loadTime: 1.8,
+    status: "good" as const,
+    detail: "All clear",
+  },
+  {
+    day: "Monday",
+    time: "02:33 PM",
+    page: "/settings",
+    loadTime: 6.4,
+    status: "slow" as const,
+    detail: "Slow Wi-Fi (2.1 Mbps)",
+  },
+  {
+    day: "Tuesday",
+    time: "10:02 AM",
+    page: "/dashboard",
+    loadTime: 0.9,
+    status: "good" as const,
+    detail: "All clear",
+  },
+  {
+    day: "Tuesday",
+    time: "11:45 AM",
+    page: "/api/export",
+    loadTime: 8.2,
+    status: "slow" as const,
+    detail: "API latency (7.8s TTFB)",
+  },
+  {
+    day: "Wednesday",
+    time: "08:55 AM",
+    page: "/dashboard",
+    loadTime: 1.1,
+    status: "good" as const,
+    detail: "All clear",
+  },
+  {
+    day: "Wednesday",
+    time: "03:20 PM",
+    page: "/reports",
+    loadTime: 1.4,
+    status: "good" as const,
+    detail: "All clear",
+  },
+];
+---
+
+<section id="evidence" class="relative py-24 md:py-32">
+  <div class="mx-auto max-w-6xl px-6">
+    <div class="grid items-center gap-12 lg:grid-cols-2 lg:gap-20">
+      <!-- Left: Copy -->
+      <div>
+        <p
+          class="mb-4 text-sm font-semibold uppercase tracking-widest text-muted-foreground"
+        >
+          The Evidence
+        </p>
+        <h2
+          class="text-balance text-3xl font-bold tracking-tight text-foreground md:text-4xl lg:text-5xl"
+        >
+          Every session. Every load. Every clue.
+        </h2>
+        <p class="mt-6 text-lg leading-relaxed text-muted-foreground">
+          Each user gets a dedicated timeline at{" "}
+          <code
+            class="rounded bg-secondary px-2 py-0.5 font-mono text-sm text-foreground"
+          >
+            /org-id/user-id
+          </code>{" "}
+          showing a 7-day chronological history of every interaction.
+        </p>
+        <p class="mt-4 text-lg leading-relaxed text-muted-foreground">
+          Instantly spot patterns: Was{" "}
+          <span class="font-medium text-foreground">Monday #4 slow</span> because
+          of their network, or was it your API? The answer is one click away.
+        </p>
+
+        <div class="mt-8 flex items-center gap-6">
+          <div class="flex items-center gap-2">
+            <span class="inline-block h-3 w-3 rounded-full bg-emerald-500"
+            ></span>
+            <span class="text-sm text-muted-foreground">Good load</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="inline-block h-3 w-3 rounded-full bg-red-500"></span>
+            <span class="text-sm text-muted-foreground">Slow load</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: Timeline visual -->
+      <div class="rounded-xl border border-border bg-card p-1">
+        <!-- Header bar -->
+        <div
+          class="flex items-center justify-between rounded-t-lg bg-secondary px-4 py-3"
+        >
+          <div class="flex items-center gap-2">
+            <div class="h-2.5 w-2.5 rounded-full bg-muted-foreground/30"></div>
+            <div class="h-2.5 w-2.5 rounded-full bg-muted-foreground/30"></div>
+            <div class="h-2.5 w-2.5 rounded-full bg-muted-foreground/30"></div>
+          </div>
+          <span class="font-mono text-xs text-muted-foreground">
+            witnes.io/acme-corp/user-4821
+          </span>
+          <div class="w-16"></div>
+        </div>
+
+        <!-- Timeline -->
+        <div class="divide-y divide-border">
+          {
+            timelineData.map((entry) => (
+              <div class="flex items-center gap-4 px-4 py-3 transition-colors hover:bg-secondary/50">
+                <span
+                  class={`inline-block h-2.5 w-2.5 shrink-0 rounded-full ${
+                    entry.status === "good" ? "bg-emerald-500" : "bg-red-500"
+                  }`}
+                />
+                <div class="flex min-w-0 flex-1 items-center justify-between gap-3">
+                  <div class="min-w-0">
+                    <p class="truncate text-sm font-medium text-foreground">
+                      {entry.page}
+                    </p>
+                    <p class="text-xs text-muted-foreground">
+                      {entry.day} at {entry.time}
+                    </p>
+                  </div>
+                  <div class="shrink-0 text-right">
+                    <p
+                      class={`font-mono text-sm font-semibold ${
+                        entry.status === "good"
+                          ? "text-emerald-600"
+                          : "text-red-600"
+                      }`}
+                    >
+                      {entry.loadTime}s
+                    </p>
+                    <p class="text-xs text-muted-foreground">{entry.detail}</p>
+                  </div>
+                </div>
+              </div>
+            ))
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

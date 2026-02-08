@@ -1,0 +1,65 @@
+---
+import IntegrationButton from "./IntegrationButton";
+---
+
+<section id="integration" class="relative py-24 md:py-32">
+  <div
+    class="pointer-events-none absolute left-1/2 top-0 -translate-x-1/2 h-px w-2/3 bg-border"
+  >
+  </div>
+
+  <div class="mx-auto max-w-6xl px-6">
+    <div class="grid items-center gap-12 lg:grid-cols-2 lg:gap-20">
+      <!-- Left: Copy -->
+      <div>
+        <p
+          class="mb-4 text-sm font-semibold uppercase tracking-widest text-muted-foreground"
+        >
+          For Developers
+        </p>
+        <h2
+          class="text-balance text-3xl font-bold tracking-tight text-foreground md:text-4xl"
+        >
+          Two lines of code. Zero config.
+        </h2>
+        <p class="mt-6 text-lg leading-relaxed text-muted-foreground">
+          Drop in our lightweight JS snippet and call{" "}
+          <code
+            class="rounded bg-secondary px-2 py-0.5 font-mono text-sm text-foreground"
+          >
+            identify()
+          </code>{" "}
+          when a user logs in. That's it. We handle the rest — page loads, SPA transitions,
+          API heartbeats, and Web Vitals.
+        </p>
+
+        <div class="mt-8">
+          <IntegrationButton client:load />
+        </div>
+      </div>
+
+      <!-- Right: Code block -->
+      <div class="rounded-xl border border-border bg-card overflow-hidden">
+        <!-- Tab bar -->
+        <div class="flex items-center gap-4 border-b border-border px-5 py-3">
+          <span class="text-xs font-medium text-foreground">app.js</span>
+          <span class="text-xs text-muted-foreground">index.html</span>
+        </div>
+
+        <div class="p-5">
+          <pre
+            class="overflow-x-auto text-sm leading-7"><code><span class="text-muted-foreground italic">// 1. Add the snippet to your &lt;head&gt;</span>
+<span class="text-red-600 font-medium">import</span> <span class="text-foreground">Witnes</span> <span class="text-red-600 font-medium">from</span> <span class="text-emerald-700">'@witnes/sdk'</span><span class="text-foreground">;</span>
+
+<span class="text-muted-foreground italic">// 2. Identify the user on login</span>
+<span class="text-foreground">Witnes.</span><span class="text-blue-600 font-medium">identify</span><span class="text-foreground">(</span><span class="text-foreground">&#123;</span>
+  <span class="text-foreground">orgId</span><span class="text-foreground">:</span> <span class="text-emerald-700">"acme-corp"</span><span class="text-foreground">,</span>
+  <span class="text-foreground">userId</span><span class="text-foreground">:</span> <span class="text-emerald-700">"user-4821"</span><span class="text-foreground">,</span>
+<span class="text-foreground">&#125;</span><span class="text-foreground">);</span>
+
+<span class="text-muted-foreground italic">// That's it. We handle everything else.</span></code></pre>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

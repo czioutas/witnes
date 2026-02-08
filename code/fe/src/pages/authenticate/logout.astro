@@ -1,0 +1,12 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { NavbarWrapper } from '../../components/NavbarWrapper';
+import { LogoutWrapper } from '../../components/LogoutWrapper';
+---
+
+<Layout title="Logout - Energy Grid Dashboard">
+  <main class="min-h-screen flex flex-col pt-16">
+    <NavbarWrapper client:load currentPath={Astro.url.pathname} />
+    <LogoutWrapper client:load />
+  </main>
+</Layout>

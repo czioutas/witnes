@@ -1,0 +1,22 @@
+---
+import PublicLayout from "../../layouts/PublicLayout.astro";
+import Navbar from "../../components/landing/Navbar.astro";
+import { RegisterWrapper } from "../../components/landing/RegisterWrapper";
+
+// Get the join code and company from query parameters
+const joinCode = Astro.url.searchParams.get("code");
+const company = Astro.url.searchParams.get("company");
+---
+
+<PublicLayout
+  title="Create Account - Witnes"
+  description="Create your Witnes account"
+  canonical="/authenticate/register"
+>
+  <Navbar />
+  <main class="flex min-h-svh w-full items-center justify-center p-6 md:p-10">
+    <div class="w-full max-w-lg">
+      <RegisterWrapper client:load joinCode={joinCode} company={company} />
+    </div>
+  </main>
+</PublicLayout>

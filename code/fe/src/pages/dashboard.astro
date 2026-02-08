@@ -1,0 +1,13 @@
+---
+import DashboardLayout from "../layouts/DashboardLayout.astro";
+import DashboardPage from "../components/DashboardPage.tsx";
+---
+
+<DashboardLayout title="Home - Witnes">
+  <DashboardPage
+    client:only="react"
+    page="home"
+    title="Home"
+    description="Your dashboard home"
+  />
+</DashboardLayout>

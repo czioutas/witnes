@@ -1,0 +1,217 @@
+using System.Text.Json;
+using Api.Application.Pricing.Entities;
+using Api.Application.Pricing.Services.Interfaces;
+using Api.Application.Services;
+using Api.Data;
+using Libs.Result;
+using Microsoft.EntityFrameworkCore;
+using StackExchange.Redis;
+
+namespace Api.Application.Pricing.Services;
+
+public class TenantPricingService : ITenantPricingService
+{
+    private readonly ApplicationDbContext _context;
+    private readonly ILogger<TenantPricingService> _logger;
+    private readonly IDatabase _redis;
+
+    public TenantPricingService(ApplicationDbContext context, ILogger<TenantPricingService> logger, IConnectionMultiplexer redisConnection)
+    {
+        _context = context;
+        _logger = logger;
+        _redis = redisConnection.GetDatabase();
+    }
+
+    public static string GetTenantPricingCacheKey(Guid tenantId)
+    {
+        return CacheKeyGeneratorService.GenerateCacheKey<TenantPricingTierEntity>("pricing", tenantId.ToString()).Key;
+    }
+
+    private async Task CacheTenantPricingAsync(Guid tenantId, TenantPricingTierEntity tenantPricing)
+    {
+        var cacheKey = GetTenantPricingCacheKey(tenantId);
+        var cacheValue = new
+        {
+            TenantId = tenantPricing.TenantId,
+            PricingTierId = tenantPricing.PricingTierId,
+            StartDate = tenantPricing.StartDate,
+            EndDate = tenantPricing.EndDate,
+            IsActive = tenantPricing.IsActive,
+            MonthlyRequestLimit = tenantPricing.PricingTier?.MonthlyRequestLimit ?? 0
+        };
+
+        await _redis.StringSetAsync(cacheKey, JsonSerializer.Serialize(cacheValue), TimeSpan.FromHours(24));
+    }
+
+    public async Task<Result<TenantPricingTierEntity>> SetTenantPricingAsync(Guid tenantId, Guid pricingTierId, DateOnly? startDate = null)
+    {
+        try
+        {
+            var effectiveStartDate = startDate ?? DateOnly.FromDateTime(DateTime.UtcNow);
+
+            // Check if pricing tier exists
+            var pricingTier = await _context.PricingTiers
+                .FirstOrDefaultAsync(pt => pt.Id == pricingTierId && pt.IsActive);
+
+            if (pricingTier == null)
+            {
+                return Result<TenantPricingTierEntity>.NotFound("PricingTier", pricingTierId.ToString());
+            }
+
+            // Check if tenant already has pricing for this date
+            var existingPricing = await _context.TenantPricingTiers
+                .Where(tp => tp.TenantId == tenantId && tp.StartDate <= effectiveStartDate && (tp.EndDate == null || tp.EndDate >= effectiveStartDate))
+                .FirstOrDefaultAsync();
+
+            if (existingPricing != null)
+            {
+                return Result<TenantPricingTierEntity>.BusinessError("TenantPricingOverlap", "Tenant already has pricing for this date");
+            }
+
+            var tenantPricing = new TenantPricingTierEntity(pricingTierId, effectiveStartDate)
+            {
+                TenantId = tenantId
+            };
+
+            _context.TenantPricingTiers.Add(tenantPricing);
+            await _context.SaveChangesAsync();
+
+            // Load the pricing tier for caching
+            await _context.Entry(tenantPricing)
+                .Reference(tp => tp.PricingTier)
+                .LoadAsync();
+
+            // Cache the pricing information
+            await CacheTenantPricingAsync(tenantId, tenantPricing);
+
+            return Result<TenantPricingTierEntity>.Ok(tenantPricing);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error setting tenant pricing for tenant {TenantId}", tenantId);
+            return Result<TenantPricingTierEntity>.Failure(new InternalErrorModel(ex));
+        }
+    }
+
+    public async Task<Result<TenantPricingTierEntity>> ChangeTenantPricingAsync(Guid tenantId, Guid newPricingTierId, DateOnly? startDate = null)
+    {
+        try
+        {
+            var effectiveStartDate = startDate ?? DateOnly.FromDateTime(DateTime.UtcNow);
+
+            // Check if new pricing tier exists
+            var newPricingTier = await _context.PricingTiers
+                .FirstOrDefaultAsync(pt => pt.Id == newPricingTierId && pt.IsActive);
+
+            if (newPricingTier == null)
+            {
+                return Result<TenantPricingTierEntity>.NotFound("PricingTier", newPricingTierId.ToString());
+            }
+
+            // End current pricing tier
+            var currentPricing = await GetCurrentTenantPricingIgnoreFiltersAsync(tenantId);
+            if (currentPricing != null)
+            {
+                currentPricing.EndDate = effectiveStartDate.AddDays(-1);
+                currentPricing.IsActive = false;
+                _context.TenantPricingTiers.Update(currentPricing);
+            }
+
+            // Create new pricing tier
+            var newTenantPricing = new TenantPricingTierEntity(newPricingTierId, effectiveStartDate)
+            {
+                TenantId = tenantId
+            };
+
+            _context.TenantPricingTiers.Add(newTenantPricing);
+            await _context.SaveChangesAsync();
+
+            // Load the pricing tier for caching
+            await _context.Entry(newTenantPricing)
+                .Reference(tp => tp.PricingTier)
+                .LoadAsync();
+
+            // Cache the pricing information
+            await CacheTenantPricingAsync(tenantId, newTenantPricing);
+
+            return Result<TenantPricingTierEntity>.Ok(newTenantPricing);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error changing tenant pricing for tenant {TenantId}", tenantId);
+            return Result<TenantPricingTierEntity>.Failure(new InternalErrorModel(ex));
+        }
+    }
+
+    public async Task<TenantPricingTierEntity> GetCurrentTenantPricingIgnoreFiltersAsync(Guid tenantId)
+    {
+        var today = DateOnly.FromDateTime(DateTime.UtcNow);
+
+        return await _context.TenantPricingTiers
+            .IgnoreQueryFilters()
+            .Include(tp => tp.PricingTier)
+            .Where(tp => tp.TenantId == tenantId &&
+                        tp.StartDate <= today &&
+                        (tp.EndDate == null || tp.EndDate >= today) &&
+                        tp.IsActive)
+            .FirstOrDefaultAsync();
+    }
+
+    public async Task<TenantPricingTierEntity?> GetTenantPricingAtDateAsync(Guid tenantId, DateOnly date)
+    {
+        return await _context.TenantPricingTiers
+            .Include(tp => tp.PricingTier)
+            .Where(tp => tp.TenantId == tenantId &&
+                        tp.StartDate <= date &&
+                        (tp.EndDate == null || tp.EndDate >= date) &&
+                        tp.IsActive)
+            .FirstOrDefaultAsync();
+    }
+
+    public async Task<List<TenantPricingTierEntity>> GetTenantPricingHistoryAsync(Guid tenantId)
+    {
+        return await _context.TenantPricingTiers
+            .Include(tp => tp.PricingTier)
+            .Where(tp => tp.TenantId == tenantId)
+            .OrderBy(tp => tp.StartDate)
+            .ToListAsync();
+    }
+
+    public async Task<Result<bool>> EndTenantPricingAsync(Guid tenantId, DateOnly? endDate = null)
+    {
+        try
+        {
+            var effectiveEndDate = endDate ?? DateOnly.FromDateTime(DateTime.UtcNow);
+
+            var currentPricing = await GetCurrentTenantPricingIgnoreFiltersAsync(tenantId);
+            if (currentPricing == null)
+            {
+                return Result<bool>.NotFound("TenantPricing", tenantId.ToString());
+            }
+
+            currentPricing.EndDate = effectiveEndDate;
+            currentPricing.IsActive = false;
+
+            _context.TenantPricingTiers.Update(currentPricing);
+            await _context.SaveChangesAsync();
+
+            // Clear the cache since pricing is no longer active
+            var cacheKey = GetTenantPricingCacheKey(tenantId);
+            await _redis.KeyDeleteAsync(cacheKey);
+
+            return Result<bool>.Ok(true);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error ending tenant pricing for tenant {TenantId}", tenantId);
+            return Result<bool>.Failure(new InternalErrorModel(ex));
+        }
+    }
+
+    public async Task<PricingTierEntity?> GetFreeTierAsync()
+    {
+        return await _context.PricingTiers
+            .Where(pt => pt.Name.ToLower() == "free" && pt.IsActive)
+            .FirstOrDefaultAsync();
+    }
+}

@@ -1,0 +1,65 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background with subtle gradient -->
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#F9F9F7;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#F5F5F3;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="630" fill="url(#bgGradient)"/>
+
+  <!-- Decorative elements -->
+  <circle cx="100" cy="100" r="80" fill="#7A9B79" opacity="0.1"/>
+  <circle cx="1100" cy="530" r="100" fill="#A68B6A" opacity="0.08"/>
+
+  <!-- Main text: GREEN -->
+  <text
+    x="600"
+    y="260"
+    font-family="Inter, system-ui, -apple-system, 'Segoe UI', sans-serif"
+    font-size="140"
+    font-weight="900"
+    text-anchor="middle"
+    fill="#0D0D0D"
+    letter-spacing="-2">
+    GREEN
+  </text>
+
+  <!-- Main text: ACTIONS -->
+  <text
+    x="600"
+    y="390"
+    font-family="Inter, system-ui, -apple-system, 'Segoe UI', sans-serif"
+    font-size="140"
+    font-weight="900"
+    text-anchor="middle"
+    fill="#0D0D0D"
+    letter-spacing="-2">
+    ACTIONS
+  </text>
+
+  <!-- Tagline -->
+  <text
+    x="600"
+    y="480"
+    font-family="Inter, system-ui, -apple-system, 'Segoe UI', sans-serif"
+    font-size="28"
+    font-weight="500"
+    text-anchor="middle"
+    fill="#7A9B79"
+    letter-spacing="1">
+    Carbon Transparency Made Simple
+  </text>
+
+  <!-- Small leaf icon accent -->
+  <path
+    d="M 550 500 Q 545 490, 540 500 Q 545 510, 550 500 Z"
+    fill="#7A9B79"
+    opacity="0.6"/>
+  <path
+    d="M 650 500 Q 655 490, 660 500 Q 655 510, 650 500 Z"
+    fill="#7A9B79"
+    opacity="0.6"/>
+</svg>

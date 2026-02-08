@@ -1,0 +1,44 @@
+---
+import PublicLayout from "../../layouts/PublicLayout.astro";
+import Navbar from "../../components/landing/Navbar.astro";
+import { RegisterInvitationWrapper } from "../../components/landing/RegisterInvitationWrapper";
+
+const { searchParams } = Astro.url;
+const invitationCode = searchParams.get("invitationCode") || "";
+const email = searchParams.get("email") || "";
+const firstName = searchParams.get("firstName") || "";
+const lastName = searchParams.get("lastName") || "";
+const company = searchParams.get("company") || "";
+---
+
+<PublicLayout
+  title="Accept Invitation - Witnes"
+  description="Join your team on Witnes"
+  canonical="/authenticate/register-invitation"
+>
+  <Navbar />
+  <main class="min-h-screen flex flex-col pt-24">
+    <div
+      class="flex-1 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8"
+    >
+      <div class="max-w-lg w-full space-y-8">
+        <div class="text-center">
+          <h2 class="text-3xl font-bold tracking-tight text-foreground">
+            Join {company}
+          </h2>
+          <p class="mt-2 text-sm text-muted-foreground">
+            Complete your registration to join your team on Witnes
+          </p>
+        </div>
+        <RegisterInvitationWrapper
+          client:load
+          invitationCode={invitationCode}
+          email={email}
+          firstName={firstName}
+          lastName={lastName}
+          company={company}
+        />
+      </div>
+    </div>
+  </main>
+</PublicLayout>

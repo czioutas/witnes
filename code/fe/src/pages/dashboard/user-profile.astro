@@ -1,0 +1,15 @@
+---
+import DashboardLayout from "@/layouts/DashboardLayout.astro";
+import DashboardPage from "@/components/DashboardPage";
+
+export const prerender = false;
+---
+
+<DashboardLayout title="User Profile - Witnes">
+  <DashboardPage
+    client:only="react"
+    page="user-profile"
+    title="User Profile"
+    description="Manage your personal account information."
+  />
+</DashboardLayout>

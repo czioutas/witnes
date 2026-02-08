@@ -1,0 +1,73 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ls:*)",
+      "Bash(cat:*)",
+      "Bash(git status:*)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(git checkout:*)",
+      "Bash(dotnet build:*)",
+      "Bash(dotnet test:*)",
+      "Bash(dotnet run:*)",
+      "Bash(dotnet ef migrations add:*)",
+      "Bash(dotnet ef dbcontext:*)",
+      "Bash(dotnet add:*)",
+      "Bash(dotnet remove:*)",
+      "Bash(dotnet list:*)",
+      "Bash(dotnet clean:*)",
+      "Bash(npm install:*)",
+      "Bash(npm run build:*)",
+      "Bash(npm run dev:*)",
+      "Bash(npm run lint:*)",
+      "Bash(npm run typecheck:*)",
+      "Bash(npm run generate-client:*)",
+      "Bash(npx shadcn@latest add:*)",
+      "Bash(./scripts/generate-openapi.sh:*)",
+      "Bash(./scripts/build-and-run.sh:*)",
+      "Bash(./scripts/format-code.sh:*)",
+      "Bash(docker-compose:*)",
+      "Bash(docker ps:*)",
+      "Bash(docker logs:*)",
+      "Bash(psql:*)",
+      "Bash(redis-cli:*)",
+      "Bash(tree:*)",
+      "Bash(find:*)",
+      "Bash(grep:*)",
+      "Bash(mkdir:*)",
+      "Bash(mv:*)",
+      "Bash(rm:*)",
+      "Bash(chmod:*)",
+      "Bash(touch:*)",
+      "Bash(echo:*)",
+      "Bash(uuidgen:*)",
+      "WebFetch(domain:ui.shadcn.com)",
+      "mcp__ide__getDiagnostics"
+    ],
+    "deny": [],
+    "ask": []
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "comment": "Auto-format C# code after edits",
+            "command": "if [[ \"$TOOL_FILE_PATH\" == *.cs ]]; then dotnet format \"$TOOL_FILE_PATH\" 2>/dev/null || true; fi"
+          },
+          {
+            "type": "command",
+            "comment": "Auto-format TypeScript/JavaScript after edits",
+            "command": "if [[ \"$TOOL_FILE_PATH\" == *.ts ]] || [[ \"$TOOL_FILE_PATH\" == *.tsx ]] || [[ \"$TOOL_FILE_PATH\" == *.js ]] || [[ \"$TOOL_FILE_PATH\" == *.jsx ]]; then cd code/fe && npx prettier --write \"$TOOL_FILE_PATH\" 2>/dev/null || true; fi"
+          }
+        ]
+      }
+    ]
+  },
+  "enableAllProjectMcpServers": false
+}

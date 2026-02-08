@@ -1,0 +1,30 @@
+---
+import PublicLayout from "../layouts/PublicLayout.astro";
+import Navbar from "../components/landing/Navbar.astro";
+import HeroSection from "../components/landing/HeroSection.astro";
+import StatsSection from "../components/landing/StatsSection.astro";
+import EvidenceSection from "../components/landing/EvidenceSection.astro";
+import PillarsSection from "../components/landing/PillarsSection.astro";
+import IntegrationSection from "../components/landing/IntegrationSection.astro";
+import PricingSection from "../components/landing/PricingSection.astro";
+import CtaSection from "../components/landing/CtaSection.astro";
+import Footer from "../components/landing/Footer.astro";
+---
+
+<PublicLayout
+  title="Witnes | Eliminate the guesswork from support tickets"
+  description="Stop asking users for screenshots. Witnes gives your CS team an X-ray link to see exactly why a session was slow — Wi-Fi, API, or frontend."
+  canonical="/"
+>
+  <main class="min-h-screen">
+    <Navbar />
+    <HeroSection />
+    <StatsSection />
+    <EvidenceSection />
+    <PillarsSection />
+    <IntegrationSection />
+    <PricingSection />
+    <CtaSection />
+    <Footer />
+  </main>
+</PublicLayout>

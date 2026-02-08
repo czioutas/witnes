@@ -1,0 +1,22 @@
+---
+import PublicLayout from "../../layouts/PublicLayout.astro";
+import Navbar from "../../components/landing/Navbar.astro";
+import { VerifyEmailWrapper } from "../../components/landing/VerifyEmailWrapper";
+---
+
+<PublicLayout
+  title="Verify Email - Witnes"
+  description="Verify your email address"
+  canonical="/authenticate/verify-email"
+>
+  <Navbar />
+  <main class="min-h-screen flex flex-col pt-24">
+    <div
+      class="flex-1 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8"
+    >
+      <div class="max-w-md w-full">
+        <VerifyEmailWrapper client:load />
+      </div>
+    </div>
+  </main>
+</PublicLayout>

@@ -1,0 +1,23 @@
+# Witnes robots.txt
+# Allow search engines to index public content
+
+User-agent: *
+Allow: /
+
+# Block authenticated areas
+Disallow: /dashboard
+Disallow: /dashboard/
+Disallow: /authenticate
+Disallow: /authenticate/
+
+# Block API endpoints if exposed
+Disallow: /api/
+
+# Allow public solution pages
+Allow: /solutions/
+Allow: /methodology
+Allow: /emission-factors
+Allow: /wiki/
+
+# Sitemap location
+Sitemap: https://witnes.io/sitemap-index.xml

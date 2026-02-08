@@ -1,0 +1,47 @@
+---
+import "../styles/landing.css";
+
+export interface Props {
+  title: string;
+  description: string;
+  canonical: string;
+}
+
+const { title, description, canonical } = Astro.props;
+const canonicalURL = new URL(canonical, Astro.site);
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="description" content={description} />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="canonical" href={canonicalURL} />
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonicalURL} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content={canonicalURL} />
+    <meta property="twitter:title" content={title} />
+    <meta property="twitter:description" content={description} />
+
+    <meta name="generator" content={Astro.generator} />
+    <title>{title}</title>
+    <script is:inline define:vars={{ projectKey: import.meta.env.PUBLIC_WITNES_PROJECT_KEY }}>
+      if (projectKey) {
+        window.witnesConfig = { projectKey };
+      }
+    </script>
+    <script src="https://cdn.witnes.io/track.js" async is:inline></script>
+  </head>
+  <body class="antialiased">
+    <slot />
+  </body>
+</html>

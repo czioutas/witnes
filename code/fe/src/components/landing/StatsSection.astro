@@ -1,0 +1,25 @@
+---
+const stats = [
+  { value: "10x", label: "Faster ticket resolution" },
+  { value: "0", label: "Screenshots requested" },
+  { value: "<5min", label: "Integration time" },
+  { value: "min 7 days", label: "Full data retention" },
+];
+---
+
+<section class="border-y border-border bg-card/50 py-16">
+  <div class="mx-auto max-w-6xl px-6">
+    <div class="grid grid-cols-2 gap-8 md:grid-cols-4">
+      {
+        stats.map((stat) => (
+          <div class="text-center">
+            <p class="text-3xl font-bold tracking-tight text-foreground md:text-4xl">
+              {stat.value}
+            </p>
+            <p class="mt-2 text-sm text-muted-foreground">{stat.label}</p>
+          </div>
+        ))
+      }
+    </div>
+  </div>
+</section>

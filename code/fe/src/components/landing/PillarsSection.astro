@@ -1,0 +1,122 @@
+---
+const pillars = [
+  {
+    iconName: "Wifi",
+    title: "Wi-Fi Speed",
+    tagColor: "text-amber-600",
+    iconColor: "text-amber-600 bg-amber-50",
+    tag: "User-side",
+    description:
+      "We measure the user's effective connection speed at the time of every interaction. Know instantly if a complaint is about their 2 Mbps coffee-shop Wi-Fi — not your infrastructure.",
+    metrics: [
+      "Effective bandwidth",
+      "Connection type (4G, Wi-Fi, etc.)",
+      "RTT to origin",
+    ],
+  },
+  {
+    iconName: "Server",
+    title: "API Latency",
+    tagColor: "text-red-600",
+    iconColor: "text-red-600 bg-red-50",
+    tag: "Server-side",
+    description:
+      "Every XHR, fetch, and WebSocket call is tracked with TTFB, total duration, and status code. Identify that one endpoint that takes 8 seconds before the user even finishes describing the problem.",
+    metrics: ["Time to First Byte", "Total response time", "HTTP status codes"],
+  },
+  {
+    iconName: "Monitor",
+    title: "Frontend Render",
+    tagColor: "text-blue-600",
+    iconColor: "text-blue-600 bg-blue-50",
+    tag: "Client-side",
+    description:
+      "We capture Largest Contentful Paint, First Input Delay, and Cumulative Layout Shift for every page load and SPA transition. If the UI is janky, you'll know why.",
+    metrics: ["LCP / FID / CLS", "SPA transition time", "JS long tasks"],
+  },
+];
+
+// Icon SVGs for each pillar
+const icons: Record<string, string> = {
+  Wifi: `<path d="M5 13a10 10 0 0 1 14 0"></path><path d="M8.5 16.5a5 5 0 0 1 7 0"></path><path d="M2 8.82a15 15 0 0 1 20 0"></path><circle cx="12" cy="20" r="1"></circle>`,
+  Server: `<rect width="20" height="8" x="2" y="2" rx="2" ry="2"></rect><rect width="20" height="8" x="2" y="14" rx="2" ry="2"></rect><line x1="6" x2="6.01" y1="6" y2="6"></line><line x1="6" x2="6.01" y1="18" y2="18"></line>`,
+  Monitor: `<rect width="20" height="14" x="2" y="3" rx="2"></rect><line x1="8" x2="16" y1="21" y2="21"></line><line x1="12" x2="12" y1="17" y2="21"></line>`,
+};
+---
+
+<section id="pillars" class="relative py-24 md:py-32">
+  <!-- Subtle divider glow -->
+  <div
+    class="pointer-events-none absolute left-1/2 top-0 -translate-x-1/2 h-px w-2/3 bg-border"
+  >
+  </div>
+
+  <div class="mx-auto max-w-6xl px-6">
+    <div class="mx-auto max-w-2xl text-center">
+      <p
+        class="mb-4 text-sm font-semibold uppercase tracking-widest text-muted-foreground"
+      >
+        The 3 Pillars of Failure
+      </p>
+      <h2
+        class="text-balance text-3xl font-bold tracking-tight text-foreground md:text-4xl lg:text-5xl"
+      >
+        We track the three places things go wrong
+      </h2>
+      <p class="mt-6 text-lg leading-relaxed text-muted-foreground">
+        Most tools just tell you{" "}
+        <span class="italic">"it's slow."</span> Witnes tells you{" "}
+        <span class="font-medium text-foreground"
+          >"it's slow because of [X]."</span
+        >
+      </p>
+    </div>
+
+    <div class="mt-16 grid gap-6 md:grid-cols-3">
+      {
+        pillars.map((pillar) => (
+          <div class="group rounded-xl border border-border bg-card p-8 transition-colors hover:border-foreground/20 hover:bg-secondary/50">
+            <div
+              class={`mb-6 inline-flex h-12 w-12 items-center justify-center rounded-lg transition-colors ${pillar.iconColor}`}
+            >
+              <svg
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="h-6 w-6"
+                set:html={icons[pillar.iconName]}
+              />
+            </div>
+
+            <div class="mb-3 flex items-center gap-3">
+              <h3 class="text-xl font-bold text-foreground">{pillar.title}</h3>
+              <span
+                class={`rounded-full border border-border px-2.5 py-0.5 text-xs font-medium ${pillar.tagColor}`}
+              >
+                {pillar.tag}
+              </span>
+            </div>
+
+            <p class="leading-relaxed text-muted-foreground">
+              {pillar.description}
+            </p>
+
+            <ul class="mt-6 space-y-2">
+              {pillar.metrics.map((metric) => (
+                <li class="flex items-center gap-2 text-sm text-muted-foreground">
+                  <span class="inline-block h-1 w-1 rounded-full bg-foreground/40" />
+                  {metric}
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))
+      }
+    </div>
+  </div>
+</section>

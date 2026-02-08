@@ -1,0 +1,15 @@
+---
+import DashboardLayout from "@/layouts/DashboardLayout.astro";
+import DashboardPage from "@/components/DashboardPage";
+
+export const prerender = false;
+---
+
+<DashboardLayout title="Organization Settings - Witnes">
+  <DashboardPage
+    client:only="react"
+    page="organization-settings"
+    title="Organization Settings"
+    description="Manage your organization's information and settings."
+  />
+</DashboardLayout>
