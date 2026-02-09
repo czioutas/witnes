@@ -170,7 +170,7 @@
             }
 
             const blob = new Blob([JSON.stringify(payload)], { type: 'application/json' });
-            const endpoint = `http://api-witnes.ziou.xyz/api/v1/ingestion?pk=${pk}`;
+            const endpoint = `https://api-witnes.ziou.xyz/api/v1/ingestion?pk=${pk}`;
             
             if (navigator.sendBeacon) {
                 navigator.sendBeacon(endpoint, blob);
