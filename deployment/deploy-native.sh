@@ -10,7 +10,7 @@ echo "Witnes API Deployment"
 echo "================================"
 
 # Configuration
-REPO_DIR="/opt/witnes/witnes"
+REPO_DIR="/home/hs/repos/witnes/witnes"
 API_DIR="${REPO_DIR}/code/api/Api"
 SERVICE_NAME="witnes-api"
 

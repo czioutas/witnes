@@ -5,11 +5,11 @@ After=network.target postgresql.service redis.service rabbitmq-server.service
 [Service]
 Type=simple
 User=root
-WorkingDirectory=/opt/witnes/witnes/code/api/Api
+WorkingDirectory=/home/hs/repos/witnes/witnes/code/api/Api
 Environment=ASPNETCORE_ENVIRONMENT=Production
 Environment=DOTNET_PRINT_TELEMETRY_MESSAGE=false
-EnvironmentFile=/opt/witnes/.env
-ExecStart=/usr/bin/dotnet /opt/witnes/witnes/code/api/Api/bin/Release/net10.0/api.dll
+EnvironmentFile=/home/hs/repos/witnes/.env
+ExecStart=/usr/bin/dotnet /home/hs/repos/witnes/witnes/code/api/Api/bin/Release/net10.0/api.dll
 Restart=always
 RestartSec=10
 TimeoutStartSec=120

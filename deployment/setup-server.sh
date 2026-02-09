@@ -12,8 +12,8 @@ echo ""
 
 # Configuration
 REPO_URL="https://github.com/Witnes/witnes.git"
-REPO_DIR="/opt/witnes/witnes"
-ENV_FILE="/opt/witnes/.env"
+REPO_DIR="/home/hs/repos/witnes/witnes"
+ENV_FILE="/home/hs/repos/witnes/.env"
 SERVICE_NAME="witnes-api"
 
 # Check if running as root
@@ -78,7 +78,7 @@ echo "----------------------------------------"
 cat > /root/deploy-api.sh <<'DEPLOY_EOF'
 #!/bin/bash
 set -e
-cd /opt/witnes/witnes
+cd /home/hs/repos/witnes/witnes
 git pull origin main
 cd code/api/Api
 dotnet build -c Release
