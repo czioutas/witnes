@@ -7,13 +7,17 @@ interface NoDataStateProps {
 
 export function NoDataState({ projectKey }: NoDataStateProps) {
   const scriptSnippet = projectKey
-    ? `<script src="https://cdn.witnes.io/track.js"></script>
+    ? `<script src="https://cdn-witnes.ziou.xyz/track.min.js"></script>
 <script>
-  window.witnessTracker.init('${projectKey}');
+  window.witnesConfig = {
+    projectKey: '${projectKey}',
+  };
 </script>`
-    : `<script src="https://cdn.witnes.io/track.js"></script>
+    : `<script src="https://cdn-witnes.ziou.xyz/track.min.js"></script>
 <script>
-  window.witnessTracker.init('YOUR_PROJECT_KEY');
+  window.witnesConfig = {
+    projectKey: 'YOUR_PROJECT_KEY',
+  };
 </script>`;
 
   return (
@@ -24,7 +28,8 @@ export function NoDataState({ projectKey }: NoDataStateProps) {
 
       <h2 className="text-2xl font-bold mb-3">Project Key Created!</h2>
       <p className="text-muted-foreground text-center max-w-md mb-8">
-        Now add the tracking script to your website to start collecting performance data.
+        Now add the tracking script to your website to start collecting
+        performance data.
       </p>
 
       <div className="w-full max-w-2xl mb-8">
@@ -40,13 +45,13 @@ export function NoDataState({ projectKey }: NoDataStateProps) {
       <div className="flex gap-4">
         <Button
           variant="outline"
-          onClick={() => window.open("https://docs.witnes.io/integration", "_blank")}
+          onClick={() =>
+            window.open("https://docs.witnes.io/integration", "_blank")
+          }
         >
           View Documentation
         </Button>
-        <Button
-          onClick={() => window.location.href = "/dashboard/usage"}
-        >
+        <Button onClick={() => (window.location.href = "/dashboard/usage")}>
           Manage Project Key
           <ArrowRight className="ml-2 h-4 w-4" />
         </Button>
