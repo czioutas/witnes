@@ -24,33 +24,20 @@
     text-anchor="middle"
     fill="#0D0D0D"
     letter-spacing="-2">
-    GREEN
-  </text>
-
-  <!-- Main text: ACTIONS -->
-  <text
-    x="600"
-    y="390"
-    font-family="Inter, system-ui, -apple-system, 'Segoe UI', sans-serif"
-    font-size="140"
-    font-weight="900"
-    text-anchor="middle"
-    fill="#0D0D0D"
-    letter-spacing="-2">
-    ACTIONS
+    WITNES
   </text>
 
   <!-- Tagline -->
   <text
     x="600"
-    y="480"
+    y="390"
     font-family="Inter, system-ui, -apple-system, 'Segoe UI', sans-serif"
     font-size="28"
     font-weight="500"
     text-anchor="middle"
     fill="#7A9B79"
     letter-spacing="1">
-    Carbon Transparency Made Simple
+    Customer Metrics
   </text>
 
   <!-- Small leaf icon accent -->
