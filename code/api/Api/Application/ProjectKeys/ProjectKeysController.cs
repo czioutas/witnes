@@ -1,8 +1,10 @@
 using Api.Application.ProjectKeys.Models;
 using Api.Application.ProjectKeys.Services;
 using Api.Application.Tenancy.Services;
+using Api.Data;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Api.Application.ProjectKeys;
 
@@ -16,13 +18,19 @@ public class ProjectKeysController : ControllerBase
 {
     private readonly IProjectKeyService _projectKeyService;
     private readonly IRequestTenant _requestTenant;
+    private readonly ApplicationDbContextRead _contextRead;
+    private readonly TimeProvider _timeProvider;
 
     public ProjectKeysController(
         IProjectKeyService projectKeyService,
-        IRequestTenant requestTenant)
+        IRequestTenant requestTenant,
+        ApplicationDbContextRead contextRead,
+        TimeProvider timeProvider)
     {
         _projectKeyService = projectKeyService ?? throw new ArgumentNullException(nameof(projectKeyService));
         _requestTenant = requestTenant ?? throw new ArgumentNullException(nameof(requestTenant));
+        _contextRead = contextRead ?? throw new ArgumentNullException(nameof(contextRead));
+        _timeProvider = timeProvider ?? throw new ArgumentNullException(nameof(timeProvider));
     }
 
     /// <summary>
@@ -79,5 +87,100 @@ public class ProjectKeysController : ControllerBase
     {
         var result = await _projectKeyService.DeactivateAsync(id);
         return !result.IsFailure ? NoContent() : NotFound();
+    }
+
+    /// <summary>
+    /// Get usage statistics for the current tenant
+    /// </summary>
+    /// <returns>Usage statistics including total and current month page loads</returns>
+    [HttpGet("usage")]
+    [ProducesResponseType(typeof(UsageStatsModel), StatusCodes.Status200OK)]
+    public async Task<ActionResult<UsageStatsModel>> GetUsageStats()
+    {
+        var tenantId = _requestTenant.TenantId;
+        var now = _timeProvider.GetUtcNow();
+        var firstDayOfMonth = new DateTimeOffset(now.Year, now.Month, 1, 0, 0, 0, TimeSpan.Zero);
+
+        // Get total page loads for the tenant (all time)
+        var totalPageLoads = await _contextRead.MetricsGold
+            .AsNoTracking()
+            .Where(m => m.TenantId == tenantId)
+            .CountAsync();
+
+        // Get current month page loads
+        var currentMonthPageLoads = await _contextRead.MetricsGold
+            .AsNoTracking()
+            .Where(m => m.TenantId == tenantId && m.Timestamp >= firstDayOfMonth)
+            .CountAsync();
+
+        // Get last page load timestamp
+        var lastPageLoad = await _contextRead.MetricsGold
+            .AsNoTracking()
+            .Where(m => m.TenantId == tenantId)
+            .OrderByDescending(m => m.Timestamp)
+            .Select(m => m.Timestamp)
+            .FirstOrDefaultAsync();
+
+        var stats = new UsageStatsModel
+        {
+            TotalPageLoads = totalPageLoads,
+            CurrentMonthPageLoads = currentMonthPageLoads,
+            LastPageLoadAt = lastPageLoad != default ? lastPageLoad : null
+        };
+
+        return Ok(stats);
+    }
+
+    /// <summary>
+    /// Get package and pricing information for the current tenant
+    /// </summary>
+    /// <returns>Package information including plan details, limits, and pricing</returns>
+    [HttpGet("package")]
+    [ProducesResponseType(typeof(PackageInfoModel), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<PackageInfoModel>> GetPackageInfo()
+    {
+        var tenantId = _requestTenant.TenantId;
+
+        // Get the current active pricing tier for the tenant
+        var tenantPricingTier = await _contextRead.TenantPricingTiers
+            .AsNoTracking()
+            .Include(tpt => tpt.PricingTier)
+            .Where(tpt => tpt.TenantId == tenantId && tpt.IsActive)
+            .OrderByDescending(tpt => tpt.StartDate)
+            .FirstOrDefaultAsync();
+
+        if (tenantPricingTier == null)
+        {
+            return NotFound(new { message = "No active pricing tier found for the current tenant" });
+        }
+
+        var pricingTier = tenantPricingTier.PricingTier;
+
+        // Get current month page loads
+        var now = _timeProvider.GetUtcNow();
+        var firstDayOfMonth = new DateTimeOffset(now.Year, now.Month, 1, 0, 0, 0, TimeSpan.Zero);
+
+        var currentMonthPageLoads = await _contextRead.MetricsGold
+            .AsNoTracking()
+            .Where(m => m.TenantId == tenantId && m.Timestamp >= firstDayOfMonth)
+            .CountAsync();
+
+        // Calculate renewal date (start of next month)
+        var renewalDate = firstDayOfMonth.AddMonths(1);
+
+        var packageInfo = new PackageInfoModel
+        {
+            PlanName = pricingTier.Name,
+            PlanDescription = pricingTier.Description,
+            PageLoadsLimit = pricingTier.MonthlyRequestLimit,
+            CurrentMonthPageLoads = currentMonthPageLoads,
+            PricePerMonth = pricingTier.PricePerMonth,
+            PricePerExtraRequest = pricingTier.PricePerExtraRequest,
+            RenewalDate = renewalDate.UtcDateTime,
+            IsActive = tenantPricingTier.IsActive
+        };
+
+        return Ok(packageInfo);
     }
 }

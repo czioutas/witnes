@@ -1,6 +1,6 @@
 # Witnes Energy Dashboard Frontend
 
-A modern energy grid dashboard built with Astro + React + shadcn/ui for monitoring and analyzing energy grid data in real-time.
+A modern dashboard built with Astro + React + shadcn/ui for monitoring and analyzing data in real-time.
 
 ## 🚀 Quick Start
 

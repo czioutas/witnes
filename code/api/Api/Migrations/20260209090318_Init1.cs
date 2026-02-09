@@ -8,7 +8,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Api.Migrations
 {
     /// <inheritdoc />
-    public partial class _1 : Migration
+    public partial class Init1 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -182,12 +182,24 @@ namespace Api.Migrations
                     id = table.Column<Guid>(type: "uuid", nullable: false),
                     SilverId = table.Column<Guid>(type: "uuid", nullable: false),
                     UserId = table.Column<string>(type: "text", nullable: false),
-                    Url = table.Column<string>(type: "text", nullable: false),
-                    Timestamp = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    LcpMs = table.Column<decimal>(type: "numeric", nullable: false),
-                    Cls = table.Column<decimal>(type: "numeric", nullable: false),
-                    IsSlow = table.Column<bool>(type: "boolean", nullable: false),
-                    HealthGrade = table.Column<string>(type: "text", nullable: false),
+                    SessionId = table.Column<string>(type: "text", nullable: false),
+                    UrlPath = table.Column<string>(type: "text", nullable: false),
+                    Timestamp = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    LcpMs = table.Column<int>(type: "integer", nullable: false),
+                    LcpVerdict = table.Column<string>(type: "text", nullable: false),
+                    ClsScore = table.Column<decimal>(type: "numeric", nullable: false),
+                    ClsVerdict = table.Column<string>(type: "text", nullable: false),
+                    IsConnectionFault = table.Column<bool>(type: "boolean", nullable: false),
+                    ConnectionQuality = table.Column<string>(type: "text", nullable: false),
+                    ConnectionReasons = table.Column<int[]>(type: "integer[]", nullable: false),
+                    EffectiveType = table.Column<string>(type: "text", nullable: false),
+                    Rtt = table.Column<int>(type: "integer", nullable: false),
+                    Downlink = table.Column<decimal>(type: "numeric", nullable: false),
+                    TtfbMs = table.Column<int>(type: "integer", nullable: false),
+                    IsBackendFault = table.Column<bool>(type: "boolean", nullable: false),
+                    IsFrontendFault = table.Column<bool>(type: "boolean", nullable: false),
+                    DeviceIcon = table.Column<string>(type: "text", nullable: false),
+                    BrowserIcon = table.Column<string>(type: "text", nullable: false),
                     created_at = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
                     updated_at = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
                     tenant_id = table.Column<Guid>(type: "uuid", nullable: false)
@@ -216,6 +228,12 @@ namespace Api.Migrations
                     LcpMs = table.Column<decimal>(type: "numeric", nullable: false),
                     Cls = table.Column<decimal>(type: "numeric", nullable: false),
                     AvgTtfbMs = table.Column<int>(type: "integer", nullable: false),
+                    Rtt = table.Column<int>(type: "integer", nullable: false),
+                    Downlink = table.Column<decimal>(type: "numeric", nullable: false),
+                    EffectiveType = table.Column<string>(type: "text", nullable: false),
+                    UserAgent = table.Column<string>(type: "text", nullable: false),
+                    DeviceType = table.Column<string>(type: "text", nullable: false),
+                    BrowserName = table.Column<string>(type: "text", nullable: false),
                     Waterfall = table.Column<string>(type: "jsonb", nullable: false),
                     JankReports = table.Column<string>(type: "jsonb", nullable: false),
                     created_at = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),

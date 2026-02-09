@@ -13,8 +13,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Api.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260208192546_1")]
-    partial class _1
+    [Migration("20260209090318_Init1")]
+    partial class Init1
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -751,22 +751,62 @@ namespace Api.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("id");
 
-                    b.Property<decimal>("Cls")
+                    b.Property<string>("BrowserIcon")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<decimal>("ClsScore")
                         .HasColumnType("numeric");
+
+                    b.Property<string>("ClsVerdict")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("ConnectionQuality")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.PrimitiveCollection<int[]>("ConnectionReasons")
+                        .IsRequired()
+                        .HasColumnType("integer[]");
 
                     b.Property<DateTimeOffset>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at");
 
-                    b.Property<string>("HealthGrade")
+                    b.Property<string>("DeviceIcon")
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<bool>("IsSlow")
+                    b.Property<decimal>("Downlink")
+                        .HasColumnType("numeric");
+
+                    b.Property<string>("EffectiveType")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<bool>("IsBackendFault")
                         .HasColumnType("boolean");
 
-                    b.Property<decimal>("LcpMs")
-                        .HasColumnType("numeric");
+                    b.Property<bool>("IsConnectionFault")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsFrontendFault")
+                        .HasColumnType("boolean");
+
+                    b.Property<int>("LcpMs")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("LcpVerdict")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("Rtt")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("SessionId")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<Guid>("SilverId")
                         .HasColumnType("uuid");
@@ -775,14 +815,17 @@ namespace Api.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("tenant_id");
 
-                    b.Property<DateTime>("Timestamp")
+                    b.Property<DateTimeOffset>("Timestamp")
                         .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("TtfbMs")
+                        .HasColumnType("integer");
 
                     b.Property<DateTimeOffset?>("UpdatedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_at");
 
-                    b.Property<string>("Url")
+                    b.Property<string>("UrlPath")
                         .IsRequired()
                         .HasColumnType("text");
 
@@ -812,6 +855,10 @@ namespace Api.Migrations
                     b.Property<Guid>("BronzeId")
                         .HasColumnType("uuid");
 
+                    b.Property<string>("BrowserName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<decimal>("Cls")
                         .HasColumnType("numeric");
 
@@ -819,12 +866,26 @@ namespace Api.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at");
 
+                    b.Property<string>("DeviceType")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<decimal>("Downlink")
+                        .HasColumnType("numeric");
+
+                    b.Property<string>("EffectiveType")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<string>("JankReports")
                         .IsRequired()
                         .HasColumnType("jsonb");
 
                     b.Property<decimal>("LcpMs")
                         .HasColumnType("numeric");
+
+                    b.Property<int>("Rtt")
+                        .HasColumnType("integer");
 
                     b.Property<string>("SessionId")
                         .IsRequired()
@@ -842,6 +903,10 @@ namespace Api.Migrations
                         .HasColumnName("updated_at");
 
                     b.Property<string>("Url")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("UserAgent")
                         .IsRequired()
                         .HasColumnType("text");
 

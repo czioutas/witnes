@@ -6,9 +6,107 @@
  * OpenAPI spec version: v1
  */
 import { customInstance } from "../lib/axios-instance";
+export type GetApiV1TenantCustomersUserIdPageLoadsParams = {
+  /**
+   * Page number (default: 1)
+   */
+  pageNumber?: number;
+  /**
+   * Page size (default: 20)
+   */
+  pageSize?: number;
+  /**
+   * Optional start date filter
+   */
+  startDate?: string;
+  /**
+   * Optional end date filter
+   */
+  endDate?: string;
+};
+
+export type GetApiV1TenantCustomersParams = {
+  /**
+   * Search filter for user IDs (case-insensitive contains)
+   */
+  UserIdSearch?: string;
+  /**
+   * Filter by page loads after this date (inclusive)
+   */
+  StartDate?: string;
+  /**
+   * Filter by page loads before this date (inclusive)
+   */
+  EndDate?: string;
+  PageNumber?: number;
+  PageSize?: number;
+  Skip?: number;
+  Take?: number;
+};
+
 export type GetV1RequestResetPasswordParams = {
   email?: string;
 };
+
+export interface WebVitals {
+  /** @nullable */
+  cls?: number | null;
+  /** @nullable */
+  fcp?: string | null;
+  /** @nullable */
+  lcp?: string | null;
+}
+
+/**
+ * @nullable
+ */
+export type WaterfallResourceLatency = LatencyMetrics | null;
+
+/**
+ * @nullable
+ */
+export type WaterfallResourceData = DataMetrics | null;
+
+export interface WaterfallResource {
+  /** @nullable */
+  data?: WaterfallResourceData;
+  /** @nullable */
+  full_url?: string | null;
+  /** @nullable */
+  initiator?: string | null;
+  /** @nullable */
+  latency?: WaterfallResourceLatency;
+  /** @nullable */
+  name?: string | null;
+  /** @nullable */
+  protocol?: string | null;
+  /** @nullable */
+  start?: number | null;
+}
+
+/**
+ * @nullable
+ */
+export type VitalsModelWebVitals = WebVitals | null;
+
+/**
+ * @nullable
+ */
+export type VitalsModelPageLoad = { [key: string]: string } | null;
+
+export interface VitalsModel {
+  /** @nullable */
+  page_load?: VitalsModelPageLoad;
+  /** @nullable */
+  web_vitals?: VitalsModelWebVitals;
+}
+
+export interface ViewportSize {
+  /** @nullable */
+  h?: number | null;
+  /** @nullable */
+  w?: number | null;
+}
 
 export interface VerifyEmailModel {
   /** @minLength 1 */
@@ -49,6 +147,21 @@ export interface UserInvitationModel {
   /** @nullable */
   updated_at?: string | null;
   used: boolean;
+}
+
+/**
+ * Model representing usage statistics for a tenant
+ */
+export interface UsageStatsModel {
+  /** Page loads consumed in the current month */
+  current_month_page_loads?: number;
+  /**
+   * Timestamp of the last page load
+   * @nullable
+   */
+  last_page_load_at?: string | null;
+  /** Total page loads consumed by the tenant (all time) */
+  total_page_loads?: number;
 }
 
 export interface UpdateUserModel {
@@ -210,13 +323,53 @@ export interface TenantDetailsModel {
 export type TenantModelDetails = TenantDetailsModel | null;
 
 /**
+ * Summary information about a user's activity
+ */
+export interface TenantCustomerSummaryModel {
+  /** List of browsers the user has used (empty in MVP - to be enhanced) */
+  browsers?: string[];
+  /** Most recent page load timestamp for this user */
+  last_seen_at?: string;
+  /** List of operating systems the user has used (empty in MVP - to be enhanced) */
+  operating_systems?: string[];
+  /** Total number of page loads recorded for this user */
+  total_page_loads?: number;
+  /** Unique user identifier */
+  user_id?: string;
+}
+
+export interface TenantCustomerSummaryModelPagedResult {
+  data?: TenantCustomerSummaryModel[];
+  readonly has_next_page?: boolean;
+  readonly has_previous_page?: boolean;
+  page_number?: number;
+  page_size?: number;
+  total_count?: number;
+  readonly total_pages?: number;
+}
+
+/**
  * Response model for speed metric data
  */
 export interface SpeedMetricResponse {
+  browser_icon?: string;
+  cls_score?: number;
+  cls_verdict?: string;
+  connection_quality?: string;
   created_at?: string;
+  device_icon?: string;
   id?: string;
-  is_gold?: boolean;
-  speed?: number;
+  is_backend_fault?: boolean;
+  is_connection_fault?: boolean;
+  is_frontend_fault?: boolean;
+  lcp_ms?: number;
+  lcp_verdict?: string;
+  session_id?: string;
+  silver_id?: string;
+  timestamp?: string;
+  ttfb_ms?: number;
+  url_path?: string;
+  user_id?: string;
 }
 
 export interface SlimApplicationUserModel {
@@ -238,6 +391,38 @@ export interface SetTenantPricingRequest {
   pricing_tier_id: string;
   /** @nullable */
   start_date?: string | null;
+}
+
+export interface SessionModel {
+  /** @nullable */
+  ref?: string | null;
+  session_id?: string;
+  url?: string;
+  user_id?: string;
+}
+
+export interface ScreenSize {
+  /** @nullable */
+  dpr?: number | null;
+  /** @nullable */
+  h?: number | null;
+  /** @nullable */
+  w?: number | null;
+}
+
+/**
+ * Model for a single resource in the network waterfall
+ */
+export interface ResourceTimingModel {
+  full_url?: string;
+  id?: number;
+  is_compressed?: boolean;
+  label?: string;
+  protocol?: string;
+  size_formatted?: string;
+  stalled_ms?: number;
+  total_ms?: number;
+  ttfb_ms?: number;
 }
 
 export interface ResetPasswordModel {
@@ -369,6 +554,123 @@ export interface ProblemDetails {
   [key: string]: unknown;
 }
 
+/**
+ * @nullable
+ */
+export type PerformanceModelVitals = VitalsModel | null;
+
+export interface PerformanceModel {
+  /** @nullable */
+  jank?: JankMetric[] | null;
+  /** @nullable */
+  vitals?: PerformanceModelVitals;
+  /** @nullable */
+  waterfall?: WaterfallResource[] | null;
+}
+
+/**
+ * Summary model for a single page load event
+ */
+export interface PageLoadSummaryModel {
+  browser_icon?: string;
+  cls_score?: number;
+  cls_verdict?: string;
+  connection_quality?: string;
+  connection_reasons?: ConnectionReason[];
+  device_icon?: string;
+  downlink?: number;
+  effective_type?: string;
+  id?: string;
+  is_backend_fault?: boolean;
+  is_connection_fault?: boolean;
+  is_frontend_fault?: boolean;
+  lcp_ms?: number;
+  lcp_verdict?: string;
+  rtt?: number;
+  session_id?: string;
+  silver_id?: string;
+  timestamp?: string;
+  ttfb_ms?: number;
+  url_path?: string;
+}
+
+export interface PageLoadSummaryModelPagedResult {
+  data?: PageLoadSummaryModel[];
+  readonly has_next_page?: boolean;
+  readonly has_previous_page?: boolean;
+  page_number?: number;
+  page_size?: number;
+  total_count?: number;
+  readonly total_pages?: number;
+}
+
+/**
+ * Detailed model for a page load including waterfall and jank data
+ */
+export interface PageLoadDetailModel {
+  /** Average Time to First Byte in milliseconds */
+  avg_ttfb_ms?: number;
+  /** Cumulative Layout Shift score */
+  cls?: number;
+  /** Unique identifier for this page load (Silver layer ID) */
+  id?: string;
+  /** Jank reports - performance issues detected */
+  jank_reports?: string[];
+  /** Largest Contentful Paint in milliseconds */
+  lcp_ms?: number;
+  /** Session ID */
+  session_id?: string;
+  /** When the page load occurred */
+  timestamp?: string;
+  /** URL of the page */
+  url?: string;
+  /** User ID who triggered this page load */
+  user_id?: string;
+  /** Network waterfall - list of resources loaded */
+  waterfall?: ResourceTimingModel[];
+}
+
+/**
+ * Model representing tenant package and pricing information
+ */
+export interface PackageInfoModel {
+  /** Current page loads used this month */
+  current_month_page_loads?: number;
+  /** Indicates if the tenant is active on this plan */
+  is_active?: boolean;
+  /** Monthly page loads limit */
+  page_loads_limit?: number;
+  /** Description of the pricing plan */
+  plan_description?: string;
+  /** Name of the pricing plan */
+  plan_name?: string;
+  /** Price per extra page load beyond the limit */
+  price_per_extra_request?: number;
+  /** Monthly subscription price */
+  price_per_month?: number;
+  /**
+   * Renewal date for the current billing period
+   * @nullable
+   */
+  renewal_date?: string | null;
+}
+
+export interface NetworkModel {
+  /** @nullable */
+  downlink?: string | null;
+  /** @nullable */
+  effective_type?: string | null;
+  /** @nullable */
+  rtt?: string | null;
+}
+
+export interface MetadataModel {
+  event?: string;
+  pk?: string;
+  /** @nullable */
+  ts?: string | null;
+}
+
 export interface LoginModel {
   /** @minLength 1 */
   email: string;
@@ -376,12 +678,35 @@ export interface LoginModel {
   password: string;
 }
 
+export interface LatencyMetrics {
+  stalled?: number;
+  total?: number;
+  ttfb?: number;
+}
+
+export interface JankMetric {
+  /** @nullable */
+  d?: string | null;
+}
+
 /**
- * Request model for ingesting speed metrics
+ * @nullable
  */
-export interface IngestSpeedMetricRequest {
-  /** Speed metric value */
-  speed: number;
+export type IngestSpeedMetricRequestModelNetwork = NetworkModel | null;
+
+/**
+ * @nullable
+ */
+export type IngestSpeedMetricRequestModelDevice = DeviceModel | null;
+
+export interface IngestSpeedMetricRequestModel {
+  /** @nullable */
+  device?: IngestSpeedMetricRequestModelDevice;
+  metadata?: MetadataModel;
+  /** @nullable */
+  network?: IngestSpeedMetricRequestModelNetwork;
+  performance?: PerformanceModel;
+  session?: SessionModel;
 }
 
 export type FeatureKey = (typeof FeatureKey)[keyof typeof FeatureKey];
@@ -393,6 +718,36 @@ export const FeatureKey = {
 
 export interface EnabledFeaturesResponse {
   features: FeatureKey[];
+}
+
+/**
+ * @nullable
+ */
+export type DeviceModelViewport = ViewportSize | null;
+
+/**
+ * @nullable
+ */
+export type DeviceModelScreen = ScreenSize | null;
+
+export interface DeviceModel {
+  /** @nullable */
+  language?: string | null;
+  /** @nullable */
+  platform?: string | null;
+  /** @nullable */
+  screen?: DeviceModelScreen;
+  /** @nullable */
+  user_agent?: string | null;
+  /** @nullable */
+  viewport?: DeviceModelViewport;
+}
+
+export interface DataMetrics {
+  /** @nullable */
+  is_compressed?: boolean | null;
+  /** @nullable */
+  transfer?: string | null;
 }
 
 export interface CreateUserInvitationModel {
@@ -414,6 +769,18 @@ export interface CreateProjectKeyRequest {
    */
   name: string;
 }
+
+export type ConnectionReason =
+  (typeof ConnectionReason)[keyof typeof ConnectionReason];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const ConnectionReason = {
+  high_latency: "high_latency",
+  low_bandwidth: "low_bandwidth",
+  network_congestion: "network_congestion",
+  unstable_cellular: "unstable_cellular",
+  local_bottleneck: "local_bottleneck",
+} as const;
 
 export interface CheckFeatureResponse {
   feature_key: FeatureKey;
@@ -660,13 +1027,13 @@ The response is lightweight and does not perform any complex operations or datab
    * @summary Ingests a speed metric
    */
   const postApiV1Ingestion = (
-    ingestSpeedMetricRequest: IngestSpeedMetricRequest,
+    ingestSpeedMetricRequestModel: IngestSpeedMetricRequestModel,
   ) => {
     return customInstance<void>({
       url: `/api/v1/ingestion`,
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      data: ingestSpeedMetricRequest,
+      data: ingestSpeedMetricRequestModel,
     });
   };
 
@@ -686,6 +1053,24 @@ The response is lightweight and does not perform any complex operations or datab
   const getApiV1MetricsId = (id: string) => {
     return customInstance<SpeedMetricResponse>({
       url: `/api/v1/metrics/${id}`,
+      method: "GET",
+    });
+  };
+
+  /**
+ * Sample request:
+            
+    GET /api/v1/page-loads/019c3eb8-7a1f-7a29-af77-963722c894b6
+            
+Returns detailed metrics including:
+- Core Web Vitals (LCP, CLS, TTFB)
+- Network waterfall (all resources loaded with timings)
+- Jank reports (performance issues detected)
+ * @summary Gets detailed information for a specific page load including network waterfall and jank reports
+ */
+  const getApiV1PageLoadsId = (id: string) => {
+    return customInstance<PageLoadDetailModel>({
+      url: `/api/v1/page-loads/${id}`,
       method: "GET",
     });
   };
@@ -802,6 +1187,26 @@ The response is lightweight and does not perform any complex operations or datab
     });
   };
 
+  /**
+   * @summary Get usage statistics for the current tenant
+   */
+  const getApiV1ProjectKeysUsage = () => {
+    return customInstance<UsageStatsModel>({
+      url: `/api/v1/project-keys/usage`,
+      method: "GET",
+    });
+  };
+
+  /**
+   * @summary Get package and pricing information for the current tenant
+   */
+  const getApiV1ProjectKeysPackage = () => {
+    return customInstance<PackageInfoModel>({
+      url: `/api/v1/project-keys/package`,
+      method: "GET",
+    });
+  };
+
   const getV1Tenant = () => {
     return customInstance<TenantModel>({ url: `/v1/tenant`, method: "GET" });
   };
@@ -814,6 +1219,46 @@ The response is lightweight and does not perform any complex operations or datab
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       data: updateTenantDetailsRequest,
+    });
+  };
+
+  /**
+ * Sample request:
+            
+    GET /api/v1/tenant-customers?userIdSearch=user123&startDate=2026-01-01&pageNumber=1&pageSize=20
+            
+Returns tenant customers ordered by most recently seen (LastSeenAt descending).
+            
+**Note:** Browsers and OperatingSystems fields are empty in the current MVP.
+These will be populated in future enhancements when device info is added to the tracking system.
+ * @summary Gets a paginated list of monitored tenant customers (end-users) with their activity summary.
+Supports filtering by user ID search, date range, and pagination.
+ */
+  const getApiV1TenantCustomers = (params?: GetApiV1TenantCustomersParams) => {
+    return customInstance<TenantCustomerSummaryModelPagedResult>({
+      url: `/api/v1/tenant-customers`,
+      method: "GET",
+      params,
+    });
+  };
+
+  /**
+ * Sample request:
+            
+    GET /api/v1/tenant-customers/user123/page-loads?pageNumber=1&pageSize=20&startDate=2026-01-01
+            
+Returns page loads ordered by most recent first (Timestamp descending).
+ * @summary Gets a paginated list of page loads for a specific tenant customer (end-user).
+Supports filtering by date range and pagination.
+ */
+  const getApiV1TenantCustomersUserIdPageLoads = (
+    userId: string,
+    params?: GetApiV1TenantCustomersUserIdPageLoadsParams,
+  ) => {
+    return customInstance<PageLoadSummaryModelPagedResult>({
+      url: `/api/v1/tenant-customers/${userId}/page-loads`,
+      method: "GET",
+      params,
     });
   };
 
@@ -883,6 +1328,7 @@ The response is lightweight and does not perform any complex operations or datab
     postApiV1Ingestion,
     getApiV1Metrics,
     getApiV1MetricsId,
+    getApiV1PageLoadsId,
     postV1PricingTenantTenantIdPricing,
     putV1PricingTenantTenantIdPricing,
     getV1PricingTenantTenantIdPricingCurrent,
@@ -892,8 +1338,12 @@ The response is lightweight and does not perform any complex operations or datab
     postApiV1ProjectKeys,
     putApiV1ProjectKeysId,
     deleteApiV1ProjectKeysId,
+    getApiV1ProjectKeysUsage,
+    getApiV1ProjectKeysPackage,
     getV1Tenant,
     putV1Tenant,
+    getApiV1TenantCustomers,
+    getApiV1TenantCustomersUserIdPageLoads,
     userUpdate,
     userGet,
     userDelete,
@@ -978,6 +1428,11 @@ export type GetApiV1MetricsIdResult = NonNullable<
     ReturnType<ReturnType<typeof getWitnesServerAPI>["getApiV1MetricsId"]>
   >
 >;
+export type GetApiV1PageLoadsIdResult = NonNullable<
+  Awaited<
+    ReturnType<ReturnType<typeof getWitnesServerAPI>["getApiV1PageLoadsId"]>
+  >
+>;
 export type PostV1PricingTenantTenantIdPricingResult = NonNullable<
   Awaited<
     ReturnType<
@@ -1043,11 +1498,39 @@ export type DeleteApiV1ProjectKeysIdResult = NonNullable<
     >
   >
 >;
+export type GetApiV1ProjectKeysUsageResult = NonNullable<
+  Awaited<
+    ReturnType<
+      ReturnType<typeof getWitnesServerAPI>["getApiV1ProjectKeysUsage"]
+    >
+  >
+>;
+export type GetApiV1ProjectKeysPackageResult = NonNullable<
+  Awaited<
+    ReturnType<
+      ReturnType<typeof getWitnesServerAPI>["getApiV1ProjectKeysPackage"]
+    >
+  >
+>;
 export type GetV1TenantResult = NonNullable<
   Awaited<ReturnType<ReturnType<typeof getWitnesServerAPI>["getV1Tenant"]>>
 >;
 export type PutV1TenantResult = NonNullable<
   Awaited<ReturnType<ReturnType<typeof getWitnesServerAPI>["putV1Tenant"]>>
+>;
+export type GetApiV1TenantCustomersResult = NonNullable<
+  Awaited<
+    ReturnType<ReturnType<typeof getWitnesServerAPI>["getApiV1TenantCustomers"]>
+  >
+>;
+export type GetApiV1TenantCustomersUserIdPageLoadsResult = NonNullable<
+  Awaited<
+    ReturnType<
+      ReturnType<
+        typeof getWitnesServerAPI
+      >["getApiV1TenantCustomersUserIdPageLoads"]
+    >
+  >
 >;
 export type UserUpdateResult = NonNullable<
   Awaited<ReturnType<ReturnType<typeof getWitnesServerAPI>["userUpdate"]>>

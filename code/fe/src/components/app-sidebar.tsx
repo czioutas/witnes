@@ -3,14 +3,11 @@
 import * as React from "react";
 import {
   BarChart3,
-  List,
   Settings,
   ShoppingBag,
   Users,
-  Upload,
-  FileText,
-  Package2,
   Home,
+  Activity,
 } from "lucide-react";
 
 import { NavMain } from "@/components/nav-main";
@@ -41,92 +38,43 @@ const data = {
             typeof window !== "undefined" &&
             window.location.pathname === "/dashboard/",
         },
-      ],
-    },
-    {
-      title: "Catalog",
-      items: [
         {
-          title: "Products",
-          url: "/dashboard/products",
+          title: "Users",
+          url: "/dashboard/customers",
+          icon: Users,
+          isActive:
+            typeof window !== "undefined" &&
+            window.location.pathname.startsWith("/dashboard/customers"),
+        },
+        {
+          title: "Organizations",
+          url: "/dashboard/organizations",
           icon: ShoppingBag,
           isActive:
             typeof window !== "undefined" &&
-            window.location.pathname.startsWith("/dashboard/products"),
+            window.location.pathname.startsWith("/dashboard/organizations"),
         },
-      ],
-    },
-    {
-      title: "Ledger",
-      items: [
         {
-          title: "Activities",
-          url: "/dashboard/activities",
-          icon: List,
-          isActive:
-            typeof window !== "undefined" &&
-            window.location.pathname.startsWith("/dashboard/activities"),
-        },
-      ],
-    },
-    {
-      title: "Reporting",
-      items: [
-        {
-          title: "Corporate Carbon Footprint Overview",
-          url: "/dashboard/corporate-carbon-footprint",
+          title: "Analytics",
+          url: "/dashboard/analytics",
           icon: BarChart3,
           isActive:
             typeof window !== "undefined" &&
-            window.location.pathname ===
-              "/dashboard/corporate-carbon-footprint",
-        },
-        {
-          title: "Product Carbon Footprint",
-          url: "/dashboard/product-carbon-footprint",
-          icon: Package2,
-          isActive:
-            typeof window !== "undefined" &&
-            window.location.pathname === "/dashboard/product-carbon-footprint",
-        },
-        {
-          title: "Sustainability Reports",
-          url: "/dashboard/sustainability-reports",
-          icon: FileText,
-          isActive:
-            typeof window !== "undefined" &&
-            window.location.pathname.startsWith(
-              "/dashboard/sustainability-reports",
-            ),
-        },
-      ],
-    },
-    {
-      title: "Experimental",
-      items: [
-        {
-          title: "DropZone",
-          url: "/dashboard/dropzone",
-          icon: Upload,
-          isActive:
-            typeof window !== "undefined" &&
-            window.location.pathname.startsWith("/dashboard/dropzone"),
-          badge: "Experimental",
-          featureKey: FeatureKey.dropzone, // Feature-gated navigation item
+            window.location.pathname.startsWith("/dashboard/analytics"),
         },
       ],
     },
   ],
   navSecondary: [
     {
-      title: "Users",
-      url: "/dashboard/users",
+      title: "Team",
+      url: "/dashboard/team",
       icon: Users,
     },
     {
-      title: "Accounting",
-      url: "/dashboard/accounting",
-      icon: Settings,
+      title: "Usage",
+      url: "/dashboard/usage",
+      icon: Activity,
     },
     {
       title: "Organization Settings",
@@ -175,7 +123,7 @@ export function AppSidebar({
   // Filter secondary nav items based on role
   const filteredNavSecondary = data.navSecondary.filter((item) => {
     // Only show admin-only pages to admins
-    const adminOnlyPages = ["Users", "Accounting", "Organization Settings"];
+    const adminOnlyPages = ["Team", "Usage", "Organization Settings"];
     if (adminOnlyPages.includes(item.title)) {
       return isAdmin;
     }

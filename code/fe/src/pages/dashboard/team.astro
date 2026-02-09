@@ -1,0 +1,13 @@
+---
+import DashboardLayout from "../../layouts/DashboardLayout.astro";
+import DashboardPage from "../../components/DashboardPage.tsx";
+---
+
+<DashboardLayout title="Team - Witnes">
+  <DashboardPage
+    client:only="react"
+    page="team"
+    title="Team"
+    description="Invite and manage team members. Users have full access except to Team, Accounting, and Organization Settings pages."
+  />
+</DashboardLayout>

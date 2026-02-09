@@ -1,0 +1,16 @@
+---
+import DashboardLayout from "../../../layouts/DashboardLayout.astro";
+import DashboardPage from "../../../components/DashboardPage.tsx";
+
+const { userId } = Astro.params;
+---
+
+<DashboardLayout title={`User ${userId} - Witnes`}>
+  <DashboardPage
+    client:only="react"
+    page="customer-detail"
+    title={`User ${userId}`}
+    description="View user activity and page loads"
+    userId={userId!}
+  />
+</DashboardLayout>

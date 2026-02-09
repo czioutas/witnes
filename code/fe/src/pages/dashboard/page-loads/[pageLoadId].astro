@@ -1,0 +1,16 @@
+---
+import DashboardLayout from "../../../layouts/DashboardLayout.astro";
+import DashboardPage from "../../../components/DashboardPage.tsx";
+
+const { pageLoadId } = Astro.params;
+---
+
+<DashboardLayout title={`Page Load ${pageLoadId} - Witnes`}>
+  <DashboardPage
+    client:only="react"
+    page="page-load-detail"
+    title="Page Load Details"
+    description="View network waterfall and performance metrics"
+    pageLoadId={pageLoadId!}
+  />
+</DashboardLayout>

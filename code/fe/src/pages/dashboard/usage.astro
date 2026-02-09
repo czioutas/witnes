@@ -1,0 +1,13 @@
+---
+import DashboardLayout from "../../layouts/DashboardLayout.astro";
+import DashboardPage from "../../components/DashboardPage.tsx";
+---
+
+<DashboardLayout title="Usage - Witnes">
+  <DashboardPage
+    client:only="react"
+    page="usage"
+    title="Usage"
+    description="Monitor your API usage and manage your subscription plan"
+  />
+</DashboardLayout>

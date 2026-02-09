@@ -14,6 +14,10 @@ import UserProfilePage from "./pages/UserProfilePage";
 import { OrganizationSettingsPage } from "./pages/OrganizationSettingsPage";
 import NotFoundPage from "./NotFoundPage";
 import { UsersPage } from "./pages/UsersPage";
+import { UsagePage } from "./pages/UsagePage";
+import { CustomersPage } from "./pages/CustomersPage";
+import UserDetailPage from "./pages/UserDetailPage";
+import PageLoadDetailPage from "./pages/PageLoadDetailPage";
 import { Toaster } from "sonner";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 
@@ -23,9 +27,15 @@ const pageComponents = {
   "user-profile": UserProfilePage,
   "organization-settings": OrganizationSettingsPage,
   analytics: ComingSoonPage,
+  organizations: ComingSoonPage,
   reports: ComingSoonPage,
   insights: ComingSoonPage,
   users: UsersPage,
+  team: UsersPage,
+  customers: CustomersPage,
+  "customer-detail": UserDetailPage,
+  "page-load-detail": PageLoadDetailPage,
+  usage: UsagePage,
   "api-keys": ComingSoonPage,
   "cross-border-flows": ComingSoonPage,
   settings: ComingSoonPage,
@@ -45,6 +55,8 @@ interface DashboardPageProps {
   locationId?: string;
   supplierId?: string;
   reportId?: string;
+  userId?: string;
+  pageLoadId?: string;
 }
 
 function AuthenticatedDashboard({
@@ -57,7 +69,7 @@ function AuthenticatedDashboard({
   const auth = useRequireAuth();
 
   // Pages that require admin role
-  const adminOnlyPages = ["users", "accounting", "organization-settings"];
+  const adminOnlyPages = ["users", "team", "accounting", "organization-settings"];
   const isAdminOnlyPage = adminOnlyPages.includes(page);
 
   // Use role-based auth for admin-only pages
@@ -103,13 +115,23 @@ function AuthenticatedDashboard({
       case "organization-settings":
         return <OrganizationSettingsPage />;
       case "analytics":
+      case "organizations":
       case "reports":
       case "insights":
       case "api-keys":
       case "settings":
         return <ComingSoonPage />;
       case "users":
+      case "team":
         return <UsersPage />;
+      case "customers":
+        return <CustomersPage />;
+      case "customer-detail":
+        return <UserDetailPage userId={rest.userId!} />;
+      case "page-load-detail":
+        return <PageLoadDetailPage pageLoadId={rest.pageLoadId!} />;
+      case "usage":
+        return <UsagePage />;
       default:
         return <NotFoundPage />;
     }

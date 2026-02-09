@@ -94,18 +94,18 @@ public class ProjectKeyMiddleware : IMiddleware
         else
 #endif
             if (string.IsNullOrEmpty(origin) || !projectKeyModel.AllowedOrigins.Contains(origin))
+        {
+            _logger.LogWarning("Invalid origin for project key {ProjectKey}: {Origin}",
+                projectKey, origin);
+            context.Response.StatusCode = StatusCodes.Status403Forbidden;
+            context.Response.ContentType = "application/json";
+            await context.Response.WriteAsJsonAsync(new
             {
-                _logger.LogWarning("Invalid origin for project key {ProjectKey}: {Origin}",
-                    projectKey, origin);
-                context.Response.StatusCode = StatusCodes.Status403Forbidden;
-                context.Response.ContentType = "application/json";
-                await context.Response.WriteAsJsonAsync(new
-                {
-                    error = "InvalidOrigin",
-                    message = "Origin is not allowed for this project key"
-                });
-                return;
-            }
+                error = "InvalidOrigin",
+                message = "Origin is not allowed for this project key"
+            });
+            return;
+        }
 
         // 5. Set tenant context (CRITICAL - same as MultiTenantServiceMiddleware)
         _requestTenant.SetTenantId(projectKeyModel.TenantId);

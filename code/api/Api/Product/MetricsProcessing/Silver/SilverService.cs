@@ -35,40 +35,45 @@ public class SilverService : ISilverService
     {
         _logger.LogDebug("Starting Silver transformation for BronzeId: {BronzeId}", bronzeId);
 
-        // 1. Fetch the Raw Bronze Data
         var bronze = await _context.MetricsBronze
             .FirstOrDefaultAsync(x => x.Id == bronzeId && x.TenantId == tenantId);
 
         if (bronze == null)
-        {
-            _logger.LogError("Critical: Bronze record {BronzeId} not found.", bronzeId);
             throw new InvalidOperationException($"Bronze record {bronzeId} not found.");
-        }
 
-        // 2. Deserialize the "Black Box"
-        var performance = JsonSerializer.Deserialize<PerformanceModel>(bronze.RawPerformanceData, JsonOptions);
+        // 1. Deserialize the WHOLE request model from the Bronze JSONB
+        var request = JsonSerializer.Deserialize<IngestSpeedMetricRequestModel>(bronze.RawPerformanceData, JsonOptions);
 
-        if (performance == null)
-        {
-            _logger.LogWarning("Performance data for {BronzeId} was empty.", bronzeId);
-            performance = new PerformanceModel(null, new List<WaterfallResource>(), new List<JankMetric>());
-        }
+        if (request == null)
+            throw new InvalidOperationException("Failed to deserialize Bronze payload into request model.");
 
-        // 3. Construct the Structured Silver Entity with Null-Safety for Optional Fields
+        var performance = request.Performance;
+        var network = request.Network;
+        var device = request.Device;
+
+        // 2. Construct the Silver Entity
         var silverEntity = new MetricSilverEntity
         {
             Id = Guid.NewGuid(),
             BronzeId = bronzeId,
             TenantId = tenantId,
-
-            // Searchable Identity
             UserId = bronze.UserId,
             SessionId = bronze.SessionId,
             Url = bronze.Url,
             Timestamp = bronze.IngestedAt,
 
-            // --- WATERFALL TRANSFORMATION ---
-            // Handles potential nulls from the browser
+            // --- Network Extraction ---
+            EffectiveType = network?.EffectiveType ?? "unknown",
+            Rtt = ParseIntMetric(network?.Rtt, "ms"),
+            Downlink = ParseDecimalMetric(network?.Downlink, "Mb/s"),
+
+            // --- Device Extraction ---
+            UserAgent = device?.UserAgent ?? "Unknown",
+            // Note: These helpers would use a simple regex or library to get "Chrome"/"Desktop"
+            BrowserName = UserAgentParser.GetBrowser(device?.UserAgent),
+            DeviceType = UserAgentParser.GetDeviceType(device?.UserAgent),
+
+            // --- Performance & Waterfall ---
             Waterfall = performance.Waterfall?.Select(r => new ProcessedResource
             {
                 Label = $"{(r.Initiator ?? "OTHER").ToUpper()} | {r.Name ?? "Unknown"}",
@@ -81,10 +86,9 @@ public class SilverService : ISilverService
                 IsCompressed = r.Data?.IsCompressed ?? false
             }).ToList() ?? new List<ProcessedResource>(),
 
-            // --- JANK & VITALS ---
             JankReports = performance.Jank?.Select(j => j.D ?? "Unknown Jank").ToList() ?? new List<string>(),
 
-            LcpMs = ExtractNumeric(performance.Vitals?.WebVitals?.Lcp),
+            LcpMs = ParseDecimalMetric(performance.Vitals?.WebVitals?.Lcp, "ms"),
             Cls = performance.Vitals?.WebVitals?.Cls ?? 0,
 
             AvgTtfbMs = (performance.Waterfall != null && performance.Waterfall.Any())
@@ -92,19 +96,56 @@ public class SilverService : ISilverService
                 : 0
         };
 
-        // 4. Save to Silver Table
         await _context.MetricsSilver.AddAsync(silverEntity);
         await _context.SaveChangesAsync();
 
         _logger.LogInformation("Silver record saved successfully: {SilverId}", silverEntity.Id);
-
         return silverEntity;
     }
 
-    private decimal ExtractNumeric(string? value)
+    // --- Helper Parsers to handle the browser strings ---
+
+    private static int ParseIntMetric(string? value, string unit)
     {
         if (string.IsNullOrEmpty(value)) return 0;
-        var cleanValue = value.Replace("ms", "").Trim();
-        return decimal.TryParse(cleanValue, out var result) ? result : 0;
+        var clean = value.Replace(unit, "").Trim();
+        return int.TryParse(clean, out var result) ? result : 0;
+    }
+
+    private static decimal ParseDecimalMetric(string? value, string unit)
+    {
+        if (string.IsNullOrEmpty(value)) return 0;
+        var clean = value.Replace(unit, "").Trim();
+        return decimal.TryParse(clean, out var result) ? result : 0;
+    }
+}
+
+public static class UserAgentParser
+{
+    public static string GetBrowser(string? ua)
+    {
+        if (string.IsNullOrWhiteSpace(ua)) return "Unknown";
+
+        if (ua.Contains("Edg/")) return "Edge";
+        if (ua.Contains("Chrome/")) return "Chrome";
+        if (ua.Contains("Safari/") && !ua.Contains("Chrome/")) return "Safari";
+        if (ua.Contains("Firefox/")) return "Firefox";
+        if (ua.Contains("OPR/") || ua.Contains("Opera/")) return "Opera";
+
+        return "Browser";
+    }
+
+    public static string GetDeviceType(string? ua)
+    {
+        if (string.IsNullOrWhiteSpace(ua)) return "Desktop";
+
+        var lowerUa = ua.ToLower();
+        if (lowerUa.Contains("mobi") || lowerUa.Contains("android") || lowerUa.Contains("iphone"))
+            return "Mobile";
+
+        if (lowerUa.Contains("tablet") || lowerUa.Contains("ipad"))
+            return "Tablet";
+
+        return "Desktop";
     }
 }

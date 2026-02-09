@@ -15,6 +15,16 @@ public class MetricSilverEntity : TenantAwareEntity
     public decimal Cls { get; set; } // Added for visual stability tracking
     public int AvgTtfbMs { get; set; }
 
+    // --- NEW: Connection Context (Missing from your snippet) ---
+    public int Rtt { get; set; }               // Round-trip time (latency)
+    public decimal Downlink { get; set; }      // Bandwidth in Mbps
+    public string EffectiveType { get; set; } = "4g"; // '4g', '3g', etc.
+
+    // --- NEW: Device Data ---
+    public string UserAgent { get; set; } = null!;
+    public string DeviceType { get; set; } = "Desktop";
+    public string BrowserName { get; set; } = "Chrome";
+
     // --- The Detailed Waterfall ---
     public List<ProcessedResource> Waterfall { get; set; } = new();
     public List<string> JankReports { get; set; } = new();

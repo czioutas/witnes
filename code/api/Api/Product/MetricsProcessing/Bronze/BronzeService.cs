@@ -44,7 +44,7 @@ public class BronzeService : IBronzeService
 
             // Store the dynamic performance block (Waterfall, Vitals, Jank) as JSONB
             // This prevents "Schema Fear" when adding new browser metrics later
-            RawPerformanceData = JsonSerializer.Serialize(request.Performance, JsonOptions)
+            RawPerformanceData = JsonSerializer.Serialize(request, JsonOptions)
         };
 
         await _context.MetricsBronze.AddAsync(entity);
