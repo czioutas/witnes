@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { getWitnesServerAPI, type TenantCustomerSummaryModel } from "@/generated/api";
+import { getWitnesServerAPI, type VisitorSummaryModel } from "@/generated/api";
 import { NoProjectKeyState } from "../home/NoProjectKeyState";
 import { NoDataState } from "../home/NoDataState";
 import { ActiveState } from "../home/ActiveState";
@@ -9,7 +9,7 @@ type HomeState = "loading" | "no-key" | "no-data" | "active";
 export function Home() {
   const [state, setState] = useState<HomeState>("loading");
   const [projectKey, setProjectKey] = useState<string | null>(null);
-  const [recentUsers, setRecentUsers] = useState<TenantCustomerSummaryModel[]>([]);
+  const [recentUsers, setRecentUsers] = useState<VisitorSummaryModel[]>([]);
   const [totalUsers, setTotalUsers] = useState<number>(0);
   const [dataIngestionWorking, setDataIngestionWorking] = useState(false);
 
@@ -37,22 +37,22 @@ export function Home() {
       const oneDayAgo = new Date();
       oneDayAgo.setDate(oneDayAgo.getDate() - 1);
 
-      const customersResponse = await api.getApiV1TenantCustomers({
+      const visitorsResponse = await api.getApiV1Visitors({
         StartDate: oneDayAgo.toISOString(),
         PageNumber: 1,
         PageSize: 4,
       });
 
-      const customersData = customersResponse.data;
+      const visitorsData = visitorsResponse.data;
 
-      if (!customersData.data || customersData.data.length === 0) {
+      if (!visitorsData.data || visitorsData.data.length === 0) {
         setState("no-data");
         return;
       }
 
       // Step 3: Active state - fetch recent users and total count
-      setRecentUsers(customersData.data.slice(0, 4));
-      setTotalUsers(customersData.total_count || 0);
+      setRecentUsers(visitorsData.data.slice(0, 4));
+      setTotalUsers(visitorsData.total_count || 0);
       setDataIngestionWorking(true);
       setState("active");
     } catch (error) {

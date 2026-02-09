@@ -1,21 +1,21 @@
 using Api.Data;
-using Api.Product.TenantCustomers.Models;
+using Api.Product.Visitors.Models;
 using Libs.Pagination;
 using Microsoft.EntityFrameworkCore;
 
-namespace Api.Product.TenantCustomers;
+namespace Api.Product.Visitors;
 
 /// <summary>
-/// Service interface for retrieving tenant customer analytics data
+/// Service interface for retrieving visitor analytics data
 /// </summary>
-public interface ITenantCustomersService
+public interface IVisitorsService
 {
     /// <summary>
-    /// Gets a paginated list of tenant customers with their activity summary
+    /// Gets a paginated list of visitors with their activity summary
     /// </summary>
     /// <param name="request">Filter and pagination parameters</param>
-    /// <returns>Paginated result containing tenant customer summaries</returns>
-    Task<PagedResult<TenantCustomerSummaryModel>> GetTenantCustomersAsync(GetTenantCustomersRequest request);
+    /// <returns>Paginated result containing visitor summaries</returns>
+    Task<PagedResult<VisitorSummaryModel>> GetVisitorsAsync(GetVisitorsRequest request);
 
     /// <summary>
     /// Gets a paginated list of page loads for a specific user
@@ -26,26 +26,26 @@ public interface ITenantCustomersService
 }
 
 /// <summary>
-/// Service for retrieving tenant customer analytics data from Gold layer metrics
+/// Service for retrieving visitor analytics data from Gold layer metrics
 /// </summary>
-public class TenantCustomersService : ITenantCustomersService
+public class VisitorsService : IVisitorsService
 {
     private readonly ApplicationDbContextRead _contextRead;
-    private readonly ILogger<TenantCustomersService> _logger;
+    private readonly ILogger<VisitorsService> _logger;
 
-    public TenantCustomersService(
+    public VisitorsService(
         ApplicationDbContextRead contextRead,
-        ILogger<TenantCustomersService> logger)
+        ILogger<VisitorsService> logger)
     {
         _contextRead = contextRead ?? throw new ArgumentNullException(nameof(contextRead));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
     /// <inheritdoc/>
-    public async Task<PagedResult<TenantCustomerSummaryModel>> GetTenantCustomersAsync(GetTenantCustomersRequest request)
+    public async Task<PagedResult<VisitorSummaryModel>> GetVisitorsAsync(GetVisitorsRequest request)
     {
         _logger.LogInformation(
-            "Retrieving tenant customers with filters: UserIdSearch={UserIdSearch}, StartDate={StartDate}, EndDate={EndDate}, Page={PageNumber}, PageSize={PageSize}",
+            "Retrieving visitors with filters: UserIdSearch={UserIdSearch}, StartDate={StartDate}, EndDate={EndDate}, Page={PageNumber}, PageSize={PageSize}",
             request.UserIdSearch,
             request.StartDate,
             request.EndDate,
@@ -55,10 +55,13 @@ public class TenantCustomersService : ITenantCustomersService
         // Build base query with filters
         var query = _contextRead.MetricsGold.AsNoTracking();
 
-        // Apply user ID search filter
+        // Apply user ID / guest ID search filter
         if (!string.IsNullOrWhiteSpace(request.UserIdSearch))
         {
-            query = query.Where(m => m.UserId.Contains(request.UserIdSearch));
+            var search = request.UserIdSearch;
+            query = query.Where(m =>
+                (m.UserId != null && m.UserId.Contains(search)) ||
+                (m.GuestId != null && m.GuestId.Contains(search)));
         }
 
         // Apply date range filters
@@ -78,40 +81,39 @@ public class TenantCustomersService : ITenantCustomersService
             query = query.Where(m => m.Timestamp <= endDateUtc);
         }
 
-        // Group by UserId and aggregate metrics
-        var customerQuery = query
-            .GroupBy(m => m.UserId)
-            .Select(g => new TenantCustomerSummaryModel
+        // Group by UserId (if present) or GuestId (for anonymous visitors)
+        var visitorQuery = query
+            .GroupBy(m => new { UserId = m.UserId, GuestId = m.UserId != null ? null : m.GuestId })
+            .Select(g => new VisitorSummaryModel
             {
-                UserId = g.Key,
+                UserId = g.Key.UserId,
+                GuestId = g.Key.GuestId,
                 TotalPageLoads = g.Count(),
                 LastSeenAt = g.Max(m => m.Timestamp),
-                // Browsers and OperatingSystems are empty for MVP
-                // These will be populated in future enhancement when we add device info to MetricsGold
                 Browsers = new List<string>(),
                 OperatingSystems = new List<string>()
             });
 
         // Get total count before pagination
-        var totalCount = await customerQuery.CountAsync();
+        var totalCount = await visitorQuery.CountAsync();
 
         // Apply ordering (most recently seen first)
-        var orderedQuery = customerQuery.OrderByDescending(c => c.LastSeenAt);
+        var orderedQuery = visitorQuery.OrderByDescending(c => c.LastSeenAt);
 
         // Apply pagination
-        var customers = await orderedQuery
+        var visitors = await orderedQuery
             .Skip(request.Skip)
             .Take(request.Take)
             .ToListAsync();
 
         _logger.LogInformation(
-            "Retrieved {Count} tenant customers out of {TotalCount} total (Page {PageNumber})",
-            customers.Count,
+            "Retrieved {Count} visitors out of {TotalCount} total (Page {PageNumber})",
+            visitors.Count,
             totalCount,
             request.PageNumber);
 
-        return new PagedResult<TenantCustomerSummaryModel>(
-            customers,
+        return new PagedResult<VisitorSummaryModel>(
+            visitors,
             totalCount,
             request.PageNumber,
             request.PageSize);
@@ -120,18 +122,24 @@ public class TenantCustomersService : ITenantCustomersService
     /// <inheritdoc/>
     public async Task<PagedResult<PageLoadSummaryModel>> GetUserPageLoadsAsync(GetUserPageLoadsRequest request)
     {
+        var isGuest = request.UserOrGuestId.StartsWith("w-gid_", StringComparison.Ordinal);
+
         _logger.LogInformation(
-            "Retrieving page loads for user: UserId={UserId}, StartDate={StartDate}, EndDate={EndDate}, Page={PageNumber}, PageSize={PageSize}",
-            request.UserId,
+            "Retrieving page loads for {IdType}: Id={Id}, StartDate={StartDate}, EndDate={EndDate}, Page={PageNumber}, PageSize={PageSize}",
+            isGuest ? "guest" : "user",
+            request.UserOrGuestId,
             request.StartDate,
             request.EndDate,
             request.PageNumber,
             request.PageSize);
 
-        // Build base query filtered by UserId
-        var query = _contextRead.MetricsGold
-            .AsNoTracking()
-            .Where(m => m.UserId == request.UserId);
+        // Build base query filtered by UserId or GuestId depending on prefix
+        var query = _contextRead.MetricsGold.AsNoTracking();
+
+        if (isGuest)
+            query = query.Where(m => m.GuestId == request.UserOrGuestId && m.UserId == null);
+        else
+            query = query.Where(m => m.UserId == request.UserOrGuestId);
 
         // Apply date range filters
         if (request.StartDate.HasValue)
@@ -185,10 +193,11 @@ public class TenantCustomersService : ITenantCustomersService
             .ToListAsync();
 
         _logger.LogInformation(
-            "Retrieved {Count} page loads out of {TotalCount} total for user {UserId} (Page {PageNumber})",
+            "Retrieved {Count} page loads out of {TotalCount} total for {IdType} {Id} (Page {PageNumber})",
             pageLoads.Count,
             totalCount,
-            request.UserId,
+            isGuest ? "guest" : "user",
+            request.UserOrGuestId,
             request.PageNumber);
 
         return new PagedResult<PageLoadSummaryModel>(

@@ -1,6 +1,6 @@
 using Libs.Domain;
 
-namespace Api.Product.TenantCustomers.Models;
+namespace Api.Product.Visitors.Models;
 
 /// <summary>
 /// Summary model for a single page load event

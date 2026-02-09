@@ -31,7 +31,7 @@ using OpenTelemetry.Metrics;
 using OpenTelemetry.Trace;
 using Serilog;
 using StackExchange.Redis;
-using Api.Product.TenantCustomers;
+using Api.Product.Visitors;
 using Api.Product.PageLoads;
 using Usersr.API.Users.Services;
 
@@ -185,17 +185,17 @@ public class Startup
 
         app.UseMiddleware<TraceMiddleware>();
 
-        // Use ProjectKeyMiddleware ONLY for ingestion routes
+        // Use ProjectKeyMiddleware ONLY for events routes
         app.UseWhen(
-            context => context.Request.Path.StartsWithSegments("/api/v1/ingestion"),
+            context => context.Request.Path.StartsWithSegments("/api/v1/events"),
             appBuilder =>
             {
                 appBuilder.UseMiddleware<ProjectKeyMiddleware>();
             });
 
-        // Use MultiTenantServiceMiddleware for all routes EXCEPT ingestion
+        // Use MultiTenantServiceMiddleware for all routes EXCEPT events
         app.UseWhen(
-            context => !context.Request.Path.StartsWithSegments("/api/v1/ingestion"),
+            context => !context.Request.Path.StartsWithSegments("/api/v1/events"),
             appBuilder =>
             {
                 appBuilder.UseMiddleware<MultiTenantServiceMiddleware>();
@@ -236,7 +236,7 @@ public class Startup
         services.AddTransient<ITenantService, TenantService>();
         services.AddTransient<IAccountService, AccountService>();
         services.AddTransient<IUsersService, UsersService>();
-        services.AddTransient<ITenantCustomersService, TenantCustomersService>();
+        services.AddTransient<IVisitorsService, VisitorsService>();
         services.AddTransient<IPageLoadsService, PageLoadsService>();
         services.AddTransient<ITenantPricingService, TenantPricingService>();
         services.AddScoped<ILimitsService, LimitsService>();

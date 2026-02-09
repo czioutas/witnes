@@ -274,3 +274,5 @@ obj
 openapi.json
 
 .test.vscode
+
+code/fe/public/w.js

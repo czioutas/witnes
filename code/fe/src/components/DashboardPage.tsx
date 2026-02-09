@@ -15,7 +15,7 @@ import { OrganizationSettingsPage } from "./pages/OrganizationSettingsPage";
 import NotFoundPage from "./NotFoundPage";
 import { UsersPage } from "./pages/UsersPage";
 import { UsagePage } from "./pages/UsagePage";
-import { CustomersPage } from "./pages/CustomersPage";
+import { VisitorsPage } from "./pages/VisitorsPage";
 import UserDetailPage from "./pages/UserDetailPage";
 import PageLoadDetailPage from "./pages/PageLoadDetailPage";
 import { Toaster } from "sonner";
@@ -31,9 +31,8 @@ const pageComponents = {
   reports: ComingSoonPage,
   insights: ComingSoonPage,
   users: UsersPage,
-  team: UsersPage,
-  customers: CustomersPage,
-  "customer-detail": UserDetailPage,
+  visitors: VisitorsPage,
+  "visitor-detail": UserDetailPage,
   "page-load-detail": PageLoadDetailPage,
   usage: UsagePage,
   "api-keys": ComingSoonPage,
@@ -69,7 +68,7 @@ function AuthenticatedDashboard({
   const auth = useRequireAuth();
 
   // Pages that require admin role
-  const adminOnlyPages = ["users", "team", "accounting", "organization-settings"];
+  const adminOnlyPages = ["users", "accounting", "organization-settings"];
   const isAdminOnlyPage = adminOnlyPages.includes(page);
 
   // Use role-based auth for admin-only pages
@@ -122,11 +121,10 @@ function AuthenticatedDashboard({
       case "settings":
         return <ComingSoonPage />;
       case "users":
-      case "team":
         return <UsersPage />;
-      case "customers":
-        return <CustomersPage />;
-      case "customer-detail":
+      case "visitors":
+        return <VisitorsPage />;
+      case "visitor-detail":
         return <UserDetailPage userId={rest.userId!} />;
       case "page-load-detail":
         return <PageLoadDetailPage pageLoadId={rest.pageLoadId!} />;

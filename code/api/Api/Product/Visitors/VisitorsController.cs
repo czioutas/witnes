@@ -1,65 +1,65 @@
 using Api.Application.Models;
-using Api.Product.TenantCustomers.Models;
+using Api.Product.Visitors.Models;
 using Libs.Pagination;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Api.Product.TenantCustomers;
+namespace Api.Product.Visitors;
 
 /// <summary>
-/// Controller for retrieving tenant customer (end-user) analytics data.
+/// Controller for retrieving visitor (end-user) analytics data.
 /// These are the website visitors being monitored, NOT Witnes application users.
 /// </summary>
 [ApiController]
-[Route("api/v1/tenant-customers")]
+[Route("api/v1/visitors")]
 [Authorize]
-public class TenantCustomersController : ControllerBase
+public class VisitorsController : ControllerBase
 {
-    private readonly ITenantCustomersService _tenantCustomersService;
-    private readonly ILogger<TenantCustomersController> _logger;
+    private readonly IVisitorsService _visitorsService;
+    private readonly ILogger<VisitorsController> _logger;
 
-    public TenantCustomersController(
-        ITenantCustomersService tenantCustomersService,
-        ILogger<TenantCustomersController> logger)
+    public VisitorsController(
+        IVisitorsService visitorsService,
+        ILogger<VisitorsController> logger)
     {
-        _tenantCustomersService = tenantCustomersService ?? throw new ArgumentNullException(nameof(tenantCustomersService));
+        _visitorsService = visitorsService ?? throw new ArgumentNullException(nameof(visitorsService));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
     /// <summary>
-    /// Gets a paginated list of monitored tenant customers (end-users) with their activity summary.
+    /// Gets a paginated list of monitored visitors (end-users) with their activity summary.
     /// Supports filtering by user ID search, date range, and pagination.
     /// </summary>
     /// <param name="request">Filter and pagination parameters</param>
-    /// <returns>Paginated result containing tenant customer summaries</returns>
+    /// <returns>Paginated result containing visitor summaries</returns>
     /// <remarks>
     /// Sample request:
     ///
-    ///     GET /api/v1/tenant-customers?userIdSearch=user123&amp;startDate=2026-01-01&amp;pageNumber=1&amp;pageSize=20
+    ///     GET /api/v1/visitors?userIdSearch=user123&amp;startDate=2026-01-01&amp;pageNumber=1&amp;pageSize=20
     ///
-    /// Returns tenant customers ordered by most recently seen (LastSeenAt descending).
+    /// Returns visitors ordered by most recently seen (LastSeenAt descending).
     ///
     /// **Note:** Browsers and OperatingSystems fields are empty in the current MVP.
     /// These will be populated in future enhancements when device info is added to the tracking system.
     /// </remarks>
     [HttpGet]
-    [ProducesResponseType(typeof(PagedResult<TenantCustomerSummaryModel>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(PagedResult<VisitorSummaryModel>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApplicationProblemDetailsModel), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ApplicationProblemDetailsModel), StatusCodes.Status401Unauthorized)]
-    public async Task<ActionResult<PagedResult<TenantCustomerSummaryModel>>> GetTenantCustomers([FromQuery] GetTenantCustomersRequest request)
+    public async Task<ActionResult<PagedResult<VisitorSummaryModel>>> GetVisitors([FromQuery] GetVisitorsRequest request)
     {
         _logger.LogInformation(
-            "Getting tenant customers with filters: UserIdSearch={UserIdSearch}, StartDate={StartDate}, EndDate={EndDate}, PageNumber={PageNumber}, PageSize={PageSize}",
+            "Getting visitors with filters: UserIdSearch={UserIdSearch}, StartDate={StartDate}, EndDate={EndDate}, PageNumber={PageNumber}, PageSize={PageSize}",
             request.UserIdSearch,
             request.StartDate,
             request.EndDate,
             request.PageNumber,
             request.PageSize);
 
-        var result = await _tenantCustomersService.GetTenantCustomersAsync(request);
+        var result = await _visitorsService.GetVisitorsAsync(request);
 
         _logger.LogInformation(
-            "Retrieved {Count} tenant customers out of {TotalCount} (Page {PageNumber}/{TotalPages})",
+            "Retrieved {Count} visitors out of {TotalCount} (Page {PageNumber}/{TotalPages})",
             result.Data.Count,
             result.TotalCount,
             result.PageNumber,
@@ -69,7 +69,7 @@ public class TenantCustomersController : ControllerBase
     }
 
     /// <summary>
-    /// Gets a paginated list of page loads for a specific tenant customer (end-user).
+    /// Gets a paginated list of page loads for a specific visitor (end-user).
     /// Supports filtering by date range and pagination.
     /// </summary>
     /// <param name="userId">The user ID to retrieve page loads for</param>
@@ -81,7 +81,7 @@ public class TenantCustomersController : ControllerBase
     /// <remarks>
     /// Sample request:
     ///
-    ///     GET /api/v1/tenant-customers/user123/page-loads?pageNumber=1&amp;pageSize=20&amp;startDate=2026-01-01
+    ///     GET /api/v1/visitors/user123/page-loads?pageNumber=1&amp;pageSize=20&amp;startDate=2026-01-01
     ///
     /// Returns page loads ordered by most recent first (Timestamp descending).
     /// </remarks>
@@ -106,14 +106,14 @@ public class TenantCustomersController : ControllerBase
 
         var request = new GetUserPageLoadsRequest
         {
-            UserId = userId,
+            UserOrGuestId = userId,
             PageNumber = pageNumber,
             PageSize = pageSize,
             StartDate = startDate,
             EndDate = endDate
         };
 
-        var result = await _tenantCustomersService.GetUserPageLoadsAsync(request);
+        var result = await _visitorsService.GetUserPageLoadsAsync(request);
 
         _logger.LogInformation(
             "Retrieved {Count} page loads out of {TotalCount} for user {UserId} (Page {PageNumber}/{TotalPages})",

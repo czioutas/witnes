@@ -6,7 +6,7 @@
  * OpenAPI spec version: v1
  */
 import { customInstance } from "../lib/axios-instance";
-export type GetApiV1TenantCustomersUserIdPageLoadsParams = {
+export type GetApiV1VisitorsUserIdPageLoadsParams = {
   /**
    * Page number (default: 1)
    */
@@ -25,7 +25,7 @@ export type GetApiV1TenantCustomersUserIdPageLoadsParams = {
   endDate?: string;
 };
 
-export type GetApiV1TenantCustomersParams = {
+export type GetApiV1VisitorsParams = {
   /**
    * Search filter for user IDs (case-insensitive contains)
    */
@@ -99,6 +99,40 @@ export interface VitalsModel {
   page_load?: VitalsModelPageLoad;
   /** @nullable */
   web_vitals?: VitalsModelWebVitals;
+}
+
+/**
+ * Summary information about a visitor's activity
+ */
+export interface VisitorSummaryModel {
+  /** List of browsers the visitor has used (empty in MVP - to be enhanced) */
+  browsers?: string[];
+  /**
+   * Guest identifier for anonymous visitors (may be null for identified users)
+   * @nullable
+   */
+  guest_id?: string | null;
+  /** Most recent page load timestamp for this visitor */
+  last_seen_at?: string;
+  /** List of operating systems the visitor has used (empty in MVP - to be enhanced) */
+  operating_systems?: string[];
+  /** Total number of page loads recorded for this visitor */
+  total_page_loads?: number;
+  /**
+   * Unique user identifier (may be null for anonymous visitors)
+   * @nullable
+   */
+  user_id?: string | null;
+}
+
+export interface VisitorSummaryModelPagedResult {
+  data?: VisitorSummaryModel[];
+  readonly has_next_page?: boolean;
+  readonly has_previous_page?: boolean;
+  page_number?: number;
+  page_size?: number;
+  total_count?: number;
+  readonly total_pages?: number;
 }
 
 export interface ViewportSize {
@@ -322,32 +356,6 @@ export interface TenantDetailsModel {
 export type TenantModelDetails = TenantDetailsModel | null;
 
 /**
- * Summary information about a user's activity
- */
-export interface TenantCustomerSummaryModel {
-  /** List of browsers the user has used (empty in MVP - to be enhanced) */
-  browsers?: string[];
-  /** Most recent page load timestamp for this user */
-  last_seen_at?: string;
-  /** List of operating systems the user has used (empty in MVP - to be enhanced) */
-  operating_systems?: string[];
-  /** Total number of page loads recorded for this user */
-  total_page_loads?: number;
-  /** Unique user identifier */
-  user_id?: string;
-}
-
-export interface TenantCustomerSummaryModelPagedResult {
-  data?: TenantCustomerSummaryModel[];
-  readonly has_next_page?: boolean;
-  readonly has_previous_page?: boolean;
-  page_number?: number;
-  page_size?: number;
-  total_count?: number;
-  readonly total_pages?: number;
-}
-
-/**
  * Response model for speed metric data
  */
 export interface SpeedMetricResponse {
@@ -394,12 +402,14 @@ export interface SetTenantPricingRequest {
 }
 
 export interface SessionModel {
-  guest_id?: string;
+  /** @nullable */
+  guest_id?: string | null;
   /** @nullable */
   ref?: string | null;
   session_id?: string;
   url?: string;
-  user_id?: string;
+  /** @nullable */
+  user_id?: string | null;
 }
 
 export interface ScreenSize {
@@ -1029,11 +1039,11 @@ The response is lightweight and does not perform any complex operations or datab
   /**
    * @summary Ingests a speed metric
    */
-  const postApiV1Ingestion = (
+  const postApiV1Events = (
     ingestSpeedMetricRequestModel: IngestSpeedMetricRequestModel,
   ) => {
     return customInstance<void>({
-      url: `/api/v1/ingestion`,
+      url: `/api/v1/events`,
       method: "POST",
       headers: { "Content-Type": "application/json" },
       data: ingestSpeedMetricRequestModel,
@@ -1225,46 +1235,6 @@ Returns detailed metrics including:
     });
   };
 
-  /**
- * Sample request:
-            
-    GET /api/v1/tenant-customers?userIdSearch=user123&startDate=2026-01-01&pageNumber=1&pageSize=20
-            
-Returns tenant customers ordered by most recently seen (LastSeenAt descending).
-            
-**Note:** Browsers and OperatingSystems fields are empty in the current MVP.
-These will be populated in future enhancements when device info is added to the tracking system.
- * @summary Gets a paginated list of monitored tenant customers (end-users) with their activity summary.
-Supports filtering by user ID search, date range, and pagination.
- */
-  const getApiV1TenantCustomers = (params?: GetApiV1TenantCustomersParams) => {
-    return customInstance<TenantCustomerSummaryModelPagedResult>({
-      url: `/api/v1/tenant-customers`,
-      method: "GET",
-      params,
-    });
-  };
-
-  /**
- * Sample request:
-            
-    GET /api/v1/tenant-customers/user123/page-loads?pageNumber=1&pageSize=20&startDate=2026-01-01
-            
-Returns page loads ordered by most recent first (Timestamp descending).
- * @summary Gets a paginated list of page loads for a specific tenant customer (end-user).
-Supports filtering by date range and pagination.
- */
-  const getApiV1TenantCustomersUserIdPageLoads = (
-    userId: string,
-    params?: GetApiV1TenantCustomersUserIdPageLoadsParams,
-  ) => {
-    return customInstance<PageLoadSummaryModelPagedResult>({
-      url: `/api/v1/tenant-customers/${userId}/page-loads`,
-      method: "GET",
-      params,
-    });
-  };
-
   const userUpdate = (id: string, updateUserModel: UpdateUserModel) => {
     return customInstance<SlimApplicationUserModel>({
       url: `/v1/user/${id}`,
@@ -1315,6 +1285,46 @@ Supports filtering by date range and pagination.
     });
   };
 
+  /**
+ * Sample request:
+            
+    GET /api/v1/visitors?userIdSearch=user123&startDate=2026-01-01&pageNumber=1&pageSize=20
+            
+Returns visitors ordered by most recently seen (LastSeenAt descending).
+            
+**Note:** Browsers and OperatingSystems fields are empty in the current MVP.
+These will be populated in future enhancements when device info is added to the tracking system.
+ * @summary Gets a paginated list of monitored visitors (end-users) with their activity summary.
+Supports filtering by user ID search, date range, and pagination.
+ */
+  const getApiV1Visitors = (params?: GetApiV1VisitorsParams) => {
+    return customInstance<VisitorSummaryModelPagedResult>({
+      url: `/api/v1/visitors`,
+      method: "GET",
+      params,
+    });
+  };
+
+  /**
+ * Sample request:
+            
+    GET /api/v1/visitors/user123/page-loads?pageNumber=1&pageSize=20&startDate=2026-01-01
+            
+Returns page loads ordered by most recent first (Timestamp descending).
+ * @summary Gets a paginated list of page loads for a specific visitor (end-user).
+Supports filtering by date range and pagination.
+ */
+  const getApiV1VisitorsUserIdPageLoads = (
+    userId: string,
+    params?: GetApiV1VisitorsUserIdPageLoadsParams,
+  ) => {
+    return customInstance<PageLoadSummaryModelPagedResult>({
+      url: `/api/v1/visitors/${userId}/page-loads`,
+      method: "GET",
+      params,
+    });
+  };
+
   return {
     postV1AccountRegister,
     postV1AccountLogin,
@@ -1328,7 +1338,7 @@ Supports filtering by date range and pagination.
     getV1Ping,
     getV1Features,
     getV1FeaturesFeatureKey,
-    postApiV1Ingestion,
+    postApiV1Events,
     getApiV1Metrics,
     getApiV1MetricsId,
     getApiV1PageLoadsId,
@@ -1345,8 +1355,6 @@ Supports filtering by date range and pagination.
     getApiV1ProjectKeysPackage,
     getV1Tenant,
     putV1Tenant,
-    getApiV1TenantCustomers,
-    getApiV1TenantCustomersUserIdPageLoads,
     userUpdate,
     userGet,
     userDelete,
@@ -1354,6 +1362,8 @@ Supports filtering by date range and pagination.
     userInvite,
     userInvitationsPendingGetAll,
     userInvitationDelete,
+    getApiV1Visitors,
+    getApiV1VisitorsUserIdPageLoads,
   };
 };
 export type PostV1AccountRegisterResult = NonNullable<
@@ -1418,10 +1428,8 @@ export type GetV1FeaturesFeatureKeyResult = NonNullable<
     ReturnType<ReturnType<typeof getWitnesServerAPI>["getV1FeaturesFeatureKey"]>
   >
 >;
-export type PostApiV1IngestionResult = NonNullable<
-  Awaited<
-    ReturnType<ReturnType<typeof getWitnesServerAPI>["postApiV1Ingestion"]>
-  >
+export type PostApiV1EventsResult = NonNullable<
+  Awaited<ReturnType<ReturnType<typeof getWitnesServerAPI>["postApiV1Events"]>>
 >;
 export type GetApiV1MetricsResult = NonNullable<
   Awaited<ReturnType<ReturnType<typeof getWitnesServerAPI>["getApiV1Metrics"]>>
@@ -1521,20 +1529,6 @@ export type GetV1TenantResult = NonNullable<
 export type PutV1TenantResult = NonNullable<
   Awaited<ReturnType<ReturnType<typeof getWitnesServerAPI>["putV1Tenant"]>>
 >;
-export type GetApiV1TenantCustomersResult = NonNullable<
-  Awaited<
-    ReturnType<ReturnType<typeof getWitnesServerAPI>["getApiV1TenantCustomers"]>
-  >
->;
-export type GetApiV1TenantCustomersUserIdPageLoadsResult = NonNullable<
-  Awaited<
-    ReturnType<
-      ReturnType<
-        typeof getWitnesServerAPI
-      >["getApiV1TenantCustomersUserIdPageLoads"]
-    >
-  >
->;
 export type UserUpdateResult = NonNullable<
   Awaited<ReturnType<ReturnType<typeof getWitnesServerAPI>["userUpdate"]>>
 >;
@@ -1560,5 +1554,15 @@ export type UserInvitationsPendingGetAllResult = NonNullable<
 export type UserInvitationDeleteResult = NonNullable<
   Awaited<
     ReturnType<ReturnType<typeof getWitnesServerAPI>["userInvitationDelete"]>
+  >
+>;
+export type GetApiV1VisitorsResult = NonNullable<
+  Awaited<ReturnType<ReturnType<typeof getWitnesServerAPI>["getApiV1Visitors"]>>
+>;
+export type GetApiV1VisitorsUserIdPageLoadsResult = NonNullable<
+  Awaited<
+    ReturnType<
+      ReturnType<typeof getWitnesServerAPI>["getApiV1VisitorsUserIdPageLoads"]
+    >
   >
 >;

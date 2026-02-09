@@ -4,8 +4,8 @@ import { useState } from "react";
 import { useApiToast } from "../../hooks/useApiToast";
 import {
   getWitnesServerAPI,
-  type TenantCustomerSummaryModel,
-  type TenantCustomerSummaryModelPagedResult,
+  type VisitorSummaryModel,
+  type VisitorSummaryModelPagedResult,
 } from "../../generated/api";
 import { TimeRangeFilter, type TimeRange } from "../filters/TimeRangeFilter";
 import { Input } from "../ui/input";
@@ -20,10 +20,10 @@ import {
 } from "../ui/table";
 import { Search, ChevronLeft, ChevronRight, ExternalLink } from "lucide-react";
 
-export function CustomersTable() {
+export function VisitorsTable() {
   const { handleApiCall } = useApiToast();
-  const [customers, setCustomers] =
-    useState<TenantCustomerSummaryModelPagedResult | null>(null);
+  const [visitors, setVisitors] =
+    useState<VisitorSummaryModelPagedResult | null>(null);
   const [loading, setLoading] = useState(false);
 
   // Filters
@@ -32,12 +32,12 @@ export function CustomersTable() {
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 20;
 
-  const fetchCustomers = async (page: number = currentPage) => {
+  const fetchVisitors = async (page: number = currentPage) => {
     setLoading(true);
     const api = getWitnesServerAPI();
     await handleApiCall({
       apiCall: async () => {
-        const response = await api.getApiV1TenantCustomers({
+        const response = await api.getApiV1Visitors({
           UserIdSearch: userIdSearch || undefined,
           StartDate: timeRange.startDate?.toISOString(),
           EndDate: timeRange.endDate?.toISOString(),
@@ -47,7 +47,7 @@ export function CustomersTable() {
         return response.data;
       },
       onSuccess: (data) => {
-        setCustomers(data);
+        setVisitors(data);
         setCurrentPage(page);
       },
       onError: () => setLoading(false),
@@ -57,19 +57,19 @@ export function CustomersTable() {
 
   const handleSearch = () => {
     setCurrentPage(1);
-    fetchCustomers(1);
+    fetchVisitors(1);
   };
 
   const handleTimeRangeChange = (newRange: TimeRange) => {
     setTimeRange(newRange);
     setCurrentPage(1);
     // Auto-fetch when time range changes
-    setTimeout(() => fetchCustomers(1), 100);
+    setTimeout(() => fetchVisitors(1), 100);
   };
 
   // Initial load
   useState(() => {
-    fetchCustomers();
+    fetchVisitors();
   });
 
   return (
@@ -108,7 +108,7 @@ export function CustomersTable() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {loading && !customers && (
+            {loading && !visitors && (
               <TableRow>
                 <TableCell colSpan={6} className="text-center py-8">
                   Loading...
@@ -116,55 +116,60 @@ export function CustomersTable() {
               </TableRow>
             )}
             {!loading &&
-              customers &&
-              customers.data &&
-              customers.data.length === 0 && (
+              visitors &&
+              visitors.data &&
+              visitors.data.length === 0 && (
                 <TableRow>
                   <TableCell
                     colSpan={6}
                     className="text-center py-8 text-muted-foreground"
                   >
-                    No customers found
+                    No visitors found
                   </TableCell>
                 </TableRow>
               )}
-            {customers?.data?.map((customer: TenantCustomerSummaryModel) => {
-              const customerUrl = `/dashboard/customers/${encodeURIComponent(customer.user_id!)}`;
+            {visitors?.data?.map((visitor: VisitorSummaryModel) => {
+              const displayId = visitor.user_id || visitor.guest_id || "Unknown";
+              const isGuest = !visitor.user_id && !!visitor.guest_id;
+              const visitorUrl = `/dashboard/visitors/${encodeURIComponent(displayId)}`;
               return (
                 <TableRow
-                  key={customer.user_id}
+                  key={visitor.user_id || visitor.guest_id}
                   className="cursor-pointer hover:bg-muted/50"
-                  onClick={() => window.location.href = customerUrl}
+                  onClick={() => window.location.href = visitorUrl}
                   onAuxClick={(e) => {
                     if (e.button === 1) {
                       e.preventDefault();
-                      window.open(customerUrl, "_blank");
+                      window.open(visitorUrl, "_blank");
                     }
                   }}
                 >
                   <TableCell className="font-medium">
-                    {customer.user_id}
+                    {displayId}
+                    {isGuest && (
+                      <span className="ml-2 text-xs px-1.5 py-0.5 rounded bg-muted text-muted-foreground">Guest</span>
+                    )}
                   </TableCell>
-                  <TableCell>{customer.total_page_loads}</TableCell>
+                  <TableCell>{visitor.total_page_loads}</TableCell>
                   <TableCell>
-                    {customer.last_seen_at
-                      ? new Date(customer.last_seen_at).toLocaleString()
+                    {visitor.last_seen_at
+                      ? new Date(visitor.last_seen_at).toLocaleString()
                       : "-"}
                   </TableCell>
                   <TableCell>
-                    {customer.browsers && customer.browsers.length > 0
-                      ? customer.browsers.join(", ")
+                    {visitor.browsers && visitor.browsers.length > 0
+                      ? visitor.browsers.join(", ")
                       : "-"}
                   </TableCell>
                   <TableCell>
-                    {customer.operating_systems &&
-                    customer.operating_systems.length > 0
-                      ? customer.operating_systems.join(", ")
+                    {visitor.operating_systems &&
+                    visitor.operating_systems.length > 0
+                      ? visitor.operating_systems.join(", ")
                       : "-"}
                   </TableCell>
                   <TableCell>
                     <a
-                      href={customerUrl}
+                      href={visitorUrl}
                       target="_blank"
                       rel="noopener noreferrer"
                       onClick={(e) => e.stopPropagation()}
@@ -182,34 +187,34 @@ export function CustomersTable() {
       </div>
 
       {/* Pagination */}
-      {customers && customers.total_count! > 0 && (
+      {visitors && visitors.total_count! > 0 && (
         <div className="flex items-center justify-between">
           <div className="text-sm text-muted-foreground">
-            Showing {(customers.page_number! - 1) * customers.page_size! + 1} to{" "}
+            Showing {(visitors.page_number! - 1) * visitors.page_size! + 1} to{" "}
             {Math.min(
-              customers.page_number! * customers.page_size!,
-              customers.total_count!,
+              visitors.page_number! * visitors.page_size!,
+              visitors.total_count!,
             )}{" "}
-            of {customers.total_count} results
+            of {visitors.total_count} results
           </div>
           <div className="flex items-center gap-2">
             <Button
               variant="outline"
               size="sm"
-              onClick={() => fetchCustomers(currentPage - 1)}
-              disabled={!customers.has_previous_page || loading}
+              onClick={() => fetchVisitors(currentPage - 1)}
+              disabled={!visitors.has_previous_page || loading}
             >
               <ChevronLeft className="h-4 w-4" />
               Previous
             </Button>
             <div className="text-sm">
-              Page {customers.page_number} of {customers.total_pages}
+              Page {visitors.page_number} of {visitors.total_pages}
             </div>
             <Button
               variant="outline"
               size="sm"
-              onClick={() => fetchCustomers(currentPage + 1)}
-              disabled={!customers.has_next_page || loading}
+              onClick={() => fetchVisitors(currentPage + 1)}
+              disabled={!visitors.has_next_page || loading}
             >
               Next
               <ChevronRight className="h-4 w-4" />

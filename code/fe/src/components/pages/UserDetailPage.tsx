@@ -2,9 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { useApiToast } from "../../hooks/useApiToast";
-import { getWitnesServerAPI, type TenantCustomerSummaryModel } from "../../generated/api";
-import { UserInfoHeader } from "../customers/UserInfoHeader";
-import { UserPageLoadsTable } from "../customers/UserPageLoadsTable";
+import { getWitnesServerAPI, type VisitorSummaryModel } from "../../generated/api";
+import { UserInfoHeader } from "../visitors/UserInfoHeader";
+import { UserPageLoadsTable } from "../visitors/UserPageLoadsTable";
 import { Button } from "../ui/button";
 import { ArrowLeft } from "lucide-react";
 
@@ -14,7 +14,7 @@ interface UserDetailPageProps {
 
 export default function UserDetailPage({ userId }: UserDetailPageProps) {
   const { handleApiCall } = useApiToast();
-  const [userSummary, setUserSummary] = useState<TenantCustomerSummaryModel | null>(null);
+  const [userSummary, setUserSummary] = useState<VisitorSummaryModel | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -23,7 +23,7 @@ export default function UserDetailPage({ userId }: UserDetailPageProps) {
       const api = getWitnesServerAPI();
       await handleApiCall({
         apiCall: async () => {
-          const response = await api.getApiV1TenantCustomers({
+          const response = await api.getApiV1Visitors({
             UserIdSearch: userId,
             PageNumber: 1,
             PageSize: 1,

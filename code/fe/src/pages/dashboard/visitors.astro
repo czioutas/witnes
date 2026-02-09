@@ -1,0 +1,13 @@
+---
+import DashboardLayout from "../../layouts/DashboardLayout.astro";
+import DashboardPage from "../../components/DashboardPage.tsx";
+---
+
+<DashboardLayout title="Visitors - Witnes">
+  <DashboardPage
+    client:only="react"
+    page="visitors"
+    title="Visitors"
+    description="View and analyze your monitored visitors' activity"
+  />
+</DashboardLayout>

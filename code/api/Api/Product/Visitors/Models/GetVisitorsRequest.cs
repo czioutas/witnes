@@ -1,11 +1,11 @@
 using Libs.Pagination;
 
-namespace Api.Product.TenantCustomers.Models;
+namespace Api.Product.Visitors.Models;
 
 /// <summary>
-/// Request model for filtering users
+/// Request model for filtering visitors
 /// </summary>
-public class GetTenantCustomersRequest : PaginationRequest
+public class GetVisitorsRequest : PaginationRequest
 {
     /// <summary>
     /// Search filter for user IDs (case-insensitive contains)

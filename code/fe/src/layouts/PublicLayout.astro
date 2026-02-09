@@ -9,6 +9,13 @@ export interface Props {
 
 const { title, description, canonical } = Astro.props;
 const canonicalURL = new URL(canonical, Astro.site);
+const trackingUrl =
+  import.meta.env.PUBLIC_WITNES_TRACKING_URL ||
+  "https://cdn-witnes.ziou.xyz/w.min.js";
+const projectKey =
+  import.meta.env.PUBLIC_WITNES_PROJECT_KEY ||
+  "pk_4705e0d771ff461f8e58027b880cf96e";
+const trackingDebug = import.meta.env.PUBLIC_WITNES_DEBUG_MODE === "false";
 ---
 
 <!doctype html>
@@ -34,14 +41,13 @@ const canonicalURL = new URL(canonical, Astro.site);
 
     <meta name="generator" content={Astro.generator} />
     <title>{title}</title>
-    <script is:inline>
+    <script is:inline define:vars={{ projectKey, trackingDebug }}>
       window.witnesConfig = {
-        projectKey: "pk_4705e0d771ff461f8e58027b880cf96e",
-        debug: true,
+        projectKey: projectKey,
+        debug: trackingDebug,
       };
     </script>
-    <script src="https://cdn-witnes.ziou.xyz/track.min.js" async is:inline
-    ></script>
+    <script src={trackingUrl} async is:inline></script>
   </head>
   <body class="antialiased">
     <slot />

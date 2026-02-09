@@ -1,6 +1,6 @@
 using Libs.Pagination;
 
-namespace Api.Product.TenantCustomers.Models;
+namespace Api.Product.Visitors.Models;
 
 /// <summary>
 /// Request model for retrieving page loads for a specific user
@@ -10,7 +10,7 @@ public class GetUserPageLoadsRequest : PaginationRequest
     /// <summary>
     /// User ID to filter page loads for
     /// </summary>
-    public string UserId { get; set; } = null!;
+    public string UserOrGuestId { get; set; } = null!;
 
     /// <summary>
     /// Optional start date filter (inclusive)

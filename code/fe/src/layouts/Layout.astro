@@ -6,6 +6,13 @@ export interface Props {
 }
 
 const { title } = Astro.props;
+const trackingUrl =
+  import.meta.env.PUBLIC_WITNES_TRACKING_URL ||
+  "https://cdn-witnes.ziou.xyz/w.min.js";
+const projectKey =
+  import.meta.env.PUBLIC_WITNES_PROJECT_KEY ||
+  "pk_4705e0d771ff461f8e58027b880cf96e";
+const trackingDebug = import.meta.env.PUBLIC_WITNES_DEBUG_MODE === "false";
 ---
 
 <!doctype html>
@@ -25,20 +32,13 @@ const { title } = Astro.props;
       }
     </style>
     <title>{title}</title>
-    <!-- <script is:inline define:vars={{ projectKey: import.meta.env.PUBLIC_WITNES_PROJECT_KEY }}>
-      if (projectKey) {
-        window.witnesConfig = { projectKey };
-      }
-    </script> -->
-    <!-- <script src="https://cdn.witnes.io/track.js" async is:inline></script> -->
-    <script is:inline>
+    <script is:inline define:vars={{ projectKey, trackingDebug }}>
       window.witnesConfig = {
-        projectKey: "pk_4705e0d771ff461f8e58027b880cf96e",
-        debug: true,
+        projectKey: projectKey,
+        debug: trackingDebug,
       };
     </script>
-    <script src="https://cdn-witnes.ziou.xyz/track.min.js" async is:inline
-    ></script>
+    <script src={trackingUrl} async is:inline></script>
   </head>
   <body>
     <slot />

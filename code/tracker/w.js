@@ -32,7 +32,7 @@
     // STICKY Guest ID: The anchor
     let guestId = localStorage.getItem(KEYS.GID);
     if (!guestId) {
-        guestId = 'gid_' + Math.random().toString(36).substr(2, 9);
+        guestId = 'w-gid_' + Math.random().toString(36).substr(2, 9);
         localStorage.setItem(KEYS.GID, guestId);
     }
 
@@ -170,7 +170,7 @@
             }
 
             const blob = new Blob([JSON.stringify(payload)], { type: 'application/json' });
-            const endpoint = `https://api-witnes.ziou.xyz/api/v1/ingestion?pk=${pk}`;
+            const endpoint = `https://api-witnes.ziou.xyz/api/v1/events?pk=${pk}`;
             
             if (navigator.sendBeacon) {
                 navigator.sendBeacon(endpoint, blob);
@@ -188,7 +188,7 @@
         loadPending = setTimeout(() => {
             dataEmitted = true;
             Witnes.emit('LOAD', false);
-        }, 5000);
+        }, 2500);
     });
 
     window.addEventListener('pagehide', () => {

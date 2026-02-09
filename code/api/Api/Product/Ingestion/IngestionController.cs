@@ -10,7 +10,7 @@ namespace Api.Product.Ingestion;
 /// Controller for ingesting speed metrics
 /// </summary>
 [ApiController]
-[Route("api/v1/[controller]")]
+[Route("api/v1/events")]
 // [Authorize]
 public class IngestionController : ControllerBase
 {

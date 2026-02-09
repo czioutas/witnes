@@ -24,12 +24,7 @@ import {
   ExternalLink,
   AlertTriangle,
 } from "lucide-react";
-import {
-  SiGooglechrome,
-  SiSafari,
-  SiFirefox,
-  SiOpera,
-} from "react-icons/si";
+import { SiGooglechrome, SiSafari, SiFirefox, SiOpera } from "react-icons/si";
 
 interface UserPageLoadsTableProps {
   userId: string;
@@ -51,7 +46,7 @@ function lcpDot(verdict?: string) {
 }
 
 function clsBadgeVariant(
-  verdict?: string
+  verdict?: string,
 ): "default" | "secondary" | "destructive" | "outline" {
   return verdict === "Shifty" ? "destructive" : "secondary";
 }
@@ -108,7 +103,7 @@ function BrowserIconDisplay({ icon }: { icon?: string }) {
 // --- Date grouping ---
 
 function groupByDay(
-  items: PageLoadSummaryModel[]
+  items: PageLoadSummaryModel[],
 ): Map<string, PageLoadSummaryModel[]> {
   const groups = new Map<string, PageLoadSummaryModel[]>();
   for (const item of items) {
@@ -159,14 +154,14 @@ export function UserPageLoadsTable({ userId }: UserPageLoadsTableProps) {
     const api = getWitnesServerAPI();
     await handleApiCall({
       apiCall: async () => {
-        const response = await api.getApiV1TenantCustomersUserIdPageLoads(
+        const response = await api.getApiV1VisitorsUserIdPageLoads(
           userId,
           {
             startDate: timeRange.startDate?.toISOString(),
             endDate: timeRange.endDate?.toISOString(),
             pageNumber: page,
             pageSize: pageSize,
-          }
+          },
         );
         return response.data;
       },
@@ -227,144 +222,152 @@ export function UserPageLoadsTable({ userId }: UserPageLoadsTableProps) {
                 {loads.map((pl) => {
                   const pageLoadUrl = `/dashboard/page-loads/${pl.silver_id}`;
                   return (
-                  <div
-                    key={pl.id}
-                    className="group flex items-center gap-3 rounded-lg border p-3 cursor-pointer transition-colors hover:bg-muted/50"
-                    onClick={() =>
-                      (window.location.href = pageLoadUrl)
-                    }
-                    onAuxClick={(e) => {
-                      if (e.button === 1) {
-                        e.preventDefault();
-                        window.open(pageLoadUrl, "_blank");
-                      }
-                    }}
-                  >
-                    {/* Col 1: Status dot */}
-                    <div className="shrink-0">
-                      <span
-                        className={`inline-block h-3 w-3 rounded-full ${lcpDot(pl.lcp_verdict)}`}
-                      />
-                    </div>
-
-                    {/* Col 2: URL (row 1) + DateTime (row 2) */}
-                    <div className="min-w-0 flex-1">
-                      <p className="text-sm font-medium truncate">
-                        {pl.url_path || "/"}
-                      </p>
-                      <div className="flex items-center gap-2 mt-0.5">
-                        <span className="text-xs text-muted-foreground">
-                          {formatDateTime(pl.timestamp)}
-                        </span>
-                        <DeviceIcon icon={pl.device_icon} />
-                        <BrowserIconDisplay icon={pl.browser_icon} />
+                    <div
+                      key={pl.id}
+                      className="group flex items-center gap-3 rounded-lg border p-3 cursor-pointer transition-colors hover:bg-muted/50"
+                      onClick={() => (window.location.href = pageLoadUrl)}
+                      onAuxClick={(e) => {
+                        if (e.button === 1) {
+                          e.preventDefault();
+                          window.open(pageLoadUrl, "_blank");
+                        }
+                      }}
+                    >
+                      {/* Col 1: Status dot */}
+                      <div className="shrink-0">
+                        <span
+                          className={`inline-block h-3 w-3 rounded-full ${lcpDot(pl.lcp_verdict)}`}
+                        />
                       </div>
-                    </div>
 
-                    {/* Col 3: Incomplete warning + Load Speed */}
-                    {pl.incomplete && (
+                      {/* Col 2: URL (row 1) + DateTime (row 2) */}
+                      <div className="min-w-0 flex-1">
+                        <p className="text-sm font-medium truncate">
+                          {pl.url_path || "/"}
+                        </p>
+                        <div className="flex items-center gap-2 mt-0.5">
+                          <span className="text-xs text-muted-foreground">
+                            {formatDateTime(pl.timestamp)}
+                          </span>
+                          <DeviceIcon icon={pl.device_icon} />
+                          <BrowserIconDisplay icon={pl.browser_icon} />
+                        </div>
+                      </div>
+
+                      {/* Col 3: Incomplete warning + Load Speed */}
+                      {pl.incomplete && (
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <div className="shrink-0 flex justify-center">
+                              <AlertTriangle className="h-4 w-4 text-amber-500" />
+                            </div>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            Potentially Incomplete — user navigated away in less
+                            than 2.5 seconds after page load, which may lead to
+                            missing performance metrics
+                          </TooltipContent>
+                        </Tooltip>
+                      )}
                       <Tooltip>
                         <TooltipTrigger asChild>
-                          <div className="shrink-0 flex justify-center">
-                            <AlertTriangle className="h-4 w-4 text-amber-500" />
+                          <div className="w-24 shrink-0 text-right">
+                            <span className="text-sm font-medium tabular-nums">
+                              {pl.lcp_verdict ?? "—"}
+                            </span>
+                            <span className="text-xs text-muted-foreground tabular-nums ml-1">
+                              {pl.lcp_ms ?? 0}ms
+                            </span>
                           </div>
                         </TooltipTrigger>
                         <TooltipContent>
-                          Incomplete — user navigated away before all data could be collected
+                          Load Speed (LCP): {pl.lcp_ms ?? 0}ms
                         </TooltipContent>
                       </Tooltip>
-                    )}
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <div className="w-24 shrink-0 text-right">
-                          <span className="text-sm font-medium tabular-nums">
-                            {pl.lcp_verdict ?? "—"}
+
+                      {/* Col 4: Stability (fixed width) */}
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <div className="w-16 shrink-0 flex justify-center">
+                            <Badge variant={clsBadgeVariant(pl.cls_verdict)}>
+                              {pl.cls_verdict ?? "Solid"}
+                            </Badge>
+                          </div>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          Visual Stability (CLS):{" "}
+                          {pl.cls_score?.toFixed(3) ?? "0.000"}
+                        </TooltipContent>
+                      </Tooltip>
+
+                      {/* Col 5: TTFB (fixed width) */}
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <span className="w-20 shrink-0 text-right text-xs text-muted-foreground tabular-nums">
+                            {pl.ttfb_ms ?? 0}ms TTFB
                           </span>
-                          <span className="text-xs text-muted-foreground tabular-nums ml-1">
-                            {pl.lcp_ms ?? 0}ms
-                          </span>
-                        </div>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        Load Speed (LCP): {pl.lcp_ms ?? 0}ms
-                      </TooltipContent>
-                    </Tooltip>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          Wait for Data (TTFB): {pl.ttfb_ms ?? 0}ms
+                        </TooltipContent>
+                      </Tooltip>
 
-                    {/* Col 4: Stability (fixed width) */}
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <div className="w-16 shrink-0 flex justify-center">
-                          <Badge variant={clsBadgeVariant(pl.cls_verdict)}>
-                            {pl.cls_verdict ?? "Solid"}
-                          </Badge>
-                        </div>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        Visual Stability (CLS):{" "}
-                        {pl.cls_score?.toFixed(3) ?? "0.000"}
-                      </TooltipContent>
-                    </Tooltip>
+                      {/* Col 6: Connection fault */}
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <div className="w-8 shrink-0 flex justify-center">
+                            <Wifi
+                              className={`h-4 w-4 ${pl.is_connection_fault ? "text-red-500" : "text-green-500"}`}
+                            />
+                          </div>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          {pl.is_connection_fault
+                            ? "Slow Connection"
+                            : "Connection OK"}
+                        </TooltipContent>
+                      </Tooltip>
 
-                    {/* Col 5: TTFB (fixed width) */}
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <span className="w-20 shrink-0 text-right text-xs text-muted-foreground tabular-nums">
-                          {pl.ttfb_ms ?? 0}ms TTFB
-                        </span>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        Wait for Data (TTFB): {pl.ttfb_ms ?? 0}ms
-                      </TooltipContent>
-                    </Tooltip>
+                      {/* Col 7: Backend fault */}
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <div className="w-8 shrink-0 flex justify-center">
+                            <Server
+                              className={`h-4 w-4 ${pl.is_backend_fault ? "text-red-500" : "text-green-500"}`}
+                            />
+                          </div>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          {pl.is_backend_fault ? "API Latency" : "Backend OK"}
+                        </TooltipContent>
+                      </Tooltip>
 
-                    {/* Col 6: Connection fault */}
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <div className="w-8 shrink-0 flex justify-center">
-                          <Wifi className={`h-4 w-4 ${pl.is_connection_fault ? "text-red-500" : "text-green-500"}`} />
-                        </div>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        {pl.is_connection_fault ? "Slow Connection" : "Connection OK"}
-                      </TooltipContent>
-                    </Tooltip>
+                      {/* Col 8: Frontend fault */}
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <div className="w-8 shrink-0 flex justify-center">
+                            <Code
+                              className={`h-4 w-4 ${pl.is_frontend_fault ? "text-red-500" : "text-green-500"}`}
+                            />
+                          </div>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          {pl.is_frontend_fault ? "Heavy Page" : "Frontend OK"}
+                        </TooltipContent>
+                      </Tooltip>
 
-                    {/* Col 7: Backend fault */}
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <div className="w-8 shrink-0 flex justify-center">
-                          <Server className={`h-4 w-4 ${pl.is_backend_fault ? "text-red-500" : "text-green-500"}`} />
-                        </div>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        {pl.is_backend_fault ? "API Latency" : "Backend OK"}
-                      </TooltipContent>
-                    </Tooltip>
-
-                    {/* Col 8: Frontend fault */}
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <div className="w-8 shrink-0 flex justify-center">
-                          <Code className={`h-4 w-4 ${pl.is_frontend_fault ? "text-red-500" : "text-green-500"}`} />
-                        </div>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        {pl.is_frontend_fault ? "Heavy Page" : "Frontend OK"}
-                      </TooltipContent>
-                    </Tooltip>
-
-                    {/* Col 9: Open in new tab */}
-                    <a
-                      href={pageLoadUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      onClick={(e) => e.stopPropagation()}
-                      className="shrink-0 ml-1 inline-flex items-center justify-center rounded-md p-1 text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
-                      title="Open in new tab"
-                    >
-                      <ExternalLink className="h-4 w-4" />
-                    </a>
-                  </div>
+                      {/* Col 9: Open in new tab */}
+                      <a
+                        href={pageLoadUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={(e) => e.stopPropagation()}
+                        className="shrink-0 ml-1 inline-flex items-center justify-center rounded-md p-1 text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+                        title="Open in new tab"
+                      >
+                        <ExternalLink className="h-4 w-4" />
+                      </a>
+                    </div>
                   );
                 })}
               </div>
@@ -377,11 +380,10 @@ export function UserPageLoadsTable({ userId }: UserPageLoadsTableProps) {
       {pageLoads && pageLoads.total_count! > 0 && (
         <div className="flex items-center justify-between">
           <div className="text-sm text-muted-foreground">
-            Showing {(pageLoads.page_number! - 1) * pageLoads.page_size! + 1}{" "}
-            to{" "}
+            Showing {(pageLoads.page_number! - 1) * pageLoads.page_size! + 1} to{" "}
             {Math.min(
               pageLoads.page_number! * pageLoads.page_size!,
-              pageLoads.total_count!
+              pageLoads.total_count!,
             )}{" "}
             of {pageLoads.total_count} results
           </div>

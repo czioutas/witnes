@@ -3,41 +3,51 @@ const { minify } = require('terser');
 const JavaScriptObfuscator = require('javascript-obfuscator');
 const path = require('path');
 
-const inputPath = 'track.js';
-const outputPath = 'track.min.js';
+const PRODUCTION_URL = 'https://api-witnes.ziou.xyz/api/v1/events';
+const DEV_URL = 'http://localhost:7070/api/v1/events';
+
+const inputPath = 'w.js';
+const distDir = 'dist';
+const prodOutput = path.join(distDir, 'w.min.js');
+const devOutput = path.join('..', 'fe', 'public', 'w.js');
 
 async function processCode() {
     try {
-        // 1. Read the source
         if (!existsSync(inputPath)) {
             console.error(`File not found: ${inputPath}`);
             return;
         }
+
         const sourceCode = readFileSync(inputPath, 'utf8');
 
-        // 2. Minify with Terser
+        // --- Production build (dist/w.min.js) ---
+        if (!existsSync(distDir)) {
+            mkdirSync(distDir);
+        }
+
         const terserResult = await minify(sourceCode, {
             compress: { passes: 2, drop_console: true },
             mangle: { toplevel: true }
         });
 
-        // 3. Obfuscate the minified code
         const obfuscationResult = JavaScriptObfuscator.obfuscate(terserResult.code, {
             compact: true,
-            controlFlowFlattening: true, // Makes the logic flow hard to follow
-            numbersToExpressions: true,  // Converts numbers to complex math (e.g., 10 becomes 2*5)
+            controlFlowFlattening: true,
+            numbersToExpressions: true,
             simplify: true,
-            stringArray: true,           // Hides strings/URLs in an array
+            stringArray: true,
             stringArrayThreshold: 0.75
         });
 
-        // 4. Write output
-        writeFileSync(outputPath, obfuscationResult.getObfuscatedCode());
-        
-        console.log('--- Build Complete ---');
-        console.log(`Output saved to: ${outputPath}`);
-        console.log(`Final size: ${obfuscationResult.getObfuscatedCode().length} bytes`);
+        writeFileSync(prodOutput, obfuscationResult.getObfuscatedCode());
+        console.log(`Production: ${prodOutput} (${obfuscationResult.getObfuscatedCode().length} bytes)`);
 
+        // --- Dev build (code/fe/public/w.js) ---
+        const devCode = sourceCode.replace(PRODUCTION_URL, DEV_URL);
+        writeFileSync(devOutput, devCode);
+        console.log(`Dev:        ${devOutput}`);
+
+        console.log('--- Build Complete ---');
     } catch (error) {
         console.error('Build failed:', error);
     }

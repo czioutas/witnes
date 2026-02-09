@@ -2,10 +2,10 @@ import { useState } from "react";
 import { Search, TrendingUp, Users, Activity } from "lucide-react";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
-import type { TenantCustomerSummaryModel } from "../../generated/api";
+import type { VisitorSummaryModel } from "../../generated/api";
 
 interface ActiveStateProps {
-  recentUsers: TenantCustomerSummaryModel[];
+  recentUsers: VisitorSummaryModel[];
   totalUsers?: number;
   dataIngestionWorking: boolean;
 }
@@ -20,7 +20,7 @@ export function ActiveState({
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim()) {
-      window.location.href = `/dashboard/customers?search=${encodeURIComponent(searchQuery)}`;
+      window.location.href = `/dashboard/visitors?search=${encodeURIComponent(searchQuery)}`;
     }
   };
 
@@ -46,9 +46,9 @@ export function ActiveState({
       {/* Large Search Component */}
       <div className="text-center space-y-6">
         <div>
-          <h1 className="text-4xl font-bold mb-3">Search Users</h1>
+          <h1 className="text-4xl font-bold mb-3">Search Visitors</h1>
           <p className="text-muted-foreground text-lg">
-            Find any monitored user by their ID to view their activity and page loads
+            Find any monitored visitor by their ID to view their activity and page loads
           </p>
         </div>
 
@@ -76,7 +76,7 @@ export function ActiveState({
         <div className="p-6 border rounded-lg">
           <div className="flex items-center gap-3 mb-2">
             <Users className="h-5 w-5 text-primary" />
-            <h3 className="font-semibold">Total Users Monitored</h3>
+            <h3 className="font-semibold">Total Visitors Monitored</h3>
           </div>
           <p className="text-3xl font-bold">{totalUsers?.toLocaleString() || "0"}</p>
         </div>
@@ -87,28 +87,34 @@ export function ActiveState({
             <h3 className="font-semibold">Recent Activity</h3>
           </div>
           <p className="text-3xl font-bold">{recentUsers.length}</p>
-          <p className="text-sm text-muted-foreground">users in the last 24 hours</p>
+          <p className="text-sm text-muted-foreground">visitors in the last 24 hours</p>
         </div>
       </div>
 
       {/* Recent Users */}
       {recentUsers.length > 0 && (
         <div>
-          <h2 className="text-2xl font-bold mb-4">Recent Users</h2>
+          <h2 className="text-2xl font-bold mb-4">Recent Visitors</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            {recentUsers.map((user) => (
+            {recentUsers.map((user) => {
+              const displayId = user.user_id || user.guest_id || "Unknown";
+              const isGuest = !user.user_id && !!user.guest_id;
+              return (
               <div
-                key={user.user_id}
+                key={user.user_id || user.guest_id}
                 className="p-4 border rounded-lg hover:bg-muted/50 cursor-pointer transition-colors"
                 onClick={() =>
-                  (window.location.href = `/dashboard/customers/${encodeURIComponent(user.user_id!)}`)
+                  (window.location.href = `/dashboard/visitors/${encodeURIComponent(displayId)}`)
                 }
               >
                 <div className="flex items-center gap-2 mb-2">
                   <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10">
                     <Users className="h-4 w-4 text-primary" />
                   </div>
-                  <p className="font-medium truncate">{user.user_id}</p>
+                  <p className="font-medium truncate">{displayId}</p>
+                  {isGuest && (
+                    <span className="text-xs px-1.5 py-0.5 rounded bg-muted text-muted-foreground">Guest</span>
+                  )}
                 </div>
                 <div className="space-y-1 text-sm text-muted-foreground">
                   <p>{user.total_page_loads} page loads</p>
@@ -120,15 +126,16 @@ export function ActiveState({
                   </p>
                 </div>
               </div>
-            ))}
+              );
+            })}
           </div>
 
           <div className="mt-6 text-center">
             <Button
               variant="outline"
-              onClick={() => (window.location.href = "/dashboard/customers")}
+              onClick={() => (window.location.href = "/dashboard/visitors")}
             >
-              View All Users
+              View All Visitors
             </Button>
           </div>
         </div>

@@ -39,17 +39,19 @@ const data = {
             window.location.pathname === "/dashboard/",
         },
         {
-          title: "Users",
-          url: "/dashboard/customers",
+          title: "Visitors",
+          url: "/dashboard/visitors",
           icon: Users,
           isActive:
             typeof window !== "undefined" &&
-            window.location.pathname.startsWith("/dashboard/customers"),
+            window.location.pathname.startsWith("/dashboard/visitors"),
         },
         {
           title: "Organizations",
           url: "/dashboard/organizations",
           icon: ShoppingBag,
+          badge: "Coming soon",
+          disabled: true,
           isActive:
             typeof window !== "undefined" &&
             window.location.pathname.startsWith("/dashboard/organizations"),
@@ -58,6 +60,8 @@ const data = {
           title: "Analytics",
           url: "/dashboard/analytics",
           icon: BarChart3,
+          badge: "Coming soon",
+          disabled: true,
           isActive:
             typeof window !== "undefined" &&
             window.location.pathname.startsWith("/dashboard/analytics"),
@@ -67,8 +71,8 @@ const data = {
   ],
   navSecondary: [
     {
-      title: "Team",
-      url: "/dashboard/team",
+      title: "Users",
+      url: "/dashboard/users",
       icon: Users,
     },
     {
@@ -123,7 +127,7 @@ export function AppSidebar({
   // Filter secondary nav items based on role
   const filteredNavSecondary = data.navSecondary.filter((item) => {
     // Only show admin-only pages to admins
-    const adminOnlyPages = ["Team", "Usage", "Organization Settings"];
+    const adminOnlyPages = ["Users", "Usage", "Organization Settings"];
     if (adminOnlyPages.includes(item.title)) {
       return isAdmin;
     }

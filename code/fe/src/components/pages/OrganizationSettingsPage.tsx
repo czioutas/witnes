@@ -50,7 +50,6 @@ export function OrganizationSettingsPage() {
   const [submitting, setSubmitting] = useState(false);
   const [, setLoading] = useState(true);
   const [normalizedIdentifier, setNormalizedIdentifier] = useState("");
-  const [logo, setLogo] = useState<PublicFileModel | null>(null);
 
   const form = useForm<OrganizationSettingsFormValues>({
     resolver: zodResolver(organizationSettingsSchema),
@@ -81,11 +80,6 @@ export function OrganizationSettingsPage() {
 
       // Store normalized identifier
       setNormalizedIdentifier(tenant.normalized_identifier);
-
-      // Store logo if present
-      if (tenant.logo) {
-        setLogo(tenant.logo);
-      }
 
       // Populate all form fields from API response
       form.setValue("identifier", tenant.identifier);
