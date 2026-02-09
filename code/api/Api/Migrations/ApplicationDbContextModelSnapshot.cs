@@ -483,14 +483,19 @@ namespace Api.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("id");
 
-                    b.Property<string>("AllowedOrigins")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("allowed_origins");
-
                     b.Property<DateTimeOffset>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)")
+                        .HasColumnName("description");
+
+                    b.Property<string>("Domain")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("domain");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("boolean")
@@ -703,14 +708,31 @@ namespace Api.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at");
 
+                    b.Property<string>("Device")
+                        .HasColumnType("jsonb");
+
                     b.Property<string>("EventType")
                         .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("GuestId")
                         .HasColumnType("text");
 
                     b.Property<DateTime>("IngestedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("RawPerformanceData")
+                    b.Property<string>("Metadata")
+                        .IsRequired()
+                        .HasColumnType("jsonb");
+
+                    b.Property<string>("Network")
+                        .HasColumnType("jsonb");
+
+                    b.Property<string>("Performance")
+                        .IsRequired()
+                        .HasColumnType("jsonb");
+
+                    b.Property<string>("Session")
                         .IsRequired()
                         .HasColumnType("jsonb");
 
@@ -731,7 +753,6 @@ namespace Api.Migrations
                         .HasColumnType("text");
 
                     b.Property<string>("UserId")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.HasKey("Id");
@@ -782,6 +803,12 @@ namespace Api.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<string>("GuestId")
+                        .HasColumnType("text");
+
+                    b.Property<bool>("Incomplete")
+                        .HasColumnType("boolean");
+
                     b.Property<bool>("IsBackendFault")
                         .HasColumnType("boolean");
 
@@ -827,7 +854,6 @@ namespace Api.Migrations
                         .HasColumnType("text");
 
                     b.Property<string>("UserId")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.HasKey("Id");
@@ -874,6 +900,12 @@ namespace Api.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<string>("GuestId")
+                        .HasColumnType("text");
+
+                    b.Property<bool>("Incomplete")
+                        .HasColumnType("boolean");
+
                     b.Property<string>("JankReports")
                         .IsRequired()
                         .HasColumnType("jsonb");
@@ -908,7 +940,6 @@ namespace Api.Migrations
                         .HasColumnType("text");
 
                     b.Property<string>("UserId")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("Waterfall")

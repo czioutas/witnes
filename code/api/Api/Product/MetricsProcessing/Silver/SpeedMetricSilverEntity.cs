@@ -5,8 +5,9 @@ namespace Api.Product.MetricsProcessing.Silver;
 public class MetricSilverEntity : TenantAwareEntity
 {
     public Guid BronzeId { get; set; }
-    public string UserId { get; set; } = null!;
+    public string? UserId { get; set; }
     public string SessionId { get; set; } = null!;
+    public string? GuestId { get; set; }
     public string Url { get; set; } = null!;
     public DateTime Timestamp { get; set; }
 
@@ -24,6 +25,9 @@ public class MetricSilverEntity : TenantAwareEntity
     public string UserAgent { get; set; } = null!;
     public string DeviceType { get; set; } = "Desktop";
     public string BrowserName { get; set; } = "Chrome";
+
+    // --- Metadata ---
+    public bool Incomplete { get; set; }
 
     // --- The Detailed Waterfall ---
     public List<ProcessedResource> Waterfall { get; set; } = new();

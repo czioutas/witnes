@@ -179,6 +179,7 @@ public class TenantCustomersService : ITenantCustomersService
                 IsFrontendFault = m.IsFrontendFault,
                 DeviceIcon = m.DeviceIcon,
                 BrowserIcon = m.BrowserIcon,
+                Incomplete = m.Incomplete,
                 SilverId = m.SilverId
             })
             .ToListAsync();

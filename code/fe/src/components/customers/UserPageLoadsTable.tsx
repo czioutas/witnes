@@ -22,6 +22,7 @@ import {
   Server,
   Code,
   ExternalLink,
+  AlertTriangle,
 } from "lucide-react";
 import {
   SiGooglechrome,
@@ -260,7 +261,19 @@ export function UserPageLoadsTable({ userId }: UserPageLoadsTableProps) {
                       </div>
                     </div>
 
-                    {/* Col 3: Load Speed (fixed width) */}
+                    {/* Col 3: Incomplete warning + Load Speed */}
+                    {pl.incomplete && (
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <div className="shrink-0 flex justify-center">
+                            <AlertTriangle className="h-4 w-4 text-amber-500" />
+                          </div>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          Incomplete — user navigated away before all data could be collected
+                        </TooltipContent>
+                      </Tooltip>
+                    )}
                     <Tooltip>
                       <TooltipTrigger asChild>
                         <div className="w-24 shrink-0 text-right">

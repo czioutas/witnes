@@ -10,7 +10,7 @@ public class UpdateProjectKeyRequest
     [MaxLength(500)]
     public string? Description { get; set; }
 
-    public List<string>? AllowedOrigins { get; set; }
+    public required string Domain { get; set; }
 
     public bool? IsActive { get; set; }
 }

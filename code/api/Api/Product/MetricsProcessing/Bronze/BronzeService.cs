@@ -39,12 +39,17 @@ public class BronzeService : IBronzeService
             // Searchable Identity
             UserId = request.Session.UserId,
             SessionId = request.Session.SessionId,
+            GuestId = request.Session.GuestId,
             Url = request.Session.Url,
             EventType = request.Metadata.Event,
 
-            // Store the dynamic performance block (Waterfall, Vitals, Jank) as JSONB
-            // This prevents "Schema Fear" when adding new browser metrics later
-            RawPerformanceData = JsonSerializer.Serialize(request, JsonOptions)
+            // Store the dynamic blocks separately as JSONB
+            // This makes it easier to debug and avoids a single gigantic JSON blob
+            Metadata = JsonSerializer.Serialize(request.Metadata, JsonOptions),
+            Session = JsonSerializer.Serialize(request.Session, JsonOptions),
+            Performance = JsonSerializer.Serialize(request.Performance, JsonOptions),
+            Network = request.Network != null ? JsonSerializer.Serialize(request.Network, JsonOptions) : null,
+            Device = request.Device != null ? JsonSerializer.Serialize(request.Device, JsonOptions) : null
         };
 
         await _context.MetricsBronze.AddAsync(entity);

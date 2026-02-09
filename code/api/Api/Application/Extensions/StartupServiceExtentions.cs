@@ -84,7 +84,7 @@ public static class StartupServiceExtensions
         services.AddStackExchangeRedisOutputCache(options =>
         {
             options.Configuration = connectionString;
-            options.InstanceName = "GreenactionsOutputCache";
+            options.InstanceName = "WitnesOutputCache";
         });
 
         services.AddOutputCache(options =>

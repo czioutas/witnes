@@ -26,5 +26,6 @@ public class SpeedMetricResponse
     public string DeviceIcon { get; set; } = null!;
     public string BrowserIcon { get; set; } = null!;
 
+    public bool Incomplete { get; set; }
     public DateTimeOffset CreatedAt { get; set; }
 }

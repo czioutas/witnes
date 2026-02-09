@@ -14,7 +14,7 @@ public abstract class BaseIntegrationTest
 {
     // Demo user credentials from Seeds.cs - email confirmed and ready to use
     protected const string DemoUserEmail = "mamaslittlebakery@witnes.io";
-    protected const string DemoUserPassword = "greenactionsDemoAa1!";
+    protected const string DemoUserPassword = "witnesDemoAa1!";
 
     protected HttpClient Client { get; private set; } = null!;
     protected TestApplicationFactory Factory { get; private set; } = null!;

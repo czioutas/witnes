@@ -76,16 +76,16 @@ public class ProjectKeysController : ControllerBase
     }
 
     /// <summary>
-    /// Deactivate a project key
+    /// Delete a project key
     /// </summary>
     /// <param name="id">Project key ID</param>
     /// <returns>No content on success</returns>
     [HttpDelete("{id}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult> Deactivate(Guid id)
+    public async Task<ActionResult> Delete(Guid id)
     {
-        var result = await _projectKeyService.DeactivateAsync(id);
+        var result = await _projectKeyService.DeleteAsync(id);
         return !result.IsFailure ? NoContent() : NotFound();
     }
 

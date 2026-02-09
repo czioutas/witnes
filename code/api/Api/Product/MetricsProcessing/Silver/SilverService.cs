@@ -41,15 +41,14 @@ public class SilverService : ISilverService
         if (bronze == null)
             throw new InvalidOperationException($"Bronze record {bronzeId} not found.");
 
-        // 1. Deserialize the WHOLE request model from the Bronze JSONB
-        var request = JsonSerializer.Deserialize<IngestSpeedMetricRequestModel>(bronze.RawPerformanceData, JsonOptions);
+        // 1. Deserialize the blocks from the Bronze entity
+        var metadata = JsonSerializer.Deserialize<MetadataModel>(bronze.Metadata, JsonOptions);
+        var performance = JsonSerializer.Deserialize<PerformanceModel>(bronze.Performance, JsonOptions);
+        var network = bronze.Network != null ? JsonSerializer.Deserialize<NetworkModel>(bronze.Network, JsonOptions) : null;
+        var device = bronze.Device != null ? JsonSerializer.Deserialize<DeviceModel>(bronze.Device, JsonOptions) : null;
 
-        if (request == null)
-            throw new InvalidOperationException("Failed to deserialize Bronze payload into request model.");
-
-        var performance = request.Performance;
-        var network = request.Network;
-        var device = request.Device;
+        if (performance == null)
+            throw new InvalidOperationException("Failed to deserialize Bronze Performance payload.");
 
         // 2. Construct the Silver Entity
         var silverEntity = new MetricSilverEntity
@@ -59,8 +58,10 @@ public class SilverService : ISilverService
             TenantId = tenantId,
             UserId = bronze.UserId,
             SessionId = bronze.SessionId,
+            GuestId = bronze.GuestId,
             Url = bronze.Url,
             Timestamp = bronze.IngestedAt,
+            Incomplete = metadata?.Incomplete ?? false,
 
             // --- Network Extraction ---
             EffectiveType = network?.EffectiveType ?? "unknown",

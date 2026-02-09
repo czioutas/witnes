@@ -378,7 +378,7 @@ Run via: `./scripts/build-and-run.sh`
 
 **Connection Details (Development):**
 ```
-PostgreSQL: localhost:5433 / witnes / greenactions_dev_password
+PostgreSQL: localhost:5433 / witnes / witnes_dev_password
 Redis: localhost:6378
 RabbitMQ: localhost:15672 (UI), 5672 (AMQP)
 MinIO: localhost:9001 (console), 9000 (API)

@@ -10,8 +10,9 @@ namespace Api.Product.MetricsProcessing.Gold;
 public class MetricGoldEntity : TenantAwareEntity
 {
     public Guid SilverId { get; set; }
-    public string UserId { get; set; } = null!;
+    public string? UserId { get; set; }
     public string SessionId { get; set; } = null!;
+    public string? GuestId { get; set; }
     public string UrlPath { get; set; } = null!;
     public DateTimeOffset Timestamp { get; set; }
 
@@ -39,6 +40,9 @@ public class MetricGoldEntity : TenantAwareEntity
 
     // 5. Frontend Pillar
     public bool IsFrontendFault { get; set; }
+
+    // 6. Data Completeness
+    public bool Incomplete { get; set; }
 
     // Environment (For Icons)
     public string DeviceIcon { get; set; } = "Desktop";

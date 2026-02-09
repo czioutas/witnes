@@ -9,6 +9,7 @@ public class PageLoadSummaryModel
 {
     public Guid Id { get; set; }
     public string SessionId { get; set; } = null!;
+    public string? GuestId { get; set; }
     public DateTimeOffset Timestamp { get; set; }
     public string UrlPath { get; set; } = null!;
 
@@ -38,6 +39,9 @@ public class PageLoadSummaryModel
     // Environment
     public string DeviceIcon { get; set; } = null!;
     public string BrowserIcon { get; set; } = null!;
+
+    // Data Completeness
+    public bool Incomplete { get; set; }
 
     public Guid SilverId { get; set; }
 }

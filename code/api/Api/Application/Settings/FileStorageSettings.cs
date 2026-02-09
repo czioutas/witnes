@@ -20,7 +20,7 @@ public class FileStorageSettings
     /// <summary>
     /// Secret key / password for authentication
     /// </summary>
-    public string SecretKey { get; set; } = "greenactions_dev_password";
+    public string SecretKey { get; set; } = "witnes_dev_password";
 
     /// <summary>
     /// Whether to use SSL/TLS for connections

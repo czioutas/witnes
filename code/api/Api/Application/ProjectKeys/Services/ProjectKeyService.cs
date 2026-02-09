@@ -15,7 +15,7 @@ public interface IProjectKeyService
     Task<Result<ProjectKeyModel>> GetByKeyAsync(string projectKey);
     Task<Result<List<ProjectKeyModel>>> GetAllForTenantAsync(Guid tenantId);
     Task<Result<ProjectKeyModel>> UpdateAsync(Guid projectKeyId, UpdateProjectKeyRequest request);
-    Task<Result<bool>> DeactivateAsync(Guid projectKeyId);
+    Task<Result<bool>> DeleteAsync(Guid projectKeyId);
     Task<Result<bool>> UpdateLastUsedAsync(string projectKey);
 }
 
@@ -48,7 +48,7 @@ public class ProjectKeyService : IProjectKeyService
             TenantId = tenantId,
             ProjectKey = projectKey,
             Name = request.Name,
-            AllowedOrigins = request.Domain,
+            Domain = request.Domain,
             IsActive = true
         };
 
@@ -109,11 +109,14 @@ public class ProjectKeyService : IProjectKeyService
             entity.Name = request.Name;
         }
 
-        if (request.AllowedOrigins != null)
+        if (request.Description != null)
         {
-            entity.AllowedOrigins = request.AllowedOrigins.Count > 0
-                ? JsonSerializer.Serialize(request.AllowedOrigins)
-                : string.Empty;
+            entity.Description = request.Description;
+        }
+
+        if (request.Domain != null)
+        {
+            entity.Domain = request.Domain;
         }
 
         if (request.IsActive.HasValue)
@@ -131,7 +134,7 @@ public class ProjectKeyService : IProjectKeyService
         return new Result<ProjectKeyModel>(model);
     }
 
-    public async Task<Result<bool>> DeactivateAsync(Guid projectKeyId)
+    public async Task<Result<bool>> DeleteAsync(Guid projectKeyId)
     {
         var entity = await _dbContext.ProjectKeys.FindAsync(projectKeyId);
 
@@ -140,12 +143,12 @@ public class ProjectKeyService : IProjectKeyService
             return Result<bool>.NotFound("ProjectKey", projectKeyId.ToString());
         }
 
-        entity.IsActive = false;
-        await _dbContext.SaveChangesAsync();
-
-        // Invalidate cache
+        // Invalidate cache before removing
         var cacheKey = GetCacheKey(entity.ProjectKey);
         await _cache.RemoveAsync(cacheKey);
+
+        _dbContext.ProjectKeys.Remove(entity);
+        await _dbContext.SaveChangesAsync();
 
         return new Result<bool>(true);
     }
@@ -200,7 +203,7 @@ public class ProjectKeyService : IProjectKeyService
             TenantId = entity.TenantId,
             ProjectKey = entity.ProjectKey,
             Name = entity.Name,
-            AllowedOrigins = entity.AllowedOrigins,
+            Domain = entity.Domain,
             IsActive = entity.IsActive,
             LastUsedAt = entity.LastUsedAt,
             CreatedAt = entity.CreatedAt

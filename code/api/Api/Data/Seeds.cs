@@ -154,7 +154,7 @@ public class Seed
         var registerModel = new RegisterModel
         {
             Email = demoUserEmail,
-            Password = "greenactionsDemoAa1!",
+            Password = "witnesDemoAa1!",
             FirstName = "Jane",
             LastName = "Smith",
             NormalizedTenantIdentifier = "Mama's Little Bakery",

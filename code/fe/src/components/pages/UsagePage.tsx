@@ -106,9 +106,6 @@ export function UsagePage() {
     });
   };
 
-  // Get the first active project key (or first key if none active)
-  const primaryKey = projectKeys.find(key => key.is_active) || projectKeys[0] || null;
-
   return (
     <>
       <div className="space-y-6">
@@ -134,8 +131,9 @@ export function UsagePage() {
 
         {/* Project Key Display */}
         <ProjectKeyDisplay
-          projectKey={primaryKey}
+          projectKeys={projectKeys}
           onCreateKey={handleCreateKey}
+          onUpdateKey={fetchAllData}
           loading={loading}
         />
       </div>
@@ -178,6 +176,9 @@ export function UsagePage() {
                     <FormControl>
                       <Input placeholder="example.com" {...field} />
                     </FormControl>
+                    <p className="text-xs text-muted-foreground">
+                      The domain this key is associated with (e.g. example.com)
+                    </p>
                     <FormMessage />
                   </FormItem>
                 )}

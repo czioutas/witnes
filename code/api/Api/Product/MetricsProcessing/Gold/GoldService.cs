@@ -48,6 +48,7 @@ public class GoldService : IGoldService
             SilverId = silver.Id,
             UserId = silver.UserId,
             SessionId = silver.SessionId,
+            GuestId = silver.GuestId,
             UrlPath = ExtractPath(silver.Url),
             Timestamp = silver.Timestamp,
 
@@ -70,6 +71,7 @@ public class GoldService : IGoldService
             IsBackendFault = EvaluateBackendFault(silver.AvgTtfbMs, lcpMs),
             IsFrontendFault = EvaluateFrontendFault(silver),
 
+            Incomplete = silver.Incomplete,
             DeviceIcon = silver.DeviceType,
             BrowserIcon = silver.BrowserName
         };

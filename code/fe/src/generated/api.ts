@@ -226,13 +226,12 @@ export interface UpdateTenantDetailsRequest {
 }
 
 export interface UpdateProjectKeyRequest {
-  /** @nullable */
-  allowed_origins?: string[] | null;
   /**
    * @maxLength 500
    * @nullable
    */
   description?: string | null;
+  domain: string;
   /** @nullable */
   is_active?: boolean | null;
   /**
@@ -359,6 +358,7 @@ export interface SpeedMetricResponse {
   created_at?: string;
   device_icon?: string;
   id?: string;
+  incomplete?: boolean;
   is_backend_fault?: boolean;
   is_connection_fault?: boolean;
   is_frontend_fault?: boolean;
@@ -394,6 +394,7 @@ export interface SetTenantPricingRequest {
 }
 
 export interface SessionModel {
+  guest_id?: string;
   /** @nullable */
   ref?: string | null;
   session_id?: string;
@@ -527,10 +528,8 @@ export interface PublicFileModel {
 }
 
 export interface ProjectKeyModel {
-  allowed_origins?: string;
   created_at?: string;
-  /** @nullable */
-  description?: string | null;
+  domain: string;
   id?: string;
   is_active?: boolean;
   /** @nullable */
@@ -580,7 +579,10 @@ export interface PageLoadSummaryModel {
   device_icon?: string;
   downlink?: number;
   effective_type?: string;
+  /** @nullable */
+  guest_id?: string | null;
   id?: string;
+  incomplete?: boolean;
   is_backend_fault?: boolean;
   is_connection_fault?: boolean;
   is_frontend_fault?: boolean;
@@ -666,6 +668,7 @@ export interface NetworkModel {
 
 export interface MetadataModel {
   event?: string;
+  incomplete?: boolean;
   pk?: string;
   /** @nullable */
   ts?: string | null;
@@ -1178,7 +1181,7 @@ Returns detailed metrics including:
   };
 
   /**
-   * @summary Deactivate a project key
+   * @summary Delete a project key
    */
   const deleteApiV1ProjectKeysId = (id: string) => {
     return customInstance<void>({

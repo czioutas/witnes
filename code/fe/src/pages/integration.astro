@@ -2,10 +2,25 @@
 import PublicLayout from "../layouts/PublicLayout.astro";
 import Navbar from "../components/landing/Navbar.astro";
 import Footer from "../components/landing/Footer.astro";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "../components/ui/card";
 import { Badge } from "../components/ui/badge";
 import { Button } from "../components/ui/button";
 import { Separator } from "../components/ui/separator";
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "../components/ui/table";
 ---
 
 <PublicLayout
@@ -13,12 +28,16 @@ import { Separator } from "../components/ui/separator";
   description="Learn how to integrate Witnes tracking into your application. Simple setup, powerful insights."
   canonical="/integration"
 >
-  <div class="min-h-screen flex flex-col selection:bg-[#A68B6A] selection:text-white relative">
+  <div
+    class="min-h-screen flex flex-col selection:bg-[#A68B6A] selection:text-white relative"
+  >
     <div class="relative z-10">
       <Navbar />
       <main class="flex-grow">
         <!-- Header Section -->
-        <section class="relative overflow-hidden pb-20 pt-32 md:pb-32 md:pt-44 border-b">
+        <section
+          class="relative overflow-hidden pb-20 pt-32 md:pb-32 md:pt-44 border-b"
+        >
           <!-- Subtle grid background -->
           <div
             class="pointer-events-none absolute inset-0 opacity-[0.4]"
@@ -49,7 +68,9 @@ import { Separator } from "../components/ui/separator";
                   stroke-linejoin="round"
                   class="h-3.5 w-3.5"
                 >
-                  <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path>
+                  <path
+                    d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"
+                  ></path>
                   <polyline points="14 2 14 8 20 8"></polyline>
                 </svg>
                 <span>For Developers</span>
@@ -64,7 +85,8 @@ import { Separator } from "../components/ui/separator";
               <p
                 class="mx-auto mt-6 max-w-2xl text-pretty text-lg leading-relaxed text-muted-foreground md:text-xl"
               >
-                Add our lightweight tracker to your frontend and start capturing user behavior receipts for your Customer Success team.
+                Add our lightweight tracker to your frontend and start capturing
+                user behavior receipts for your Customer Success team.
               </p>
 
               <p class="mt-8 text-sm text-muted-foreground">
@@ -77,21 +99,27 @@ import { Separator } from "../components/ui/separator";
         <!-- Main Integration Content -->
         <section class="py-16 md:py-24 px-6 bg-background">
           <div class="container max-w-4xl mx-auto space-y-12">
-
             <!-- Section 01: Quick Start -->
             <Card className="border-zinc-200">
               <CardHeader>
                 <div class="flex items-center gap-3 mb-2">
                   <Badge variant="outline" className="text-sm">01</Badge>
-                  <CardTitle className="text-xl uppercase tracking-widest">Quick Start (Standard Setup)</CardTitle>
+                  <CardTitle className="text-xl uppercase tracking-widest"
+                    >Quick Start (Standard Setup)</CardTitle
+                  >
                 </div>
                 <CardDescription className="text-base text-zinc-600 mt-4">
-                  Copy and paste this snippet into the <code class="text-sm bg-zinc-100 px-2 py-1 rounded">&lt;head&gt;</code> of your website. This is ideal for traditional web applications where the user identity is known at the time of page render.
+                  Copy and paste this snippet into the <code
+                    class="text-sm bg-zinc-100 px-2 py-1 rounded"
+                    >&lt;head&gt;</code
+                  > of your website. This is ideal for traditional web applications
+                  where the user identity is known at the time of page render.
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <div class="rounded-lg bg-zinc-50 p-6 border border-zinc-200">
-                  <pre class="overflow-x-auto text-sm"><code class="language-html">&lt;script&gt;
+                  <pre
+                    class="overflow-x-auto text-sm"><code class="language-html">&lt;script&gt;
   window.witnesConfig = &#123;
     projectKey: 'YOUR_PROJECT_KEY',
     userId: 'user_123' // Replace with your internal User ID
@@ -107,18 +135,28 @@ import { Separator } from "../components/ui/separator";
               <CardHeader>
                 <div class="flex items-center gap-3 mb-2">
                   <Badge variant="outline" className="text-sm">02</Badge>
-                  <CardTitle className="text-xl uppercase tracking-widest">Dynamic Setup (Single Page Apps)</CardTitle>
+                  <CardTitle className="text-xl uppercase tracking-widest"
+                    >Dynamic Setup (Single Page Apps)</CardTitle
+                  >
                 </div>
                 <CardDescription className="text-base text-zinc-600 mt-4">
-                  If you are using a framework like <strong>React</strong>, <strong>Vue</strong>, or <strong>Next.js</strong>, you might not know the User ID until after the page has loaded and the user has logged in.
+                  If you are using a framework like <strong>React</strong>, <strong
+                    >Vue</strong
+                  >, or <strong>Next.js</strong>, you might not know the User ID
+                  until after the page has loaded and the user has logged in.
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-8">
                 <div>
-                  <h3 class="text-base font-semibold text-black mb-4">Step A: Initialize with the Project Key</h3>
-                  <p class="text-sm text-zinc-600 mb-4">Add this to your main HTML file:</p>
+                  <h3 class="text-base font-semibold text-black mb-4">
+                    Step A: Initialize with the Project Key
+                  </h3>
+                  <p class="text-sm text-zinc-600 mb-4">
+                    Add this to your main HTML file:
+                  </p>
                   <div class="rounded-lg bg-white p-6 border border-zinc-200">
-                    <pre class="overflow-x-auto text-sm"><code class="language-html">&lt;script&gt;
+                    <pre
+                      class="overflow-x-auto text-sm"><code class="language-html">&lt;script&gt;
   window.witnesConfig = &#123; projectKey: 'YOUR_PROJECT_KEY' &#125;;
 &lt;/script&gt;
 &lt;script src="https://cdn.witnes.io/track.js" async&gt;&lt;/script&gt;</code></pre>
@@ -128,10 +166,18 @@ import { Separator } from "../components/ui/separator";
                 <Separator />
 
                 <div>
-                  <h3 class="text-base font-semibold text-black mb-4">Step B: Identify the User</h3>
-                  <p class="text-sm text-zinc-600 mb-4">Call the <code class="text-sm bg-zinc-100 px-2 py-1 rounded">identify</code> method as soon as your authentication is complete. Witnes will automatically begin tracking events once an ID is provided.</p>
+                  <h3 class="text-base font-semibold text-black mb-4">
+                    Step B: Identify the User
+                  </h3>
+                  <p class="text-sm text-zinc-600 mb-4">
+                    Call the <code class="text-sm bg-zinc-100 px-2 py-1 rounded"
+                      >identify</code
+                    > method as soon as your authentication is complete. Witnes will
+                    automatically begin tracking events once an ID is provided.
+                  </p>
                   <div class="rounded-lg bg-white p-6 border border-zinc-200">
-                    <pre class="overflow-x-auto text-sm"><code class="language-javascript">// Call this after your login logic
+                    <pre
+                      class="overflow-x-auto text-sm"><code class="language-javascript">// Call this after your login logic
 if (window.Witnes) &#123;
     window.Witnes.identify("customer_id_99");
 &#125; else &#123;
@@ -148,7 +194,9 @@ if (window.Witnes) &#123;
               <CardHeader>
                 <div class="flex items-center gap-3 mb-2">
                   <Badge variant="outline" className="text-sm">03</Badge>
-                  <CardTitle className="text-xl uppercase tracking-widest">How Billing Works</CardTitle>
+                  <CardTitle className="text-xl uppercase tracking-widest"
+                    >How Billing Works</CardTitle
+                  >
                 </div>
                 <CardDescription className="text-base text-zinc-600 mt-4">
                   Witnes calculates usage based on <strong>Units</strong>.
@@ -156,22 +204,28 @@ if (window.Witnes) &#123;
               </CardHeader>
               <CardContent className="space-y-6">
                 <div class="bg-zinc-50 p-6 rounded-lg border border-zinc-200">
-                  <p class="text-2xl font-bold text-black mb-2">1 Unit = 50 Events</p>
+                  <p class="text-2xl font-bold text-black mb-2">
+                    1 Unit = 50 Events
+                  </p>
                 </div>
 
                 <div>
-                  <h3 class="text-base font-semibold text-black mb-4">Tracked Events:</h3>
+                  <h3 class="text-base font-semibold text-black mb-4">
+                    Tracked Events:
+                  </h3>
                   <ul class="space-y-3 text-zinc-600">
                     <li class="flex gap-3">
                       <span class="text-[#A68B6A] font-mono text-sm">•</span>
                       <div>
-                        <strong class="text-black">LOAD:</strong> Triggered when a page is first opened.
+                        <strong class="text-black">LOAD:</strong> Triggered when a
+                        page is first opened.
                       </div>
                     </li>
                     <li class="flex gap-3">
                       <span class="text-[#A68B6A] font-mono text-sm">•</span>
                       <div>
-                        <strong class="text-black">SPA_NAV:</strong> Triggered when the URL changes (even without a page reload).
+                        <strong class="text-black">SPA_NAV:</strong> Triggered when
+                        the URL changes (even without a page reload).
                       </div>
                     </li>
                   </ul>
@@ -179,28 +233,141 @@ if (window.Witnes) &#123;
               </CardContent>
             </Card>
 
-            <!-- Section 04: Technical Details -->
+            <!-- Section 04: Browser Coverage -->
             <Card className="border-zinc-200">
               <CardHeader>
                 <div class="flex items-center gap-3 mb-2">
                   <Badge variant="outline" className="text-sm">04</Badge>
-                  <CardTitle className="text-xl uppercase tracking-widest">Technical Details</CardTitle>
+                  <CardTitle className="text-xl uppercase tracking-widest"
+                    >Browser Coverage</CardTitle
+                  >
+                </div>
+                <CardDescription className="text-base text-zinc-600 mt-4">
+                  We support all modern browsers. Some advanced metrics are subject to browser API availability.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Feature</TableHead>
+                      <TableHead>Chrome 131+</TableHead>
+                      <TableHead>Edge 131+</TableHead>
+                      <TableHead>Safari 18.5+</TableHead>
+                      <TableHead>Firefox 133+</TableHead>
+                      <TableHead>Notes</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    <TableRow>
+                      <TableCell className="font-medium">Session Tracking</TableCell>
+                      <TableCell>✅ Tested</TableCell>
+                      <TableCell>✅ Tested</TableCell>
+                      <TableCell>✅ Tested</TableCell>
+                      <TableCell>⚠️ Theory</TableCell>
+                      <TableCell>sessionStorage universal</TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell className="font-medium">LCP</TableCell>
+                      <TableCell>✅ Tested</TableCell>
+                      <TableCell>✅ Tested</TableCell>
+                      <TableCell>✅ Tested</TableCell>
+                      <TableCell>⚠️ Theory</TableCell>
+                      <TableCell>Safari 18.2+ (Dec 2024)</TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell className="font-medium">CLS</TableCell>
+                      <TableCell>✅ Tested</TableCell>
+                      <TableCell>✅ Tested</TableCell>
+                      <TableCell>✅ Tested</TableCell>
+                      <TableCell>⚠️ Theory</TableCell>
+                      <TableCell>-</TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell className="font-medium">FCP</TableCell>
+                      <TableCell>✅ Tested</TableCell>
+                      <TableCell>✅ Tested</TableCell>
+                      <TableCell>✅ Tested</TableCell>
+                      <TableCell>⚠️ Theory</TableCell>
+                      <TableCell>-</TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell className="font-medium">Long Tasks</TableCell>
+                      <TableCell>✅ Tested</TableCell>
+                      <TableCell>✅ Tested</TableCell>
+                      <TableCell>❌ Never</TableCell>
+                      <TableCell>⚠️ Theory</TableCell>
+                      <TableCell>Safari lacks longtask API</TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell className="font-medium">Resource Timing</TableCell>
+                      <TableCell>✅ Tested</TableCell>
+                      <TableCell>✅ Tested</TableCell>
+                      <TableCell>⚠️ Partial</TableCell>
+                      <TableCell>⚠️ Theory</TableCell>
+                      <TableCell>Safari: ~60% missing protocol</TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell className="font-medium">Network Info</TableCell>
+                      <TableCell>✅ Tested</TableCell>
+                      <TableCell>✅ Tested</TableCell>
+                      <TableCell>❌ Never</TableCell>
+                      <TableCell>❌ Never</TableCell>
+                      <TableCell>Chromium exclusive</TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell className="font-medium">sendBeacon</TableCell>
+                      <TableCell>✅ Tested</TableCell>
+                      <TableCell>✅ Tested</TableCell>
+                      <TableCell>✅ Tested</TableCell>
+                      <TableCell>⚠️ Theory</TableCell>
+                      <TableCell>fetch keepalive fallback</TableCell>
+                    </TableRow>
+                  </TableBody>
+                </Table>
+                <div class="mt-4 space-y-1 text-xs text-muted-foreground">
+                  <p>• Tested Versions: Chrome 131, Edge 131, Safari 18.5</p>
+                  <p>• Theory: Firefox 133+ per MDN compatibility data</p>
+                  <p>• Safari Notes: LCP support added in Safari 18.2/macOS 15.2 (December 2024)</p>
+                </div>
+              </CardContent>
+            </Card>
+
+            <!-- Section 05: Technical Details -->
+            <Card className="border-zinc-200">
+              <CardHeader>
+                <div class="flex items-center gap-3 mb-2">
+                  <Badge variant="outline" className="text-sm">04</Badge>
+                  <CardTitle className="text-xl uppercase tracking-widest"
+                    >Technical Details</CardTitle
+                  >
                 </div>
               </CardHeader>
               <CardContent className="space-y-8">
                 <div>
-                  <h3 class="text-base font-semibold text-black mb-4">Performance</h3>
+                  <h3 class="text-base font-semibold text-black mb-4">
+                    Performance
+                  </h3>
                   <ul class="space-y-3 text-zinc-600">
                     <li class="flex gap-3">
                       <span class="text-[#A68B6A]">•</span>
                       <div>
-                        <strong class="text-black">Zero Blocking:</strong> Our script uses the <code class="text-sm bg-zinc-100 px-2 py-1 rounded">async</code> attribute and <code class="text-sm bg-zinc-100 px-2 py-1 rounded">navigator.sendBeacon</code>. It will never slow down your page load or delay your users.
+                        <strong class="text-black">Zero Blocking:</strong> Our script
+                        uses the <code
+                          class="text-sm bg-zinc-100 px-2 py-1 rounded"
+                          >async</code
+                        > attribute and <code
+                          class="text-sm bg-zinc-100 px-2 py-1 rounded"
+                          >navigator.sendBeacon</code
+                        >. It will never slow down your page load or delay your
+                        users.
                       </div>
                     </li>
                     <li class="flex gap-3">
                       <span class="text-[#A68B6A]">•</span>
                       <div>
-                        <strong class="text-black">Lightweight:</strong> The library is &lt; 1KB gzipped.
+                        <strong class="text-black">Lightweight:</strong> The library
+                        is &lt; 1KB gzipped.
                       </div>
                     </li>
                   </ul>
@@ -209,18 +376,24 @@ if (window.Witnes) &#123;
                 <Separator />
 
                 <div>
-                  <h3 class="text-base font-semibold text-black mb-4">Security & Privacy</h3>
+                  <h3 class="text-base font-semibold text-black mb-4">
+                    Security & Privacy
+                  </h3>
                   <ul class="space-y-3 text-zinc-600">
                     <li class="flex gap-3">
                       <span class="text-[#A68B6A]">•</span>
                       <div>
-                        <strong class="text-black">Project Key:</strong> Used to route data to your specific dashboard.
+                        <strong class="text-black">Project Key:</strong> Used to route
+                        data to your specific dashboard.
                       </div>
                     </li>
                     <li class="flex gap-3">
                       <span class="text-[#A68B6A]">•</span>
                       <div>
-                        <strong class="text-black">User ID:</strong> We require a User ID so your CS agents can search for specific sessions when a ticket is filed. We recommend using a non-sensitive internal ID or a hashed email.
+                        <strong class="text-black">User ID:</strong> We require a
+                        User ID so your CS agents can search for specific sessions
+                        when a ticket is filed. We recommend using a non-sensitive
+                        internal ID or a hashed email.
                       </div>
                     </li>
                   </ul>
@@ -233,9 +406,13 @@ if (window.Witnes) &#123;
               <CardHeader>
                 <div class="flex items-center gap-3 mb-2">
                   <Badge variant="outline" className="text-sm">05</Badge>
-                  <CardTitle className="text-xl uppercase tracking-widest">Troubleshooting</CardTitle>
+                  <CardTitle className="text-xl uppercase tracking-widest"
+                    >Troubleshooting</CardTitle
+                  >
                 </div>
-                <CardDescription className="text-base font-semibold text-black mt-4">
+                <CardDescription
+                  className="text-base font-semibold text-black mt-4"
+                >
                   Events not appearing?
                 </CardDescription>
               </CardHeader>
@@ -244,19 +421,27 @@ if (window.Witnes) &#123;
                   <li class="flex gap-3">
                     <span class="text-[#A68B6A]">•</span>
                     <div>
-                      Check that the <code class="text-sm bg-zinc-100 px-2 py-1 rounded">projectKey</code> matches your dashboard exactly.
+                      Check that the <code
+                        class="text-sm bg-zinc-100 px-2 py-1 rounded"
+                        >projectKey</code
+                      > matches your dashboard exactly.
                     </div>
                   </li>
                   <li class="flex gap-3">
                     <span class="text-[#A68B6A]">•</span>
                     <div>
-                      Ensure <code class="text-sm bg-zinc-100 px-2 py-1 rounded">Witnes.identify()</code> is being called with a non-null string.
+                      Ensure <code class="text-sm bg-zinc-100 px-2 py-1 rounded"
+                        >Witnes.identify()</code
+                      > is being called with a non-null string.
                     </div>
                   </li>
                   <li class="flex gap-3">
                     <span class="text-[#A68B6A]">•</span>
                     <div>
-                      Open your browser console and verify that requests to <code class="text-sm bg-zinc-100 px-2 py-1 rounded">api.witnes.io/ingest</code> are returning <strong>202 Accepted</strong>.
+                      Open your browser console and verify that requests to <code
+                        class="text-sm bg-zinc-100 px-2 py-1 rounded"
+                        >api.witnes.io/ingest</code
+                      > are returning <strong>202 Accepted</strong>.
                     </div>
                   </li>
                 </ul>
@@ -268,9 +453,19 @@ if (window.Witnes) &#123;
             <div class="flex flex-col items-center gap-8">
               <Button variant="outline" className="gap-2" asChild client:load>
                 <a href="/">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="m12 19-7-7 7-7"/>
-                    <path d="M19 12H5"/>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d="m12 19-7-7 7-7"></path>
+                    <path d="M19 12H5"></path>
                   </svg>
                   Back to Home
                 </a>

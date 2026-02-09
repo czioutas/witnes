@@ -34,12 +34,13 @@ const canonicalURL = new URL(canonical, Astro.site);
 
     <meta name="generator" content={Astro.generator} />
     <title>{title}</title>
-    <script is:inline define:vars={{ projectKey: import.meta.env.PUBLIC_WITNES_PROJECT_KEY }}>
-      if (projectKey) {
-        window.witnesConfig = { projectKey };
-      }
+    <script is:inline>
+      window.witnesConfig = {
+        projectKey: "pk_432e09e1a9664634b855638ac8592319",
+        debug: true,
+      };
     </script>
-    <script src="https://cdn.witnes.io/track.js" async is:inline></script>
+    <script src="http://localhost:4321/track.min.js" async is:inline></script>
   </head>
   <body class="antialiased">
     <slot />

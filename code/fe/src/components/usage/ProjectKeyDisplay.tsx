@@ -1,39 +1,98 @@
 import { useState } from "react";
 import { Button } from "../ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../ui/card";
-import { Copy, Check, Plus, AlertCircle } from "lucide-react";
-import type { ProjectKeyModel } from "../../generated/api";
+import { Copy, Check, Plus, AlertCircle, Edit, Trash2, Globe } from "lucide-react";
+import { getWitnesServerAPI, type ProjectKeyModel, type UpdateProjectKeyRequest } from "../../generated/api";
 import { Alert, AlertDescription } from "../ui/alert";
+import { Badge } from "../ui/badge";
+import { useApiToast } from "../../hooks/useApiToast";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "../ui/dialog";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "../ui/form";
+import { Input } from "../ui/input";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+
+const api = getWitnesServerAPI();
+
+const updateKeySchema = z.object({
+  name: z.string().min(1, "Name is required").max(200, "Name must be 200 characters or less"),
+  domain: z.string().min(1, "Domain is required"),
+});
+
+type UpdateKeyFormValues = z.infer<typeof updateKeySchema>;
 
 interface ProjectKeyDisplayProps {
-  projectKey: ProjectKeyModel | null;
+  projectKeys: ProjectKeyModel[];
   onCreateKey: () => void;
+  onUpdateKey: () => void;
   loading: boolean;
 }
 
-export function ProjectKeyDisplay({ projectKey, onCreateKey, loading }: ProjectKeyDisplayProps) {
-  const [copied, setCopied] = useState(false);
+export function ProjectKeyDisplay({ projectKeys, onCreateKey, onUpdateKey, loading }: ProjectKeyDisplayProps) {
+  const { handleApiCall } = useApiToast();
+  const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [editingKey, setEditingKey] = useState<ProjectKeyModel | null>(null);
+  const [submitting, setSubmitting] = useState(false);
 
-  const handleCopy = async () => {
-    if (!projectKey?.project_key) return;
+  const updateKeyForm = useForm<UpdateKeyFormValues>({
+    resolver: zodResolver(updateKeySchema),
+    defaultValues: {
+      name: "",
+      domain: "",
+    },
+  });
 
+  const handleCopy = async (id: string, key: string) => {
     try {
-      await navigator.clipboard.writeText(projectKey.project_key);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+      await navigator.clipboard.writeText(key);
+      setCopiedId(id);
+      setTimeout(() => setCopiedId(null), 2000);
     } catch (err) {
       console.error("Failed to copy:", err);
     }
   };
 
-  const formatDate = (dateString: string | null | undefined) => {
-    if (!dateString) return "Never used";
-    return new Date(dateString).toLocaleString("en-US", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
+  const handleEdit = (key: ProjectKeyModel) => {
+    setEditingKey(key);
+    updateKeyForm.reset({
+      name: key.name || "",
+      domain: key.domain || "",
+    });
+  };
+
+  const onUpdateKeySubmit = async (values: UpdateKeyFormValues) => {
+    if (!editingKey || !editingKey.id) return;
+    setSubmitting(true);
+
+    const updateRequest: UpdateProjectKeyRequest = {
+      name: values.name,
+      domain: values.domain,
+    };
+
+    await handleApiCall({
+      apiCall: () => api.putApiV1ProjectKeysId(editingKey.id!, updateRequest),
+      successMessage: "Project key updated successfully",
+      onSuccess: () => {
+        setEditingKey(null);
+        onUpdateKey();
+        setSubmitting(false);
+      },
+      onError: () => setSubmitting(false),
+    });
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!confirm("Are you sure you want to delete this project key? This action cannot be undone.")) {
+      return;
+    }
+
+    await handleApiCall({
+      apiCall: () => api.deleteApiV1ProjectKeysId(id),
+      successMessage: "Project key deleted successfully",
+      onSuccess: () => {
+        onUpdateKey();
+      },
     });
   };
 
@@ -41,19 +100,19 @@ export function ProjectKeyDisplay({ projectKey, onCreateKey, loading }: ProjectK
     return (
       <Card>
         <CardHeader>
-          <CardTitle>Project Key</CardTitle>
+          <CardTitle>Project Keys</CardTitle>
           <CardDescription>Loading project key information...</CardDescription>
         </CardHeader>
       </Card>
     );
   }
 
-  if (!projectKey) {
+  if (projectKeys.length === 0) {
     return (
       <Card>
         <CardHeader>
-          <CardTitle>Project Key</CardTitle>
-          <CardDescription>No project key found for your organization</CardDescription>
+          <CardTitle>Project Keys</CardTitle>
+          <CardDescription>No project keys found for your organization</CardDescription>
         </CardHeader>
         <CardContent>
           <Alert>
@@ -72,61 +131,143 @@ export function ProjectKeyDisplay({ projectKey, onCreateKey, loading }: ProjectK
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Project Key</CardTitle>
-        <CardDescription>
-          Use this key to integrate Witnes tracking into your application
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="space-y-2">
-          <label className="text-sm font-medium">API Key</label>
-          <div className="flex gap-2">
-            <div className="flex-1 rounded-md border bg-muted px-3 py-2 font-mono text-sm">
-              {projectKey.project_key || "No key available"}
-            </div>
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={handleCopy}
-              disabled={!projectKey.project_key}
+    <div className="space-y-4">
+      <div className="flex items-center justify-between">
+        <h2 className="text-xl font-semibold">Project Keys</h2>
+        <Button onClick={onCreateKey} size="sm">
+          <Plus className="mr-2 h-4 w-4" />
+          New Key
+        </Button>
+      </div>
+
+      <div className="grid gap-4">
+        {projectKeys.map((key) => (
+          <Card key={key.id}>
+            <CardHeader className="pb-3">
+              <div className="flex items-center justify-between">
+                <div className="space-y-1">
+                  <CardTitle className="text-lg">{key.name}</CardTitle>
+                  <CardDescription className="flex items-center gap-2">
+                    {key.is_active ? (
+                      <Badge variant="outline" className="text-green-600 border-green-200 bg-green-50">Active</Badge>
+                    ) : (
+                      <Badge variant="outline" className="text-red-600 border-red-200 bg-red-50">Inactive</Badge>
+                    )}
+                  </CardDescription>
+                </div>
+                <div className="flex gap-2">
+                  <Button variant="outline" size="icon" onClick={() => handleEdit(key)}>
+                    <Edit className="h-4 w-4" />
+                  </Button>
+                  {key.id && (
+                    <Button variant="outline" size="icon" className="text-red-600" onClick={() => handleDelete(key.id!)}>
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  )}
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <label className="text-sm font-medium">API Key</label>
+                <div className="flex gap-2">
+                  <div className="flex-1 rounded-md border bg-muted px-3 py-2 font-mono text-sm overflow-hidden text-ellipsis whitespace-nowrap">
+                    {key.project_key}
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={() => key.id && key.project_key && handleCopy(key.id, key.project_key)}
+                    disabled={!key.project_key}
+                  >
+                    {copiedId === key.id ? (
+                      <Check className="h-4 w-4 text-green-600" />
+                    ) : (
+                      <Copy className="h-4 w-4" />
+                    )}
+                  </Button>
+                </div>
+              </div>
+
+              {key.domain && (
+                <div className="space-y-2">
+                  <label className="text-sm font-medium flex items-center gap-1.5">
+                    <Globe className="h-3.5 w-3.5" />
+                    Domain
+                  </label>
+                  <Badge variant="secondary" className="font-mono text-[10px]">
+                    {key.domain}
+                  </Badge>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
+      {/* Edit Project Key Dialog */}
+      <Dialog open={!!editingKey} onOpenChange={(open) => !open && setEditingKey(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit Project Key</DialogTitle>
+            <DialogDescription>
+              Update your project key settings
+            </DialogDescription>
+          </DialogHeader>
+
+          <Form {...updateKeyForm}>
+            <form
+              onSubmit={updateKeyForm.handleSubmit(onUpdateKeySubmit)}
+              className="space-y-4"
             >
-              {copied ? (
-                <Check className="h-4 w-4 text-green-600" />
-              ) : (
-                <Copy className="h-4 w-4" />
-              )}
-            </Button>
-          </div>
-        </div>
+              <FormField
+                control={updateKeyForm.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Key Name</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Production App" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
-          <div>
-            <p className="text-sm text-muted-foreground">Status</p>
-            <p className="text-base font-medium">
-              {projectKey.is_active ? (
-                <span className="text-green-600">Active</span>
-              ) : (
-                <span className="text-red-600">Inactive</span>
-              )}
-            </p>
-          </div>
-          <div>
-            <p className="text-sm text-muted-foreground">Last Used</p>
-            <p className="text-base font-medium">
-              {formatDate(projectKey.last_used_at)}
-            </p>
-          </div>
-        </div>
+              <FormField
+                control={updateKeyForm.control}
+                name="domain"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Domain</FormLabel>
+                    <FormControl>
+                      <Input placeholder="example.com" {...field} />
+                    </FormControl>
+                    <p className="text-xs text-muted-foreground">
+                      The domain this key is associated with (e.g. example.com)
+                    </p>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-        {projectKey.description && (
-          <div className="pt-2">
-            <p className="text-sm text-muted-foreground">Description</p>
-            <p className="text-base">{projectKey.description}</p>
-          </div>
-        )}
-      </CardContent>
-    </Card>
+              <DialogFooter>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setEditingKey(null)}
+                  disabled={submitting}
+                >
+                  Cancel
+                </Button>
+                <Button type="submit" disabled={submitting}>
+                  {submitting ? "Updating..." : "Update Key"}
+                </Button>
+              </DialogFooter>
+            </form>
+          </Form>
+        </DialogContent>
+      </Dialog>
+    </div>
   );
 }

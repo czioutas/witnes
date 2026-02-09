@@ -15,12 +15,14 @@ public record IngestSpeedMetricRequestModel(
 public record MetadataModel(
     [property: JsonPropertyName("event")][Required] string Event,
     [property: JsonPropertyName("pk")][Required] string Pk,
-    [property: JsonPropertyName("ts")] DateTime? Ts
+    [property: JsonPropertyName("ts")] DateTime? Ts,
+    [property: JsonPropertyName("incomplete")] bool Incomplete
 );
 
 public record SessionModel(
-    [property: JsonPropertyName("userId")][Required] string UserId,
+    [property: JsonPropertyName("userId")] string? UserId,
     [property: JsonPropertyName("sessionId")][Required] string SessionId,
+    [property: JsonPropertyName("guestId")] string? GuestId,
     [property: JsonPropertyName("url")][Required] string Url,
     [property: JsonPropertyName("ref")] string? Ref
 );
