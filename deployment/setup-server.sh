@@ -75,7 +75,7 @@ echo "📜 Step 4: Creating deployment script..."
 echo "----------------------------------------"
 
 # Create deployment script in /root
-cat > /root/deploy-api.sh <<'DEPLOY_EOF'
+cat > /home/hs/deploy-api.sh <<'DEPLOY_EOF'
 #!/bin/bash
 set -e
 cd /home/hs/repos/witnes/witnes
@@ -87,8 +87,8 @@ echo "Deployment complete!"
 sudo systemctl status witnes-api --no-pager
 DEPLOY_EOF
 
-chmod +x /root/deploy-api.sh
-echo "✓ Deployment script created at /root/deploy-api.sh"
+chmod +x /home/hs/deploy-api.sh
+echo "✓ Deployment script created at /home/hs/deploy-api.sh"
 
 echo ""
 echo "========================================"

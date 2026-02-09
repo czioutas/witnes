@@ -87,13 +87,4 @@
     <ProjectReference Include="..\..\libs\Libs\Libs.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <None Update="Data\csv\*.csv">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Product\DropZone\Prompts\*.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-
 </Project>
