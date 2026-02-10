@@ -152,12 +152,27 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUserEntity, App
             entity.HasQueryFilter(e => e.TenantId == CurrentTenantId);
         });
 
+        builder.Entity<MetricBronzeEntity>(entity =>
+        {
+            entity.HasQueryFilter(e => e.TenantId == CurrentTenantId);
+        });
+
+        builder.Entity<MetricSilverEntity>(entity =>
+        {
+            entity.HasQueryFilter(e => e.TenantId == CurrentTenantId);
+        });
+
+        builder.Entity<MetricGoldEntity>(entity =>
+        {
+            entity.HasQueryFilter(e => e.TenantId == CurrentTenantId);
+        });
+
         builder.Entity<ProjectKeyEntity>(entity =>
         {
+            entity.HasQueryFilter(e => e.TenantId == CurrentTenantId);
             entity.HasIndex(e => e.ProjectKey).IsUnique();
         });
     }
-
 
 
     public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = new CancellationToken())

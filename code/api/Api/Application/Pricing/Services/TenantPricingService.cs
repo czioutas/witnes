@@ -1,6 +1,5 @@
 using System.Text.Json;
 using Api.Application.Pricing.Entities;
-using Api.Application.Pricing.Services.Interfaces;
 using Api.Application.Services;
 using Api.Data;
 using Libs.Result;
@@ -8,6 +7,17 @@ using Microsoft.EntityFrameworkCore;
 using StackExchange.Redis;
 
 namespace Api.Application.Pricing.Services;
+
+public interface ITenantPricingService
+{
+    Task<Result<TenantPricingTierEntity>> SetTenantPricingAsync(Guid tenantId, Guid pricingTierId, DateOnly? startDate = null);
+    Task<Result<TenantPricingTierEntity>> ChangeTenantPricingAsync(Guid tenantId, Guid newPricingTierId, DateOnly? startDate = null);
+    Task<TenantPricingTierEntity> GetCurrentTenantPricingIgnoreFiltersAsync(Guid tenantId);
+    Task<TenantPricingTierEntity?> GetTenantPricingAtDateAsync(Guid tenantId, DateOnly date);
+    Task<List<TenantPricingTierEntity>> GetTenantPricingHistoryAsync(Guid tenantId);
+    Task<Result<bool>> EndTenantPricingAsync(Guid tenantId, DateOnly? endDate = null);
+    Task<PricingTierEntity?> GetFreeTierAsync();
+}
 
 public class TenantPricingService : ITenantPricingService
 {

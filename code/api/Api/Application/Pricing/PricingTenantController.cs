@@ -1,6 +1,6 @@
 using Api.Application.Authentication;
 using Api.Application.Pricing.Models;
-using Api.Application.Pricing.Services.Interfaces;
+using Api.Application.Pricing.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
