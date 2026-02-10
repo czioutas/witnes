@@ -5,6 +5,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
+#pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
+
 namespace Api.Migrations
 {
     /// <inheritdoc />
@@ -72,9 +74,10 @@ namespace Api.Migrations
                     id = table.Column<Guid>(type: "uuid", nullable: false),
                     Name = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
                     Description = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
-                    MonthlyRequestLimit = table.Column<int>(type: "integer", nullable: false),
+                    MonthlyPageLoads = table.Column<int>(type: "integer", nullable: false),
                     PricePerMonth = table.Column<decimal>(type: "numeric", nullable: false),
-                    PricePerExtraRequest = table.Column<decimal>(type: "numeric", nullable: false),
+                    MaxTeamMembers = table.Column<int>(type: "integer", nullable: false),
+                    DataRetentionDays = table.Column<int>(type: "integer", nullable: false),
                     IsActive = table.Column<bool>(type: "boolean", nullable: false),
                     created_at = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
                     updated_at = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true)
@@ -567,8 +570,12 @@ namespace Api.Migrations
 
             migrationBuilder.InsertData(
                 table: "pricing_tiers",
-                columns: new[] { "id", "created_at", "Description", "IsActive", "MonthlyRequestLimit", "Name", "PricePerExtraRequest", "PricePerMonth", "updated_at" },
-                values: new object[] { new Guid("33333333-3333-3333-3333-333333333333"), new DateTimeOffset(new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "Free tier with limited requests", true, 1000, "Free", 0.001m, 0.00m, new DateTimeOffset(new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)) });
+                columns: new[] { "id", "created_at", "DataRetentionDays", "Description", "IsActive", "MaxTeamMembers", "MonthlyPageLoads", "Name", "PricePerMonth", "updated_at" },
+                values: new object[,]
+                {
+                    { new Guid("44444444-4444-4444-4444-444444444444"), new DateTimeOffset(new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), 7, "For small teams getting started with session diagnostics", true, 2, 50000, "Starter", 29.00m, new DateTimeOffset(new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)) },
+                    { new Guid("55555555-5555-5555-5555-555555555555"), new DateTimeOffset(new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), 14, "For growing teams that need more capacity and longer retention", true, 4, 100000, "Growth", 80.00m, new DateTimeOffset(new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)) }
+                });
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",

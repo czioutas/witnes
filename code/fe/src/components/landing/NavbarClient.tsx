@@ -58,6 +58,12 @@ export default function NavbarClient() {
             Integration
           </a>
           <a
+            href="/#privacy"
+            className="text-sm text-muted-foreground transition-colors hover:text-foreground"
+          >
+            Privacy
+          </a>
+          <a
             href="/#pricing"
             className="text-sm text-muted-foreground transition-colors hover:text-foreground"
           >
@@ -106,6 +112,13 @@ export default function NavbarClient() {
               onClick={() => setMobileOpen(false)}
             >
               Integration
+            </a>
+            <a
+              href="/#privacy"
+              className="text-sm text-muted-foreground transition-colors hover:text-foreground"
+              onClick={() => setMobileOpen(false)}
+            >
+              Privacy
             </a>
             <a
               href="/#pricing"

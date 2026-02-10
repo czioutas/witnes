@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace Api.Application.ProjectKeys.Models;
 
 /// <summary>
@@ -8,32 +10,44 @@ public class PackageInfoModel
     /// <summary>
     /// Name of the pricing plan
     /// </summary>
-    public string PlanName { get; set; } = string.Empty;
+    [Required]
+    public required string PlanName { get; set; }
 
     /// <summary>
     /// Description of the pricing plan
     /// </summary>
-    public string PlanDescription { get; set; } = string.Empty;
+    [Required]
+    public required string PlanDescription { get; set; }
 
     /// <summary>
-    /// Monthly page loads limit
+    /// Monthly page load limit
     /// </summary>
-    public int PageLoadsLimit { get; set; }
+    [Required]
+    public required int MonthlyPageLoadLimit { get; set; }
 
     /// <summary>
     /// Current page loads used this month
     /// </summary>
-    public int CurrentMonthPageLoads { get; set; }
+    [Required]
+    public required int CurrentMonthPageLoads { get; set; }
 
     /// <summary>
     /// Monthly subscription price
     /// </summary>
-    public decimal PricePerMonth { get; set; }
+    [Required]
+    public required decimal PricePerMonth { get; set; }
 
     /// <summary>
-    /// Price per extra page load beyond the limit
+    /// Maximum team members allowed
     /// </summary>
-    public decimal PricePerExtraRequest { get; set; }
+    [Required]
+    public int MaxTeamMembers { get; set; }
+
+    /// <summary>
+    /// Data retention in days
+    /// </summary>
+    [Required]
+    public int DataRetentionDays { get; set; }
 
     /// <summary>
     /// Renewal date for the current billing period
@@ -43,5 +57,6 @@ public class PackageInfoModel
     /// <summary>
     /// Indicates if the tenant is active on this plan
     /// </summary>
-    public bool IsActive { get; set; }
+    [Required]
+    public required bool IsActive { get; set; }
 }

@@ -1,7 +1,7 @@
-using System.Text.Json;
 using Api.Application.ProjectKeys.Entities;
 using Api.Application.ProjectKeys.Models;
 using Api.Application.Services;
+using Api.Application.Tenancy.Services;
 using Api.Data;
 using Libs.Result;
 using Microsoft.EntityFrameworkCore;
@@ -14,8 +14,8 @@ public interface IProjectKeyService
     Task<Result<ProjectKeyModel>> CreateAsync(Guid tenantId, CreateProjectKeyRequest request);
     Task<Result<ProjectKeyModel>> GetByKeyAsync(string projectKey);
     Task<Result<List<ProjectKeyModel>>> GetAllForTenantAsync(Guid tenantId);
-    Task<Result<ProjectKeyModel>> UpdateAsync(Guid projectKeyId, UpdateProjectKeyRequest request);
-    Task<Result<bool>> DeleteAsync(Guid projectKeyId);
+    Task<Result<ProjectKeyModel>> UpdateAsync(Guid tenantId, Guid projectKeyId, UpdateProjectKeyRequest request);
+    Task<Result<bool>> DeleteAsync(Guid tenantId, Guid projectKeyId);
     Task<Result<bool>> UpdateLastUsedAsync(string projectKey);
 }
 
@@ -26,13 +26,16 @@ public class ProjectKeyService : IProjectKeyService
     private readonly IFusionCache _cache;
     private readonly TimeProvider _timeProvider;
     private static readonly TimeSpan CacheDuration = TimeSpan.FromHours(1);
+    private readonly IRequestTenant _requestTenant;
 
     public ProjectKeyService(
+        IRequestTenant requestTenant,
         ApplicationDbContext dbContext,
         ApplicationDbContextRead dbContextRead,
         IFusionCache cache,
         TimeProvider timeProvider)
     {
+        _requestTenant = requestTenant ?? throw new ArgumentNullException(nameof(requestTenant));
         _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
         _dbContextRead = dbContextRead ?? throw new ArgumentNullException(nameof(dbContextRead));
         _cache = cache ?? throw new ArgumentNullException(nameof(cache));
@@ -72,10 +75,21 @@ public class ProjectKeyService : IProjectKeyService
     {
         var cacheKey = GetCacheKey(projectKey);
 
-        var model = await _cache.GetOrSetAsync(
+        var model = await _cache.GetOrSetAsync<ProjectKeyModel?>(
             cacheKey,
-            async _ => await GetProjectKeyFromDbAsync(projectKey),
-            new FusionCacheEntryOptions { Duration = CacheDuration });
+            async (ctx, ct) =>
+            {
+                var result = await UNSAFEGetProjectKeyFromDbAsync(projectKey);
+
+                if (result == null)
+                {
+                    ctx.Options.Duration = TimeSpan.FromMinutes(15);
+                }
+
+                return result;
+            },
+            new FusionCacheEntryOptions { Duration = CacheDuration }
+        );
 
         return model != null
             ? new Result<ProjectKeyModel>(model)
@@ -94,9 +108,9 @@ public class ProjectKeyService : IProjectKeyService
         return new Result<List<ProjectKeyModel>>(models);
     }
 
-    public async Task<Result<ProjectKeyModel>> UpdateAsync(Guid projectKeyId, UpdateProjectKeyRequest request)
+    public async Task<Result<ProjectKeyModel>> UpdateAsync(Guid tenantId, Guid projectKeyId, UpdateProjectKeyRequest request)
     {
-        var entity = await _dbContext.ProjectKeys.FindAsync(projectKeyId);
+        var entity = await _dbContext.ProjectKeys.Where(pk => pk.TenantId == tenantId && pk.Id == projectKeyId).FirstOrDefaultAsync();
 
         if (entity == null)
         {
@@ -134,9 +148,9 @@ public class ProjectKeyService : IProjectKeyService
         return new Result<ProjectKeyModel>(model);
     }
 
-    public async Task<Result<bool>> DeleteAsync(Guid projectKeyId)
+    public async Task<Result<bool>> DeleteAsync(Guid tenantId, Guid projectKeyId)
     {
-        var entity = await _dbContext.ProjectKeys.FindAsync(projectKeyId);
+        var entity = await _dbContext.ProjectKeys.Where(pk => pk.TenantId == tenantId && pk.Id == projectKeyId).FirstOrDefaultAsync();
 
         if (entity == null)
         {
@@ -175,7 +189,7 @@ public class ProjectKeyService : IProjectKeyService
         return new Result<bool>(true);
     }
 
-    private async Task<ProjectKeyModel?> GetProjectKeyFromDbAsync(string projectKey)
+    private async Task<ProjectKeyModel?> UNSAFEGetProjectKeyFromDbAsync(string projectKey)
     {
         var entity = await _dbContextRead.ProjectKeys
             .AsNoTracking()

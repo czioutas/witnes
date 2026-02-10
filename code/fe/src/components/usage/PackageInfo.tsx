@@ -1,11 +1,17 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "../ui/card";
 import { Progress } from "../ui/progress";
 import { Badge } from "../ui/badge";
-import { CalendarDays, DollarSign, Zap } from "lucide-react";
+import { CalendarDays, Zap } from "lucide-react";
 import type { PackageInfoModel } from "../../generated/api";
 
 interface PackageInfoProps {
-  packageInfo: PackageInfoModel | null;
+  packageInfo: PackageInfoModel;
   loading: boolean;
 }
 
@@ -16,10 +22,10 @@ export function PackageInfo({ packageInfo, loading }: PackageInfoProps) {
   };
 
   const formatCurrency = (amount: number | undefined) => {
-    if (amount === undefined) return "$0.00";
+    if (amount === undefined) return "€0.00";
     return new Intl.NumberFormat("en-US", {
       style: "currency",
-      currency: "USD",
+      currency: "EUR",
     }).format(amount);
   };
 
@@ -33,12 +39,10 @@ export function PackageInfo({ packageInfo, loading }: PackageInfoProps) {
   };
 
   const calculateUsagePercentage = () => {
-    if (!packageInfo?.page_loads_limit || !packageInfo?.current_month_page_loads) {
-      return 0;
-    }
+    var pageLoadsUsed = packageInfo.current_month_page_loads;
     return Math.min(
-      (packageInfo.current_month_page_loads / packageInfo.page_loads_limit) * 100,
-      100
+      (pageLoadsUsed / packageInfo.monthly_page_load_limit) * 100,
+      100,
     );
   };
 
@@ -71,7 +75,7 @@ export function PackageInfo({ packageInfo, loading }: PackageInfoProps) {
   }
 
   const usagePercentage = calculateUsagePercentage();
-  const remainingLoads = (packageInfo.page_loads_limit || 0) - (packageInfo.current_month_page_loads || 0);
+  var pageLoadsUsed = packageInfo.current_month_page_loads;
 
   return (
     <Card>
@@ -79,7 +83,9 @@ export function PackageInfo({ packageInfo, loading }: PackageInfoProps) {
         <div className="flex items-center justify-between">
           <div>
             <CardTitle>Package Information</CardTitle>
-            <CardDescription>Your current subscription plan and usage</CardDescription>
+            <CardDescription>
+              Your current subscription plan and usage
+            </CardDescription>
           </div>
           <Badge variant={packageInfo.is_active ? "default" : "secondary"}>
             {packageInfo.is_active ? "Active" : "Inactive"}
@@ -92,7 +98,9 @@ export function PackageInfo({ packageInfo, loading }: PackageInfoProps) {
           <div className="flex items-center justify-between">
             <div className="space-y-1">
               <p className="text-sm text-muted-foreground">Current Plan</p>
-              <p className="text-2xl font-bold">{packageInfo.plan_name || "Unknown"}</p>
+              <p className="text-2xl font-bold">
+                {packageInfo.plan_name || "Unknown"}
+              </p>
               {packageInfo.plan_description && (
                 <p className="text-sm text-muted-foreground">
                   {packageInfo.plan_description}
@@ -108,19 +116,16 @@ export function PackageInfo({ packageInfo, loading }: PackageInfoProps) {
           <div className="flex items-center justify-between text-sm">
             <span className="font-medium">Monthly Usage</span>
             <span className={getUsageColor(usagePercentage)}>
-              {formatNumber(packageInfo.current_month_page_loads)} / {formatNumber(packageInfo.page_loads_limit)}
+              {formatNumber(pageLoadsUsed)} /{" "}
+              {formatNumber(packageInfo.monthly_page_load_limit)} page loads
             </span>
           </div>
           <Progress value={usagePercentage} className="h-2" />
           <p className="text-xs text-muted-foreground">
-            {remainingLoads > 0 ? (
-              <>
-                {formatNumber(remainingLoads)} page loads remaining this month
-              </>
+            {packageInfo.monthly_page_load_limit - pageLoadsUsed < 0 ? (
+              <>You have exceeded your monthly limit</>
             ) : (
-              <>
-                You have exceeded your monthly limit
-              </>
+              ""
             )}
           </p>
         </div>
@@ -128,21 +133,10 @@ export function PackageInfo({ packageInfo, loading }: PackageInfoProps) {
         {/* Pricing Details */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2 border-t">
           <div className="flex items-start gap-3">
-            <DollarSign className="h-5 w-5 text-muted-foreground mt-0.5" />
             <div>
               <p className="text-sm text-muted-foreground">Monthly Price</p>
               <p className="text-lg font-semibold">
                 {formatCurrency(packageInfo.price_per_month)}
-              </p>
-            </div>
-          </div>
-
-          <div className="flex items-start gap-3">
-            <DollarSign className="h-5 w-5 text-muted-foreground mt-0.5" />
-            <div>
-              <p className="text-sm text-muted-foreground">Extra Page Load</p>
-              <p className="text-lg font-semibold">
-                {formatCurrency(packageInfo.price_per_extra_request)}
               </p>
             </div>
           </div>

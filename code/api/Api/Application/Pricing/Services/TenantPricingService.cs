@@ -16,7 +16,7 @@ public interface ITenantPricingService
     Task<TenantPricingTierEntity?> GetTenantPricingAtDateAsync(Guid tenantId, DateOnly date);
     Task<List<TenantPricingTierEntity>> GetTenantPricingHistoryAsync(Guid tenantId);
     Task<Result<bool>> EndTenantPricingAsync(Guid tenantId, DateOnly? endDate = null);
-    Task<PricingTierEntity?> GetFreeTierAsync();
+    Task<PricingTierEntity?> GetStarterTierAsync();
 }
 
 public class TenantPricingService : ITenantPricingService
@@ -47,7 +47,7 @@ public class TenantPricingService : ITenantPricingService
             StartDate = tenantPricing.StartDate,
             EndDate = tenantPricing.EndDate,
             IsActive = tenantPricing.IsActive,
-            MonthlyRequestLimit = tenantPricing.PricingTier?.MonthlyRequestLimit ?? 0
+            MonthlyPageLoads = tenantPricing.PricingTier?.MonthlyPageLoads ?? 0
         };
 
         await _redis.StringSetAsync(cacheKey, JsonSerializer.Serialize(cacheValue), TimeSpan.FromHours(24));
@@ -218,10 +218,10 @@ public class TenantPricingService : ITenantPricingService
         }
     }
 
-    public async Task<PricingTierEntity?> GetFreeTierAsync()
+    public async Task<PricingTierEntity?> GetStarterTierAsync()
     {
         return await _context.PricingTiers
-            .Where(pt => pt.Name.ToLower() == "free" && pt.IsActive)
+            .Where(pt => pt.Name.ToLower() == "starter" && pt.IsActive)
             .FirstOrDefaultAsync();
     }
 }

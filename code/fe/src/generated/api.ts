@@ -372,7 +372,6 @@ export interface SpeedMetricResponse {
   is_frontend_fault?: boolean;
   lcp_ms?: number;
   lcp_verdict?: string;
-  session_id?: string;
   silver_id?: string;
   timestamp?: string;
   ttfb_ms?: number;
@@ -403,10 +402,7 @@ export interface SetTenantPricingRequest {
 
 export interface SessionModel {
   /** @nullable */
-  guest_id?: string | null;
-  /** @nullable */
   ref?: string | null;
-  session_id?: string;
   url?: string;
   /** @nullable */
   user_id?: string | null;
@@ -589,8 +585,6 @@ export interface PageLoadSummaryModel {
   device_icon?: string;
   downlink?: number;
   effective_type?: string;
-  /** @nullable */
-  guest_id?: string | null;
   id?: string;
   incomplete?: boolean;
   is_backend_fault?: boolean;
@@ -599,7 +593,6 @@ export interface PageLoadSummaryModel {
   lcp_ms?: number;
   lcp_verdict?: string;
   rtt?: number;
-  session_id?: string;
   silver_id?: string;
   timestamp?: string;
   ttfb_ms?: number;
@@ -630,8 +623,6 @@ export interface PageLoadDetailModel {
   jank_reports?: string[];
   /** Largest Contentful Paint in milliseconds */
   lcp_ms?: number;
-  /** Session ID */
-  session_id?: string;
   /** When the page load occurred */
   timestamp?: string;
   /** URL of the page */
@@ -647,19 +638,27 @@ export interface PageLoadDetailModel {
  */
 export interface PackageInfoModel {
   /** Current page loads used this month */
-  current_month_page_loads?: number;
+  current_month_page_loads: number;
+  /** Data retention in days */
+  data_retention_days: number;
   /** Indicates if the tenant is active on this plan */
-  is_active?: boolean;
-  /** Monthly page loads limit */
-  page_loads_limit?: number;
-  /** Description of the pricing plan */
-  plan_description?: string;
-  /** Name of the pricing plan */
-  plan_name?: string;
-  /** Price per extra page load beyond the limit */
-  price_per_extra_request?: number;
+  is_active: boolean;
+  /** Maximum team members allowed */
+  max_team_members: number;
+  /** Monthly page load limit */
+  monthly_page_load_limit: number;
+  /**
+   * Description of the pricing plan
+   * @minLength 1
+   */
+  plan_description: string;
+  /**
+   * Name of the pricing plan
+   * @minLength 1
+   */
+  plan_name: string;
   /** Monthly subscription price */
-  price_per_month?: number;
+  price_per_month: number;
   /**
    * Renewal date for the current billing period
    * @nullable
@@ -705,19 +704,19 @@ export interface JankMetric {
 /**
  * @nullable
  */
-export type IngestSpeedMetricRequestModelNetwork = NetworkModel | null;
+export type IngestMetricRequestModelNetwork = NetworkModel | null;
 
 /**
  * @nullable
  */
-export type IngestSpeedMetricRequestModelDevice = DeviceModel | null;
+export type IngestMetricRequestModelDevice = DeviceModel | null;
 
-export interface IngestSpeedMetricRequestModel {
+export interface IngestMetricRequestModel {
   /** @nullable */
-  device?: IngestSpeedMetricRequestModelDevice;
+  device?: IngestMetricRequestModelDevice;
   metadata?: MetadataModel;
   /** @nullable */
-  network?: IngestSpeedMetricRequestModelNetwork;
+  network?: IngestMetricRequestModelNetwork;
   performance?: PerformanceModel;
   session?: SessionModel;
 }
@@ -1040,13 +1039,13 @@ The response is lightweight and does not perform any complex operations or datab
    * @summary Ingests a speed metric
    */
   const postApiV1Events = (
-    ingestSpeedMetricRequestModel: IngestSpeedMetricRequestModel,
+    ingestMetricRequestModel: IngestMetricRequestModel,
   ) => {
     return customInstance<void>({
       url: `/api/v1/events`,
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      data: ingestSpeedMetricRequestModel,
+      data: ingestMetricRequestModel,
     });
   };
 

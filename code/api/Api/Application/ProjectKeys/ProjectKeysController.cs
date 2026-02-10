@@ -71,7 +71,9 @@ public class ProjectKeysController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<ProjectKeyModel>> Update(Guid id, [FromBody] UpdateProjectKeyRequest request)
     {
-        var result = await _projectKeyService.UpdateAsync(id, request);
+        var tenantId = _requestTenant.TenantId;
+
+        var result = await _projectKeyService.UpdateAsync(tenantId, id, request);
         return !result.IsFailure ? Ok(result.GetValue) : NotFound();
     }
 
@@ -85,7 +87,8 @@ public class ProjectKeysController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult> Delete(Guid id)
     {
-        var result = await _projectKeyService.DeleteAsync(id);
+        var tenantId = _requestTenant.TenantId;
+        var result = await _projectKeyService.DeleteAsync(tenantId, id);
         return !result.IsFailure ? NoContent() : NotFound();
     }
 
@@ -173,10 +176,11 @@ public class ProjectKeysController : ControllerBase
         {
             PlanName = pricingTier.Name,
             PlanDescription = pricingTier.Description,
-            PageLoadsLimit = pricingTier.MonthlyRequestLimit,
+            MonthlyPageLoadLimit = pricingTier.MonthlyPageLoads,
             CurrentMonthPageLoads = currentMonthPageLoads,
             PricePerMonth = pricingTier.PricePerMonth,
-            PricePerExtraRequest = pricingTier.PricePerExtraRequest,
+            MaxTeamMembers = pricingTier.MaxTeamMembers,
+            DataRetentionDays = pricingTier.DataRetentionDays,
             RenewalDate = renewalDate.UtcDateTime,
             IsActive = tenantPricingTier.IsActive
         };

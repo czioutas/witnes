@@ -15,11 +15,13 @@ public class PricingTierEntity : AuditableBaseEntity
     [MaxLength(200)]
     public string Description { get; set; } = string.Empty;
 
-    public int MonthlyRequestLimit { get; set; }
+    public int MonthlyPageLoads { get; set; }
 
     public decimal PricePerMonth { get; set; }
 
-    public decimal PricePerExtraRequest { get; set; }
+    public int MaxTeamMembers { get; set; }
+
+    public int DataRetentionDays { get; set; }
 
     public bool IsActive { get; set; } = true;
 
@@ -28,14 +30,16 @@ public class PricingTierEntity : AuditableBaseEntity
     public PricingTierEntity(
         string name,
         string description,
-        int monthlyRequestLimit,
+        int monthlyPageLoads,
         decimal pricePerMonth,
-        decimal pricePerExtraRequest)
+        int maxTeamMembers,
+        int dataRetentionDays)
     {
         Name = name;
         Description = description;
-        MonthlyRequestLimit = monthlyRequestLimit;
+        MonthlyPageLoads = monthlyPageLoads;
         PricePerMonth = pricePerMonth;
-        PricePerExtraRequest = pricePerExtraRequest;
+        MaxTeamMembers = maxTeamMembers;
+        DataRetentionDays = dataRetentionDays;
     }
 }

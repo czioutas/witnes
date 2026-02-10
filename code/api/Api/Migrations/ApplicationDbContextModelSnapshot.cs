@@ -391,6 +391,9 @@ namespace Api.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at");
 
+                    b.Property<int>("DataRetentionDays")
+                        .HasColumnType("integer");
+
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasMaxLength(200)
@@ -399,16 +402,16 @@ namespace Api.Migrations
                     b.Property<bool>("IsActive")
                         .HasColumnType("boolean");
 
-                    b.Property<int>("MonthlyRequestLimit")
+                    b.Property<int>("MaxTeamMembers")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("MonthlyPageLoads")
                         .HasColumnType("integer");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)");
-
-                    b.Property<decimal>("PricePerExtraRequest")
-                        .HasColumnType("numeric");
 
                     b.Property<decimal>("PricePerMonth")
                         .HasColumnType("numeric");
@@ -424,14 +427,28 @@ namespace Api.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("33333333-3333-3333-3333-333333333333"),
+                            Id = new Guid("44444444-4444-4444-4444-444444444444"),
                             CreatedAt = new DateTimeOffset(new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
-                            Description = "Free tier with limited requests",
+                            DataRetentionDays = 7,
+                            Description = "For small teams getting started with session diagnostics",
                             IsActive = true,
-                            MonthlyRequestLimit = 1000,
-                            Name = "Free",
-                            PricePerExtraRequest = 0.001m,
-                            PricePerMonth = 0.00m,
+                            MaxTeamMembers = 2,
+                            MonthlyPageLoads = 50000,
+                            Name = "Starter",
+                            PricePerMonth = 29.00m,
+                            UpdatedAt = new DateTimeOffset(new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0))
+                        },
+                        new
+                        {
+                            Id = new Guid("55555555-5555-5555-5555-555555555555"),
+                            CreatedAt = new DateTimeOffset(new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            DataRetentionDays = 14,
+                            Description = "For growing teams that need more capacity and longer retention",
+                            IsActive = true,
+                            MaxTeamMembers = 4,
+                            MonthlyPageLoads = 100000,
+                            Name = "Growth",
+                            PricePerMonth = 80.00m,
                             UpdatedAt = new DateTimeOffset(new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0))
                         });
                 });

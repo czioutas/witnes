@@ -76,6 +76,9 @@ public class Startup
 
         CorsSettings? corsSettings = corsSettingsSection.Get<CorsSettings>();
 
+        var origins = corsSettings?.Origins?.Split(",") ?? [];
+        Console.WriteLine($"[CORS] Configured origins ({origins.Length}): [{string.Join("] [", origins)}]");
+
         services.AddCors(options =>
             {
                 options.AddPolicy("DefaultPolicy",
@@ -83,9 +86,7 @@ public class Startup
                     {
                         builder
                             .SetIsOriginAllowedToAllowWildcardSubdomains()
-#pragma warning disable CS8602 // Dereference of a possibly null reference
-                            .WithOrigins(corsSettings.Origins.Split(","))
-#pragma warning restore CS8602
+                            .WithOrigins(origins)
                             .AllowAnyHeader()
                             .AllowAnyMethod()
                             .AllowCredentials()

@@ -169,7 +169,6 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUserEntity, App
 
         builder.Entity<ProjectKeyEntity>(entity =>
         {
-            entity.HasQueryFilter(e => e.TenantId == CurrentTenantId);
             entity.HasIndex(e => e.ProjectKey).IsUnique();
         });
     }

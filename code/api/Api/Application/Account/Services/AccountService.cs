@@ -181,20 +181,20 @@ public class AccountService : IAccountService
 
             if (!tenantResult.IsFailure)
             {
-                // Set Free pricing tier for newly created tenant
-                var freeTier = await _tenantPricingService.GetFreeTierAsync();
-                if (freeTier != null)
+                // Set Starter pricing tier for newly created tenant
+                var starterTier = await _tenantPricingService.GetStarterTierAsync();
+                if (starterTier != null)
                 {
-                    var pricingResult = await _tenantPricingService.SetTenantPricingAsync(tenantResult.GetValue.Id, freeTier.Id);
+                    var pricingResult = await _tenantPricingService.SetTenantPricingAsync(tenantResult.GetValue.Id, starterTier.Id);
                     if (pricingResult.IsFailure)
                     {
-                        _logger.LogWarning("Failed to set Free pricing tier for tenant {TenantId}: {Error}",
+                        _logger.LogWarning("Failed to set Starter pricing tier for tenant {TenantId}: {Error}",
                             tenantResult.GetValue.Id, pricingResult.ErrorModel?.Message);
                     }
                 }
                 else
                 {
-                    _logger.LogWarning("Free pricing tier not found for tenant {TenantId}", tenantResult.GetValue.Id);
+                    _logger.LogWarning("Starter pricing tier not found for tenant {TenantId}", tenantResult.GetValue.Id);
                 }
             }
 
