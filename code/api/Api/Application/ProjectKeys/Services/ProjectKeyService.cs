@@ -3,6 +3,7 @@ using Api.Application.ProjectKeys.Models;
 using Api.Application.Services;
 using Api.Application.Tenancy.Services;
 using Api.Data;
+using Api.Product.Cors.Services;
 using Libs.Result;
 using Microsoft.EntityFrameworkCore;
 using ZiggyCreatures.Caching.Fusion;
@@ -25,21 +26,21 @@ public class ProjectKeyService : IProjectKeyService
     private readonly ApplicationDbContextRead _dbContextRead;
     private readonly IFusionCache _cache;
     private readonly TimeProvider _timeProvider;
+    private readonly IAllowedOriginService _allowedOriginService;
     private static readonly TimeSpan CacheDuration = TimeSpan.FromHours(1);
-    private readonly IRequestTenant _requestTenant;
 
     public ProjectKeyService(
-        IRequestTenant requestTenant,
         ApplicationDbContext dbContext,
         ApplicationDbContextRead dbContextRead,
         IFusionCache cache,
-        TimeProvider timeProvider)
+        TimeProvider timeProvider,
+        IAllowedOriginService allowedOriginService)
     {
-        _requestTenant = requestTenant ?? throw new ArgumentNullException(nameof(requestTenant));
         _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
         _dbContextRead = dbContextRead ?? throw new ArgumentNullException(nameof(dbContextRead));
         _cache = cache ?? throw new ArgumentNullException(nameof(cache));
         _timeProvider = timeProvider ?? throw new ArgumentNullException(nameof(timeProvider));
+        _allowedOriginService = allowedOriginService ?? throw new ArgumentNullException(nameof(allowedOriginService));
     }
 
     public async Task<Result<ProjectKeyModel>> CreateAsync(Guid tenantId, CreateProjectKeyRequest request)
@@ -67,6 +68,9 @@ public class ProjectKeyService : IProjectKeyService
         var cacheKey = GetCacheKey(projectKey);
         var model = MapToModel(entity);
         await _cache.SetAsync(cacheKey, model, new FusionCacheEntryOptions { Duration = CacheDuration });
+
+        // Invalidate CORS origins cache so the new domain is picked up
+        await _allowedOriginService.InvalidateCacheAsync();
 
         return new Result<ProjectKeyModel>(model);
     }
@@ -144,6 +148,9 @@ public class ProjectKeyService : IProjectKeyService
         var cacheKey = GetCacheKey(entity.ProjectKey);
         await _cache.RemoveAsync(cacheKey);
 
+        // Invalidate CORS origins cache so domain changes are picked up
+        await _allowedOriginService.InvalidateCacheAsync();
+
         var model = MapToModel(entity);
         return new Result<ProjectKeyModel>(model);
     }
@@ -163,6 +170,9 @@ public class ProjectKeyService : IProjectKeyService
 
         _dbContext.ProjectKeys.Remove(entity);
         await _dbContext.SaveChangesAsync();
+
+        // Invalidate CORS origins cache so removed domain is no longer allowed
+        await _allowedOriginService.InvalidateCacheAsync();
 
         return new Result<bool>(true);
     }

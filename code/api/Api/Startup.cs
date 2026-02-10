@@ -36,8 +36,11 @@ using Usersr.API.Users.Services;
 using Api.Product.MetricsProcessing.Gold;
 using Api.Product.MetricsProcessing.Silver;
 using Api.Product.MetricsProcessing.Bronze;
+using Api.Product.Cors;
+using Api.Product.Cors.Services;
 using Api.Product.MetricCleanup;
 using Api.Product.Metrics;
+using Microsoft.AspNetCore.Cors.Infrastructure;
 
 namespace Api;
 
@@ -75,25 +78,10 @@ public class Startup
         IConfigurationSection corsSettingsSection = Configuration.GetSection(nameof(CorsSettings));
         services.Configure<CorsSettings>(corsSettingsSection);
 
-        CorsSettings? corsSettings = corsSettingsSection.Get<CorsSettings>();
-
-        var origins = corsSettings?.Origins?.Split(",") ?? [];
-        Console.WriteLine($"[CORS] Configured origins ({origins.Length}): [{string.Join("] [", origins)}]");
-
-        services.AddCors(options =>
-            {
-                options.AddPolicy("DefaultPolicy",
-                    builder =>
-                    {
-                        builder
-                            .SetIsOriginAllowedToAllowWildcardSubdomains()
-                            .WithOrigins(origins)
-                            .AllowAnyHeader()
-                            .AllowAnyMethod()
-                            .AllowCredentials()
-                            .WithExposedHeaders("Content-Disposition");
-                    });
-            });
+        // Dynamic CORS: origins loaded from DB (project keys) + static origins from appsettings
+        services.AddSingleton<IAllowedOriginService, AllowedOriginService>();
+        services.AddSingleton<ICorsPolicyProvider, DatabaseCorsPolicyProvider>();
+        services.AddCors();
 
         services.AddRouting(options => options.LowercaseUrls = true);
 
@@ -177,7 +165,7 @@ public class Startup
 
         app.UseRouting();
 
-        app.UseCors("DefaultPolicy");
+        app.UseCors();
 
         app.UseAuthentication();
         app.UseAuthorization();

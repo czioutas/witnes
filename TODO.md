@@ -112,7 +112,7 @@ we should have an endpoint in which they can see all invoces
 we will have an entity to hold the invoice
 the entity will have an enum saying Pending, Due, Paid, Overdue
 
-## [PENDING] Task 9 - Dyanmic CORS
+## [TODO] Task 9 - Dyanmic CORS
 
 We currently set CORS from appsettings.json and in Startup.cs we do WithOrigins
 Unfortunately as we need to dynamically be able to add origins based on the tenant, we need to change this and make it dynamic.
@@ -179,3 +179,9 @@ And compare only hostnames.
 ## [PENDING] Task 10 - Checking usage and applying limits
 
 We will have a cronjob that will run every day at midnight and will check the usage of each tenant and will apply the limits based on their pricing tier.
+
+## [PENDING] Task 11 - CORS Cache invalidation is too aggressive
+
+When we make any change to a project key we clear the cache of the allowed origins for CORS. this is too aggressive and can cause performance issues if we have a lot of changes to the project keys.
+
+We should edit the cache content instead of clearing it. so if we add a new origin we just add it to the cache and if we remove an origin we just remove it from the cache.
