@@ -7,6 +7,7 @@ interface PricingButtonsProps {
 export default function PricingButtons({ planName }: PricingButtonsProps) {
   return (
     <Button
+      asChild
       size="lg"
       className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
     >

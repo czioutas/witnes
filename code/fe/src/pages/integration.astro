@@ -173,9 +173,28 @@ import {
                     > method as soon as your authentication is complete. Witnes will
                     automatically begin tracking events once an ID is provided.
                   </p>
+
+                  <!-- Privacy Warning -->
+                  <div class="rounded-lg bg-amber-50 border border-amber-200 p-4 mb-4">
+                    <div class="flex gap-3">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-amber-600 mt-0.5 flex-shrink-0">
+                        <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"></path>
+                        <path d="M12 9v4"></path>
+                        <path d="M12 17h.01"></path>
+                      </svg>
+                      <div>
+                        <p class="text-sm font-semibold text-amber-800 mb-1">Do not use personally identifiable information as the User ID</p>
+                        <p class="text-sm text-amber-700">
+                          Never pass emails, full names, phone numbers, or any other personal data as the User ID. Use an opaque internal identifier (e.g. a database ID or UUID) instead. If you choose to send identifiable data, <strong>you are solely responsible</strong> for any privacy or regulatory violations that may result (GDPR, CCPA, etc.). See our <a href="/privacy" class="underline font-medium hover:text-amber-900">Privacy Policy</a> for details.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
                   <div class="rounded-lg bg-white p-6 border border-zinc-200">
                     <pre
                       class="overflow-x-auto text-sm"><code class="language-javascript">// Call this after your login logic
+// Use an opaque ID — never use emails or personal data
 if (window.Witnes) &#123;
     window.Witnes.identify("customer_id_99");
 &#125; else &#123;
@@ -398,8 +417,11 @@ if (window.Witnes) &#123;
                       <div>
                         <strong class="text-black">User ID:</strong> We require a
                         User ID so your CS agents can search for specific sessions
-                        when a ticket is filed. We recommend using a non-sensitive
-                        internal ID or a hashed email.
+                        when a ticket is filed. You <strong>must</strong> use a non-identifiable
+                        internal ID (e.g. a database ID or UUID). Do not send emails,
+                        names, or any personally identifiable information. If you choose
+                        to pass identifiable data, you bear full responsibility for any
+                        resulting privacy violations.
                       </div>
                     </li>
                   </ul>

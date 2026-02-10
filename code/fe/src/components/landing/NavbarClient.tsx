@@ -40,25 +40,25 @@ export default function NavbarClient() {
 
         <div className="hidden items-center gap-8 md:flex">
           <a
-            href="#evidence"
+            href="/#evidence"
             className="text-sm text-muted-foreground transition-colors hover:text-foreground"
           >
             Evidence
           </a>
           <a
-            href="#pillars"
+            href="/#pillars"
             className="text-sm text-muted-foreground transition-colors hover:text-foreground"
           >
             How We Track
           </a>
           <a
-            href="#integration"
+            href="/#integration"
             className="text-sm text-muted-foreground transition-colors hover:text-foreground"
           >
             Integration
           </a>
           <a
-            href="#pricing"
+            href="/#pricing"
             className="text-sm text-muted-foreground transition-colors hover:text-foreground"
           >
             Pricing
@@ -87,28 +87,28 @@ export default function NavbarClient() {
         <div className="border-t border-border/50 bg-background/95 px-6 pb-6 pt-4 backdrop-blur-xl md:hidden">
           <div className="flex flex-col gap-4">
             <a
-              href="#evidence"
+              href="/#evidence"
               className="text-sm text-muted-foreground transition-colors hover:text-foreground"
               onClick={() => setMobileOpen(false)}
             >
               Evidence
             </a>
             <a
-              href="#pillars"
+              href="/#pillars"
               className="text-sm text-muted-foreground transition-colors hover:text-foreground"
               onClick={() => setMobileOpen(false)}
             >
               How We Track
             </a>
             <a
-              href="#integration"
+              href="/#integration"
               className="text-sm text-muted-foreground transition-colors hover:text-foreground"
               onClick={() => setMobileOpen(false)}
             >
               Integration
             </a>
             <a
-              href="#pricing"
+              href="/#pricing"
               className="text-sm text-muted-foreground transition-colors hover:text-foreground"
               onClick={() => setMobileOpen(false)}
             >

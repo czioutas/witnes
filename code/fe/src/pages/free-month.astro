@@ -1,0 +1,214 @@
+---
+import PublicLayout from "../layouts/PublicLayout.astro";
+import Navbar from "../components/landing/Navbar.astro";
+import Footer from "../components/landing/Footer.astro";
+---
+
+<PublicLayout
+  title="Get 1 Month Free | Witnes"
+  description="Get full access to Witnes for 30 days — no credit card, no catch. Just your feedback."
+  canonical="/free-month"
+>
+  <div class="min-h-screen flex flex-col relative">
+    <div class="relative z-10">
+      <Navbar />
+      <main class="flex-grow">
+        <!-- Hero Section -->
+        <section class="relative overflow-hidden pb-16 pt-32 md:pb-24 md:pt-44 border-b border-border">
+          <!-- Subtle grid background -->
+          <div
+            class="pointer-events-none absolute inset-0 opacity-[0.4]"
+            style="background-image: linear-gradient(hsl(var(--border)) 1px, transparent 1px), linear-gradient(to right, hsl(var(--border)) 1px, transparent 1px); background-size: 60px 60px;"
+          >
+          </div>
+
+          <!-- Glow effect -->
+          <div
+            class="pointer-events-none absolute left-1/2 top-0 -translate-x-1/2 h-[500px] w-[800px] rounded-full bg-muted blur-[120px]"
+          >
+          </div>
+
+          <div class="relative mx-auto max-w-6xl px-6">
+            <div class="mx-auto max-w-3xl text-center">
+              <!-- Badge -->
+              <div
+                class="mb-8 inline-flex items-center gap-2 rounded-full border border-border bg-secondary px-4 py-1.5 text-sm text-foreground"
+              >
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="h-3.5 w-3.5"
+                >
+                  <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                </svg>
+                <span>Feedback-for-Access</span>
+              </div>
+
+              <h1
+                class="text-balance text-4xl font-bold leading-tight tracking-tight text-foreground md:text-6xl lg:text-7xl"
+              >
+                Get 1 Month Free
+              </h1>
+
+              <p
+                class="mx-auto mt-6 max-w-2xl text-pretty text-lg leading-relaxed text-muted-foreground md:text-xl"
+              >
+                Full access to Witnes for 30 days — no credit card, no catch. Just your feedback.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <!-- Welcome Message -->
+        <section class="py-16 md:py-24">
+          <div class="mx-auto max-w-3xl px-6">
+            <div class="rounded-2xl border border-border bg-card p-8 md:p-12 shadow-sm">
+              <p class="text-lg leading-relaxed text-muted-foreground md:text-xl">
+                We're building Witnes to eliminate guesswork for every CS team. To make it the best tool possible, we want your brain — <span class="text-foreground font-medium">not your money.</span>
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <!-- 3-Step Roadmap -->
+        <section class="pb-16 md:pb-24">
+          <div class="mx-auto max-w-3xl px-6">
+            <h2 class="text-center text-2xl font-bold tracking-tight text-foreground md:text-3xl mb-12">
+              The 3-Step Roadmap
+            </h2>
+
+            <div class="space-y-8">
+              <!-- Step 1 -->
+              <div class="group relative flex gap-6">
+                <div class="flex flex-col items-center">
+                  <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground font-bold text-sm">
+                    1
+                  </div>
+                  <div class="mt-2 h-full w-px bg-border"></div>
+                </div>
+                <div class="pb-8">
+                  <h3 class="text-xl font-bold text-foreground">Install & Explore</h3>
+                  <p class="text-sm font-medium text-muted-foreground mt-1">Days 1 - 7</p>
+                  <p class="mt-3 text-muted-foreground leading-relaxed">
+                    Drop the snippet into your <code class="rounded bg-secondary px-1.5 py-0.5 text-sm font-mono text-foreground">&lt;head&gt;</code>. You get immediate access to the full <span class="text-foreground font-medium">session timeline</span>, <span class="text-foreground font-medium">network diagnostics</span>, and <span class="text-foreground font-medium">API tracking</span>.
+                  </p>
+                </div>
+              </div>
+
+              <!-- Step 2 -->
+              <div class="group relative flex gap-6">
+                <div class="flex flex-col items-center">
+                  <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground font-bold text-sm">
+                    2
+                  </div>
+                  <div class="mt-2 h-full w-px bg-border"></div>
+                </div>
+                <div class="pb-8">
+                  <h3 class="text-xl font-bold text-foreground">The Feedback Call</h3>
+                  <p class="text-sm font-medium text-muted-foreground mt-1">By Day 14</p>
+                  <p class="mt-3 text-muted-foreground leading-relaxed">
+                    Schedule a 15-minute sync with our founders. Tell us what's working and what's "janky".
+                  </p>
+                </div>
+              </div>
+
+              <!-- Step 3 -->
+              <div class="group relative flex gap-6">
+                <div class="flex flex-col items-center">
+                  <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground font-bold text-sm">
+                    3
+                  </div>
+                </div>
+                <div>
+                  <h3 class="text-xl font-bold text-foreground">Unlock the Month</h3>
+                  <p class="text-sm font-medium text-muted-foreground mt-1">30 days free</p>
+                  <p class="mt-3 text-muted-foreground leading-relaxed">
+                    Once we chat, we'll extend your Starter Plan to a full 30 days for free.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Why Starter Plan -->
+        <section class="pb-16 md:pb-24">
+          <div class="mx-auto max-w-3xl px-6">
+            <div class="rounded-2xl border border-border bg-card p-8 md:p-12 shadow-sm">
+              <h2 class="text-2xl font-bold tracking-tight text-foreground md:text-3xl mb-4">
+                Why the Starter Plan?
+              </h2>
+              <p class="text-muted-foreground leading-relaxed mb-8">
+                This offer is specifically for the Starter tier — everything you need to diagnose real user sessions at scale.
+              </p>
+
+              <div class="grid gap-4 sm:grid-cols-3">
+                <div class="rounded-xl border border-border bg-secondary/30 p-5">
+                  <p class="text-2xl font-bold text-foreground">2.5M</p>
+                  <p class="text-sm text-muted-foreground mt-1">page loads</p>
+                </div>
+                <div class="rounded-xl border border-border bg-secondary/30 p-5">
+                  <p class="text-2xl font-bold text-foreground">2</p>
+                  <p class="text-sm text-muted-foreground mt-1">team members</p>
+                </div>
+                <div class="rounded-xl border border-border bg-secondary/30 p-5">
+                  <p class="text-2xl font-bold text-foreground">7-day</p>
+                  <p class="text-sm text-muted-foreground mt-1">data retention</p>
+                </div>
+              </div>
+
+              <div class="mt-8">
+                <ul class="space-y-3">
+                  <li class="flex items-start gap-3">
+                    <svg class="mt-0.5 h-5 w-5 shrink-0 text-primary" viewBox="0 0 20 20" fill="currentColor">
+                      <path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clip-rule="evenodd" />
+                    </svg>
+                    <span class="text-sm leading-relaxed text-foreground">Full session timeline</span>
+                  </li>
+                  <li class="flex items-start gap-3">
+                    <svg class="mt-0.5 h-5 w-5 shrink-0 text-primary" viewBox="0 0 20 20" fill="currentColor">
+                      <path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clip-rule="evenodd" />
+                    </svg>
+                    <span class="text-sm leading-relaxed text-foreground">API latency tracking</span>
+                  </li>
+                  <li class="flex items-start gap-3">
+                    <svg class="mt-0.5 h-5 w-5 shrink-0 text-primary" viewBox="0 0 20 20" fill="currentColor">
+                      <path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clip-rule="evenodd" />
+                    </svg>
+                    <span class="text-sm leading-relaxed text-foreground">Network diagnostics</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- CTA -->
+        <section class="pb-24 md:pb-32">
+          <div class="mx-auto max-w-3xl px-6 text-center">
+            <a
+              href="/authenticate/register"
+              class="inline-flex items-center justify-center gap-2 rounded-lg bg-primary px-8 py-4 text-base font-medium text-primary-foreground shadow-sm transition-all hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            >
+              Get Started
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M5 12h14"></path>
+                <path d="m12 5 7 7-7 7"></path>
+              </svg>
+            </a>
+            <p class="mt-4 text-sm text-muted-foreground">
+              No credit card required. Takes less than 2 minutes.
+            </p>
+          </div>
+        </section>
+      </main>
+      <Footer />
+    </div>
+  </div>
+</PublicLayout>

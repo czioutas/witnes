@@ -5,7 +5,6 @@ import Footer from "../components/landing/Footer.astro";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from "../components/ui/card";
@@ -84,7 +83,7 @@ import { Separator } from "../components/ui/separator";
               </p>
 
               <p class="mt-8 text-sm text-muted-foreground">
-                Last updated: January 2026
+                Effective Date: February 9, 2026
               </p>
             </div>
           </div>
@@ -93,211 +92,270 @@ import { Separator } from "../components/ui/separator";
         <!-- Main Terms Content -->
         <section class="section-frame py-32 md:py-48 px-6 md:px-12 bg-white">
           <div class="max-w-4xl mx-auto space-y-12">
-            <!-- Section 01: About the Service -->
+            <!-- Section 01: Acceptance of Terms -->
             <Card className="border-zinc-200">
               <CardHeader>
                 <div class="flex items-center gap-3 mb-2">
                   <Badge variant="outline" className="text-sm">01</Badge>
                   <CardTitle className="text-xl uppercase tracking-widest"
-                    >About the Service</CardTitle
+                    >Acceptance of Terms</CardTitle
                   >
                 </div>
               </CardHeader>
               <CardContent>
                 <p class="text-base leading-relaxed text-zinc-600">
-                  Witnes provides <strong
-                    >analytical and informational estimates</strong
-                  > only. It does not constitute certification, verification, or assurance
-                  under ISO 14067, GHG Protocol, or any other standard.
+                  By creating an account or using the Witnes analytics script
+                  ("Service"), you agree to be bound by these Terms of Service.
+                  If you are entering into this agreement on behalf of a company,
+                  you represent that you have the authority to bind that entity to
+                  these terms.
                 </p>
               </CardContent>
             </Card>
 
-            <!-- Section 02: Eligibility -->
+            <!-- Section 02: Description of Service -->
             <Card className="border-zinc-200">
               <CardHeader>
                 <div class="flex items-center gap-3 mb-2">
                   <Badge variant="outline" className="text-sm">02</Badge>
                   <CardTitle className="text-xl uppercase tracking-widest"
-                    >Eligibility</CardTitle
+                    >Description of Service</CardTitle
                   >
                 </div>
               </CardHeader>
               <CardContent>
                 <p class="text-base leading-relaxed text-zinc-600">
-                  You must be at least 18 years old and legally able to enter
-                  into a binding agreement. If using the service on behalf of an
-                  organization, you confirm you are authorized to bind that
-                  entity.
+                  Witnes provides a lightweight, privacy-focused session
+                  recording and analytics platform. We grant you a limited,
+                  non-exclusive, non-transferable license to use our tracking
+                  code on websites you own or control.
                 </p>
               </CardContent>
             </Card>
 
-            <!-- Section 03: Accounts -->
+            <!-- Section 03: User Obligations & Restrictions -->
             <Card className="border-zinc-200">
               <CardHeader>
                 <div class="flex items-center gap-3 mb-2">
                   <Badge variant="outline" className="text-sm">03</Badge>
                   <CardTitle className="text-xl uppercase tracking-widest"
-                    >Accounts</CardTitle
+                    >User Obligations & Restrictions</CardTitle
                   >
                 </div>
               </CardHeader>
-              <CardContent>
+              <CardContent className="space-y-8">
                 <p class="text-base leading-relaxed text-zinc-600">
-                  You are responsible for your account credentials and all
-                  activity under your account. We reserve the right to suspend
-                  or terminate accounts that violate these Terms.
+                  You agree to use the Service only for lawful purposes. You
+                  strictly agree <strong>NOT</strong> to:
                 </p>
+                <div>
+                  <h3
+                    class="text-base font-bold text-black uppercase tracking-tight mb-4"
+                  >
+                    a) Prohibited Data (The "Identify" Feature)
+                  </h3>
+                  <p class="text-base leading-relaxed text-zinc-600">
+                    You must not use the <code
+                      class="bg-zinc-100 px-1.5 py-0.5 rounded text-sm"
+                      >Witnes.identify()</code
+                    > function to collect or store "Personally Identifiable
+                    Information" (PII) such as plain-text email addresses, names,
+                    phone numbers, or social security numbers. You agree to use
+                    only pseudonymous identifiers (e.g., internal Database UUIDs)
+                    for this feature.
+                  </p>
+                </div>
+                <div>
+                  <h3
+                    class="text-base font-bold text-black uppercase tracking-tight mb-4"
+                  >
+                    b) Abuse & Security
+                  </h3>
+                  <ul class="space-y-3 text-zinc-600">
+                    <li class="flex gap-2">
+                      <span class="text-[#A68B6A]">•</span>
+                      <span
+                        >Reverse engineer, decompile, or disassemble the Witnes
+                        tracking code.</span
+                      >
+                    </li>
+                    <li class="flex gap-2">
+                      <span class="text-[#A68B6A]">•</span>
+                      <span
+                        >Attempt to probe, scan, or test the vulnerability of our
+                        API.</span
+                      >
+                    </li>
+                    <li class="flex gap-2">
+                      <span class="text-[#A68B6A]">•</span>
+                      <span
+                        >Use the Service to generate artificial traffic (DDoS) or
+                        spam.</span
+                      >
+                    </li>
+                    <li class="flex gap-2">
+                      <span class="text-[#A68B6A]">•</span>
+                      <span
+                        >Use the Service on websites that contain illegal
+                        content, hate speech, or malware.</span
+                      >
+                    </li>
+                  </ul>
+                </div>
               </CardContent>
             </Card>
 
-            <!-- Section 04: Acceptable Use -->
+            <!-- Section 04: Payment & Subscription -->
             <Card className="border-zinc-200">
               <CardHeader>
                 <div class="flex items-center gap-3 mb-2">
                   <Badge variant="outline" className="text-sm">04</Badge>
                   <CardTitle className="text-xl uppercase tracking-widest"
-                    >Acceptable Use</CardTitle
+                    >Payment & Subscription</CardTitle
                   >
                 </div>
               </CardHeader>
               <CardContent>
-                <p class="text-base leading-relaxed text-zinc-600 mb-4">
-                  You agree not to:
-                </p>
                 <ul class="space-y-3 text-zinc-600">
                   <li class="flex gap-2">
                     <span class="text-[#A68B6A]">•</span>
                     <span
-                      >Copy, modify, or redistribute the Service or its content</span
+                      ><strong>Billing:</strong> Services are billed in advance
+                      on a monthly or yearly basis via Stripe.</span
                     >
                   </li>
                   <li class="flex gap-2">
                     <span class="text-[#A68B6A]">•</span>
                     <span
-                      >Reverse-engineer or attempt to access the source code</span
+                      ><strong>Refunds:</strong> You may cancel your subscription
+                      at any time. Refunds are provided solely at our discretion,
+                      typically only in cases of extended service failure.</span
                     >
                   </li>
                   <li class="flex gap-2">
                     <span class="text-[#A68B6A]">•</span>
-                    <span>Misrepresent results as verified or certified</span>
-                  </li>
-                  <li class="flex gap-2">
-                    <span class="text-[#A68B6A]">•</span>
-                    <span>Upload unlawful or infringing data</span>
+                    <span
+                      ><strong>Plan Limits:</strong> Data retention (7, 14, or 30
+                      days) is strictly enforced based on your selected plan. We
+                      reserve the right to throttle or limit data ingestion if
+                      you significantly exceed the usage limits of your
+                      tier.</span
+                    >
                   </li>
                 </ul>
               </CardContent>
             </Card>
 
-            <!-- Section 05: Payment -->
+            <!-- Section 05: Data Ownership -->
             <Card className="border-zinc-200">
               <CardHeader>
                 <div class="flex items-center gap-3 mb-2">
                   <Badge variant="outline" className="text-sm">05</Badge>
                   <CardTitle className="text-xl uppercase tracking-widest"
-                    >Payment</CardTitle
+                    >Data Ownership</CardTitle
                   >
                 </div>
               </CardHeader>
               <CardContent>
-                <p class="text-base leading-relaxed text-zinc-600">
-                  Paid plans renew automatically. All prices are in EUR and may
-                  change with notice. Fees are non-refundable except where
-                  required by law.
-                </p>
+                <ul class="space-y-3 text-zinc-600">
+                  <li class="flex gap-2">
+                    <span class="text-[#A68B6A]">•</span>
+                    <span
+                      ><strong>Your Data:</strong> You retain all rights and
+                      ownership of the data you collect using Witnes. We do not
+                      claim ownership of your user data.</span
+                    >
+                  </li>
+                  <li class="flex gap-2">
+                    <span class="text-[#A68B6A]">•</span>
+                    <span
+                      ><strong>License to Process:</strong> You grant us a
+                      worldwide, royalty-free license to access, process, and
+                      store your data solely for the purpose of providing the
+                      Service to you.</span
+                    >
+                  </li>
+                </ul>
               </CardContent>
             </Card>
 
-            <!-- Section 06: Intellectual Property -->
-            <Card className="border-zinc-200">
+            <!-- Section 06: Limitation of Liability -->
+            <Card className="border-zinc-200 bg-[#F9F9F7]">
               <CardHeader>
                 <div class="flex items-center gap-3 mb-2">
                   <Badge variant="outline" className="text-sm">06</Badge>
                   <CardTitle className="text-xl uppercase tracking-widest"
-                    >Intellectual Property</CardTitle
+                    >Limitation of Liability</CardTitle
                   >
                 </div>
               </CardHeader>
-              <CardContent>
+              <CardContent className="space-y-6">
                 <p class="text-base leading-relaxed text-zinc-600">
-                  All software, designs, databases, and documentation are the
-                  property of Witnes or its licensors.
+                  To the maximum extent permitted by law, Witnes shall not be
+                  liable for any indirect, incidental, special, consequential, or
+                  punitive damages, including without limitation, loss of
+                  profits, data, use, goodwill, or other intangible losses.
+                </p>
+                <p class="text-base leading-relaxed text-zinc-600">
+                  <strong>Service Credits:</strong> In the event of a Service
+                  interruption caused by our systems, your sole remedy shall be a
+                  credit to your account equal to the pro-rated charges for the
+                  period of the downtime.
                 </p>
               </CardContent>
             </Card>
 
-            <!-- Section 07: Automated Features -->
-            <Card className="border-zinc-200 bg-[#F9F9F7]">
+            <!-- Section 07: Termination -->
+            <Card className="border-zinc-200">
               <CardHeader>
                 <div class="flex items-center gap-3 mb-2">
                   <Badge variant="outline" className="text-sm">07</Badge>
                   <CardTitle className="text-xl uppercase tracking-widest"
-                    >Automated Features</CardTitle
+                    >Termination</CardTitle
                   >
                 </div>
-                <CardDescription
-                  className="text-base font-bold text-black uppercase tracking-tight mt-4"
-                >
-                  AI Extraction Disclaimer
-                </CardDescription>
               </CardHeader>
               <CardContent>
                 <p class="text-base leading-relaxed text-zinc-600">
-                  AI-powered data extraction features are provided <strong
-                    >"as is"</strong
-                  >. <strong>You are solely responsible</strong> for reviewing, verifying,
-                  and correcting all automatically processed data. We are <strong
-                    >not liable</strong
-                  > for any errors resulting from reliance on extracted data.
+                  We may suspend or terminate your access to the Service
+                  immediately, without prior notice, if you breach these Terms
+                  (e.g., by collecting prohibited PII or attacking our
+                  infrastructure). Upon termination, your right to use the
+                  Service will immediately cease, and your data may be deleted
+                  according to our retention policies.
                 </p>
               </CardContent>
             </Card>
 
-            <!-- Section 08: Liability -->
+            <!-- Section 08: Governing Law -->
             <Card className="border-zinc-200">
               <CardHeader>
                 <div class="flex items-center gap-3 mb-2">
                   <Badge variant="outline" className="text-sm">08</Badge>
                   <CardTitle className="text-xl uppercase tracking-widest"
-                    >Liability</CardTitle
+                    >Governing Law</CardTitle
                   >
                 </div>
               </CardHeader>
               <CardContent>
                 <p class="text-base leading-relaxed text-zinc-600">
-                  The Service is provided "as is". Our total liability shall not
-                  exceed the amount you paid in the preceding 12 months. We are
-                  not liable for indirect or consequential damages.
-                </p>
-              </CardContent>
-            </Card>
-
-            <!-- Section 09: Jurisdiction -->
-            <Card className="border-zinc-200">
-              <CardHeader>
-                <div class="flex items-center gap-3 mb-2">
-                  <Badge variant="outline" className="text-sm">09</Badge>
-                  <CardTitle className="text-xl uppercase tracking-widest"
-                    >Jurisdiction</CardTitle
-                  >
-                </div>
-              </CardHeader>
-              <CardContent>
-                <p class="text-base leading-relaxed text-zinc-600">
-                  These Terms are governed by the laws of <strong>Greece</strong
-                  > and applicable <strong>EU law</strong>. Any dispute shall
-                  fall under the exclusive jurisdiction of the courts of <strong
-                    >Thessaloniki, Greece</strong
-                  >.
+                  These Terms shall be governed by and construed in accordance
+                  with the laws of <strong>Greece</strong> and applicable <strong
+                    >EU law</strong
+                  >, without regard to its conflict of law provisions. Any
+                  dispute shall fall under the exclusive jurisdiction of the
+                  courts of <strong>Thessaloniki, Greece</strong>.
                 </p>
               </CardContent>
             </Card>
 
             <!-- Closing -->
             <Separator className="my-12" />
-            <div class="flex flex-col items-center gap-8">
+            <div class="flex flex-col items-center gap-4">
+              <p class="text-base text-zinc-600">
+                For any questions regarding these Terms, please contact us at
+                <strong>support@witnes.io</strong>.
+              </p>
               <Button variant="outline" className="gap-2" asChild client:load>
                 <a href="/">
                   <svg
