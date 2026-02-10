@@ -51,7 +51,7 @@ public class ProjectKeyService : IProjectKeyService
             TenantId = tenantId,
             ProjectKey = projectKey,
             Name = request.Name,
-            Domain = request.Domain,
+            Domain = DomainNormalizer.Normalize(request.Domain),
             IsActive = true
         };
 
@@ -130,7 +130,7 @@ public class ProjectKeyService : IProjectKeyService
 
         if (request.Domain != null)
         {
-            entity.Domain = request.Domain;
+            entity.Domain = DomainNormalizer.Normalize(request.Domain);
         }
 
         if (request.IsActive.HasValue)

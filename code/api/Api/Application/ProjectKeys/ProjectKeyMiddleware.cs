@@ -84,9 +84,8 @@ public class ProjectKeyMiddleware : IMiddleware
             return;
         }
 
-        // 4. Validate origin
+        // 4. Validate origin against stored domain (exact hostname match)
         var origin = context.Request.Headers.Origin.ToString();
-        // Allow empty origins ONLY if in Development environment OR if specifically handled
 #if DEBUG
         if (string.IsNullOrEmpty(origin))
         {
@@ -94,7 +93,10 @@ public class ProjectKeyMiddleware : IMiddleware
         }
         else
 #endif
-            if (string.IsNullOrEmpty(origin) || !projectKeyModel.Domain.Contains(origin, StringComparison.OrdinalIgnoreCase))
+        {
+            var normalizedOrigin = DomainNormalizer.NormalizeOrigin(origin);
+            if (string.IsNullOrEmpty(normalizedOrigin) ||
+                !string.Equals(normalizedOrigin, projectKeyModel.Domain, StringComparison.OrdinalIgnoreCase))
             {
                 _logger.LogWarning("Invalid origin for project key {ProjectKey}: {Origin}",
                     projectKey, origin);
@@ -107,6 +109,7 @@ public class ProjectKeyMiddleware : IMiddleware
                 });
                 return;
             }
+        }
 
         // 5. Set tenant context (CRITICAL - same as MultiTenantServiceMiddleware)
         _requestTenant.SetTenantId(projectKeyModel.TenantId);

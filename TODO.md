@@ -1,5 +1,8 @@
 # TODOS
 
+Read the tasks bellow and work on the one that is makred as [TODO]. when you finish a task, change the status to [DONE] and move to the next one.
+Before you start working on the task, read it, read the relevant files etc and ask questions.
+
 ## [DONE] Task 1 - Emphasize on EU data
 
 take a look at https://www.simpleanalytics.com/
@@ -27,7 +30,7 @@ dont worry about throttling, we will do it differently.
 
 we need to see the db with this pricing tiers.
 
-## [TODO] Task 3 - Domain sanitization
+## [DONE] Task 3 - Domain sanitization
 
 When someone adds a domain to the project key, we need to sanitize it and normalize it before storing it in the db. this is important for CORS and also for security reasons.
 
@@ -57,7 +60,14 @@ we dont do billing atm still
 
 changing the tenant pricing will come into effect immediately from the start of the current day of change. We will bother with billing elsehow
 
-## [TODO]Task 5 - Data cleanup
+## [TODO] Task 5 - Display Free trial info in Usage
+
+In http://localhost:4321/dashboard/usage we need to display the free trial info. if the tenant is in free trial we will show a message saying "You are in a 7 day free trial, you have X days left" and if the free trial is expired we will show a message saying "Your free trial has expired, please upgrade to continue using the service"
+
+we need to enhance the info from http://localhost:4321/dashboard/usage
+from tenant_pricing
+
+## [TODO]Task 6 - Data cleanup
 
 we need to be cleaning up the data of tenants based on their pricing model.
 
@@ -75,7 +85,7 @@ Any info it needs it will use other services and will not directly access the db
 - check the data retention of the pricing tier
 - delete the data of the tenant that is older than the data retention
 
-## [PENDING] Task 6 - Billing
+## [PENDING] Task 7 - Billing
 
 We will create a module under Product called Billing. in there we will have a service which will be responsible for billing the tenants based on their pricing tier.
 
@@ -92,7 +102,7 @@ Rules for billing:
   - if however they sign up for the trial on the 25th of the month, they will have 7 days free until the 1st of the next month, and then they will be billed for the full month of the next month.
   - we will change the has_trial_expired when we do billing, but if the month didnt have fully 7 days we wont set it to expired until the 7 days are over. so if they sign up on the 20th of the month, we will set has_trial_expired to true on the 27th of the month, but if they sign up on the 25th of the month, we will set has_trial_expired to true on the 1st of the next month.
 
-## [PENDING] Task 7 - Generate invoices and send them to customers
+## [PENDING] Task 8 - Generate invoices and send them to customers
 
 We have the Billing module.
 
@@ -102,7 +112,7 @@ we should have an endpoint in which they can see all invoces
 we will have an entity to hold the invoice
 the entity will have an enum saying Pending, Due, Paid, Overdue
 
-## [PENDING] Task 8 - Dyanmic CORS
+## [PENDING] Task 9 - Dyanmic CORS
 
 We currently set CORS from appsettings.json and in Startup.cs we do WithOrigins
 Unfortunately as we need to dynamically be able to add origins based on the tenant, we need to change this and make it dynamic.
@@ -166,6 +176,6 @@ remove trailing slash
 
 And compare only hostnames.
 
-## [PENDING] Task 9 - Checking usage and applying limits
+## [PENDING] Task 10 - Checking usage and applying limits
 
 We will have a cronjob that will run every day at midnight and will check the usage of each tenant and will apply the limits based on their pricing tier.
