@@ -3,7 +3,7 @@ using Api.Application.Account.Models;
 using Api.Application.Account.Services.Interfaces;
 using Api.Application.Authentication;
 using Api.Application.Communication.Services;
-using Api.Application.Pricing.Services.Interfaces;
+using Api.Application.Pricing.Services;
 using Api.Application.Tenancy.Models;
 using Api.Application.Tenancy.Services;
 using Api.Application.Users.Models;
