@@ -13,6 +13,8 @@ using Api.Application.Metrics;
 using Api.Application.Middleware;
 using Api.Application.Pricing.Services;
 using Api.Application.ProjectKeys;
+using Api.Product.Billing;
+using Api.Product.Billing.Services;
 using Api.Application.ProjectKeys.Services;
 using Api.Application.Settings;
 using Api.Application.Tenancy;
@@ -253,6 +255,11 @@ public class Startup
         // Metric cleanup
         services.AddTransient<IMetricCleanupService, MetricCleanupService>();
         services.AddTransient<MetricCleanupJob>();
+
+        // Billing
+        services.AddTransient<IBillingService, BillingService>();
+        services.AddTransient<IInvoiceService, InvoiceService>();
+        services.AddTransient<BillingJob>();
     }
 
     protected virtual void SetupSettingsModels(IServiceCollection services, IConfiguration configuration)

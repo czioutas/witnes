@@ -85,7 +85,7 @@ Any info it needs it will use other services and will not directly access the db
 - check the data retention of the pricing tier
 - delete the data of the tenant that is older than the data retention
 
-## [PENDING] Task 7 - Billing
+## [TODO] Task 7 - Billing
 
 We will create a module under Product called Billing. in there we will have a service which will be responsible for billing the tenants based on their pricing tier.
 
@@ -102,7 +102,10 @@ Rules for billing:
   - if however they sign up for the trial on the 25th of the month, they will have 7 days free until the 1st of the next month, and then they will be billed for the full month of the next month.
   - we will change the has_trial_expired when we do billing, but if the month didnt have fully 7 days we wont set it to expired until the 7 days are over. so if they sign up on the 20th of the month, we will set has_trial_expired to true on the 27th of the month, but if they sign up on the 25th of the month, we will set has_trial_expired to true on the 1st of the next month.
 
-## [PENDING] Task 8 - Generate invoices and send them to customers
+the invoice entity should use a long id
+then when we make the entity we should leave the invoice number empty and then after we save it to the db we can generate the invoice number based on the id and update the entity with the invoice number. this way we ensure that the invoice number is unique and we dont have any issues with concurrency when generating the invoice number. we can use a format like INV-{id} for the invoice number. so if the id is 1 the invoice number will be INV-1 and if the id is 2 the invoice number will be INV-2 and so on.
+
+## [TODO] Task 8 - Generate invoices and send them to customers
 
 We have the Billing module.
 
@@ -112,7 +115,7 @@ we should have an endpoint in which they can see all invoces
 we will have an entity to hold the invoice
 the entity will have an enum saying Pending, Due, Paid, Overdue
 
-## [TODO] Task 9 - Dyanmic CORS
+## [DONE] Task 9 - Dyanmic CORS
 
 We currently set CORS from appsettings.json and in Startup.cs we do WithOrigins
 Unfortunately as we need to dynamically be able to add origins based on the tenant, we need to change this and make it dynamic.
@@ -185,3 +188,17 @@ We will have a cronjob that will run every day at midnight and will check the us
 When we make any change to a project key we clear the cache of the allowed origins for CORS. this is too aggressive and can cause performance issues if we have a lot of changes to the project keys.
 
 We should edit the cache content instead of clearing it. so if we add a new origin we just add it to the cache and if we remove an origin we just remove it from the cache.
+
+## [TODO] Task 12 - Use Result pattern
+
+InvoiceService and BillingService and TenantPricingService should use the Result pattern to return the result of the operation. this way we can return more information about the error if something goes wrong and we can also return warnings if there are any.
+
+code/libs/Libs/Result/Result.cs
+
+## [TODO] Task 13 - Use AutoMapper
+
+Invoice Service and Billing Service and TenantPricingService should use AutoMapper to map the entities to the models and vice versa. this will make the code cleaner and easier to maintain.
+
+## [TODO] Task 14 - Invoice controller
+
+we should add xml docs to the invoice controller and also add swagger documentation for the endpoints. this will make it easier for the customers to understand how to use the endpoints and what data they need to send.

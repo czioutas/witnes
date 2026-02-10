@@ -114,8 +114,7 @@ public class SilverService : ISilverService
     public async Task<int> DeleteOlderThanAsync(Guid tenantId, DateTimeOffset cutoffDate)
     {
         return await _context.MetricsSilver
-            .IgnoreQueryFilters()
-            .Where(m => m.TenantId == tenantId && m.PageRequestedAtByVisitor < cutoffDate)
+            .Where(m => m.PageRequestedAtByVisitor < cutoffDate)
             .ExecuteDeleteAsync();
     }
 

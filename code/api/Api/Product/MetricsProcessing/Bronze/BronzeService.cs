@@ -71,8 +71,7 @@ public class BronzeService : IBronzeService
     public async Task<int> DeleteOlderThanAsync(Guid tenantId, DateTimeOffset cutoffDate)
     {
         return await _context.MetricsBronze
-            .IgnoreQueryFilters()
-            .Where(m => m.TenantId == tenantId && m.PageRequestedAtByVisitor < cutoffDate)
+            .Where(m => m.PageRequestedAtByVisitor < cutoffDate)
             .ExecuteDeleteAsync();
     }
 }

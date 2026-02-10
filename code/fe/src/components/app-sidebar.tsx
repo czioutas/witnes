@@ -8,6 +8,7 @@ import {
   Users,
   Home,
   Activity,
+  Receipt,
 } from "lucide-react";
 
 import { NavMain } from "@/components/nav-main";
@@ -81,6 +82,11 @@ const data = {
       icon: Activity,
     },
     {
+      title: "Billing",
+      url: "/dashboard/billing",
+      icon: Receipt,
+    },
+    {
       title: "Organization Settings",
       url: "/dashboard/organization-settings",
       icon: Settings,
@@ -127,7 +133,7 @@ export function AppSidebar({
   // Filter secondary nav items based on role
   const filteredNavSecondary = data.navSecondary.filter((item) => {
     // Only show admin-only pages to admins
-    const adminOnlyPages = ["Users", "Usage", "Organization Settings"];
+    const adminOnlyPages = ["Users", "Usage", "Billing", "Organization Settings"];
     if (adminOnlyPages.includes(item.title)) {
       return isAdmin;
     }

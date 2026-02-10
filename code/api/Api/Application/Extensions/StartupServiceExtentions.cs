@@ -1,11 +1,10 @@
-using System.ComponentModel.DataAnnotations;
 using System.Reflection;
 using System.Text;
 using Api.Application.Account.Entities;
 using Api.Application.Filters;
-using Api.Application.Services;
 using Api.Application.Settings;
 using Api.Data;
+using Api.Product.Billing.Entities;
 using Libs.Domain;
 using MassTransit;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -16,10 +15,8 @@ using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
-using Minio;
 using RabbitMQ.Client;
 using StackExchange.Redis;
-using Swashbuckle.AspNetCore.SwaggerGen;
 using ZiggyCreatures.Caching.Fusion;
 
 namespace Api.Application.Extensions;
@@ -148,6 +145,7 @@ public static class StartupServiceExtensions
                 o.MapEnum<FeatureKey>("feature_key");
                 o.MapEnum<LimitKey>("limit_key");
                 o.MapEnum<LimitPeriod>("limit_period");
+                o.MapEnum<InvoiceStatus>("invoice_status");
             })
         );
 
@@ -158,6 +156,7 @@ public static class StartupServiceExtensions
                 o.MapEnum<FeatureKey>("feature_key");
                 o.MapEnum<LimitKey>("limit_key");
                 o.MapEnum<LimitPeriod>("limit_period");
+                o.MapEnum<InvoiceStatus>("invoice_status");
             })
         );
 

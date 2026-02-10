@@ -20,8 +20,10 @@ public class MetricCleanupService : IMetricCleanupService
     private readonly IGoldService _goldService;
     private readonly TimeProvider _timeProvider;
     private readonly ILogger<MetricCleanupService> _logger;
+    private readonly IRequestTenant _requestTenant;
 
     public MetricCleanupService(
+        IRequestTenant requestTenant,
         ITenantService tenantService,
         ITenantPricingService tenantPricingService,
         IBronzeService bronzeService,
@@ -30,13 +32,14 @@ public class MetricCleanupService : IMetricCleanupService
         TimeProvider timeProvider,
         ILogger<MetricCleanupService> logger)
     {
-        _tenantService = tenantService;
-        _tenantPricingService = tenantPricingService;
-        _bronzeService = bronzeService;
-        _silverService = silverService;
-        _goldService = goldService;
-        _timeProvider = timeProvider;
-        _logger = logger;
+        _requestTenant = requestTenant ?? throw new ArgumentNullException(nameof(requestTenant));
+        _tenantService = tenantService ?? throw new ArgumentNullException(nameof(tenantService));
+        _tenantPricingService = tenantPricingService ?? throw new ArgumentNullException(nameof(tenantPricingService));
+        _bronzeService = bronzeService ?? throw new ArgumentNullException(nameof(bronzeService));
+        _silverService = silverService ?? throw new ArgumentNullException(nameof(silverService));
+        _goldService = goldService ?? throw new ArgumentNullException(nameof(goldService));
+        _timeProvider = timeProvider ?? throw new ArgumentNullException(nameof(timeProvider));
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
     public async Task RunCleanupAsync()
@@ -52,6 +55,7 @@ public class MetricCleanupService : IMetricCleanupService
         {
             try
             {
+                _requestTenant.SetTenantId(tenantId);
                 var deleted = await CleanupTenantAsync(tenantId);
                 totalDeleted += deleted;
             }
@@ -66,7 +70,7 @@ public class MetricCleanupService : IMetricCleanupService
 
     private async Task<int> CleanupTenantAsync(Guid tenantId)
     {
-        var pricing = await _tenantPricingService.GetCurrentTenantPricingIgnoreFiltersAsync(tenantId);
+        var pricing = await _tenantPricingService.GetCurrentTenantPricingAsync();
 
         if (pricing?.PricingTier == null)
         {

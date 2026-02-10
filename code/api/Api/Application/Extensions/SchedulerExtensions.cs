@@ -1,3 +1,4 @@
+using Api.Product.Billing;
 using Api.Product.MetricCleanup;
 using Coravel;
 
@@ -11,6 +12,9 @@ public static class SchedulerExtensions
         {
             scheduler.Schedule<MetricCleanupJob>()
                 .DailyAtHour(0);
+
+            scheduler.Schedule<BillingJob>()
+                .Cron("0 6 1 * *"); // 1st of each month at midnight
         });
     }
 }

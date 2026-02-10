@@ -7,6 +7,7 @@ namespace Api.Settings.Settings
         public required string VerifyEmailTemplateId { get; set; }
         public required string PasswordResetTemplateId { get; set; }
         public required string UserInvitationTemplateId { get; set; }
+        public string? InvoiceNotificationTemplateId { get; set; }
         public string? MailtrapAccountId { get; set; }
         public string? JoinRequestListId { get; set; }
     }

@@ -10,6 +10,7 @@ using Api.Application.Tenancy.Services;
 using Api.Application.Users;
 using Api.Data.Seeders;
 using Api.Product.DailySalt;
+using Api.Product.Billing.Entities;
 using Api.Product.MetricsProcessing.Bronze;
 using Api.Product.MetricsProcessing.Gold;
 using Api.Product.MetricsProcessing.Silver;
@@ -67,6 +68,10 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUserEntity, App
     // Daily Salt (for visitor hash ID generation)
     public virtual DbSet<DailySaltEntity> DailySalts => Set<DailySaltEntity>();
 
+    // Billing
+    public virtual DbSet<InvoiceEntity> Invoices => Set<InvoiceEntity>();
+    public virtual DbSet<InvoiceLineItemEntity> InvoiceLineItems => Set<InvoiceLineItemEntity>();
+
     // Witnes Metrics (Medallion Architecture)
     public virtual DbSet<MetricBronzeEntity> MetricsBronze => Set<MetricBronzeEntity>();
     public virtual DbSet<MetricSilverEntity> MetricsSilver => Set<MetricSilverEntity>();
@@ -82,6 +87,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUserEntity, App
         builder.HasPostgresEnum<FeatureKey>();
         builder.HasPostgresEnum<LimitKey>();
         builder.HasPostgresEnum<LimitPeriod>();
+        builder.HasPostgresEnum<InvoiceStatus>();
 
         // Seed data (order matters - roles and pricing must come first)
         PricingTiersSeeder.Seed(builder);
@@ -170,6 +176,16 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUserEntity, App
         builder.Entity<ProjectKeyEntity>(entity =>
         {
             entity.HasIndex(e => e.ProjectKey).IsUnique();
+        });
+
+        builder.Entity<InvoiceEntity>(entity =>
+        {
+            entity.HasQueryFilter(e => e.TenantId == CurrentTenantId);
+        });
+
+        builder.Entity<InvoiceLineItemEntity>(entity =>
+        {
+            entity.HasQueryFilter(e => e.TenantId == CurrentTenantId);
         });
     }
 

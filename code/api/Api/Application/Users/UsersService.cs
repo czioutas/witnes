@@ -28,6 +28,7 @@ public interface IUsersService
     Task<Result<bool>> MarkInvitationAsUsedAsync(Guid id);
     Task<Result<bool>> DeleteUserAsync(Guid userId, Guid tenantId, Guid requestingUserId);
     Task<Result<bool>> DeleteUserInvitationAsync(Guid invitationId, Guid tenantId);
+    Task<string?> GetTenantAdminEmailAsync();
 }
 
 public class UsersService : IUsersService
@@ -443,6 +444,18 @@ public class UsersService : IUsersService
         }
 
         return new Result<bool>(true);
+    }
+
+    public async Task<string?> GetTenantAdminEmailAsync()
+    {
+        var adminEmail = await _dbContext.Users
+            .Where(u => _dbContext.UserRoles
+                .Join(_dbContext.Roles, ur => ur.RoleId, r => r.Id, (ur, r) => new { ur.UserId, r.Name })
+                .Any(ur => ur.UserId == u.Id && ur.Name == AccountRoles.AdminUserRole.ToString()))
+            .Select(u => u.Email)
+            .FirstOrDefaultAsync();
+
+        return adminEmail;
     }
 
     public async Task<Result<bool>> DeleteUserInvitationAsync(Guid invitationId, Guid tenantId)

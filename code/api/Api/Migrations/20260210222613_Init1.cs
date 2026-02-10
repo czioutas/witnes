@@ -1,4 +1,5 @@
 ﻿using System;
+using Api.Product.Billing.Entities;
 using Libs.Domain;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
@@ -17,6 +18,7 @@ namespace Api.Migrations
         {
             migrationBuilder.AlterDatabase()
                 .Annotation("Npgsql:Enum:feature_key", "dropzone")
+                .Annotation("Npgsql:Enum:invoice_status", "pending,due,paid,overdue")
                 .Annotation("Npgsql:Enum:limit_key", "locations,materials")
                 .Annotation("Npgsql:Enum:limit_period", "daily,weekly,monthly");
 
@@ -162,6 +164,44 @@ namespace Api.Migrations
                     table.ForeignKey(
                         name: "FK_AspNetUsers_tenants_TenantId",
                         column: x => x.TenantId,
+                        principalTable: "tenants",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "invoices",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    InvoiceNumber = table.Column<string>(type: "character varying(30)", maxLength: 30, nullable: false),
+                    Status = table.Column<InvoiceStatus>(type: "invoice_status", nullable: false),
+                    PeriodStart = table.Column<DateOnly>(type: "date", nullable: false),
+                    PeriodEnd = table.Column<DateOnly>(type: "date", nullable: false),
+                    SubtotalAmount = table.Column<decimal>(type: "numeric", nullable: false),
+                    DiscountPercentage = table.Column<decimal>(type: "numeric", nullable: false),
+                    DiscountAmount = table.Column<decimal>(type: "numeric", nullable: false),
+                    TotalAmount = table.Column<decimal>(type: "numeric", nullable: false),
+                    TenantName = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    VatNumber = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: true),
+                    CompanyRegistrationNumber = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: true),
+                    StreetLine1 = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
+                    StreetLine2 = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
+                    City = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true),
+                    StateProvince = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true),
+                    PostalCode = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: true),
+                    Country = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true),
+                    created_at = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    updated_at = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
+                    tenant_id = table.Column<Guid>(type: "uuid", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_invoices", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_invoices_tenants_tenant_id",
+                        column: x => x.tenant_id,
                         principalTable: "tenants",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
@@ -535,6 +575,40 @@ namespace Api.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "invoice_line_items",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    InvoiceId = table.Column<long>(type: "bigint", nullable: false),
+                    Description = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: false),
+                    TierName = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    UnitPrice = table.Column<decimal>(type: "numeric", nullable: false),
+                    DaysInPeriod = table.Column<int>(type: "integer", nullable: false),
+                    TotalDaysInMonth = table.Column<int>(type: "integer", nullable: false),
+                    Amount = table.Column<decimal>(type: "numeric", nullable: false),
+                    created_at = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    updated_at = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
+                    tenant_id = table.Column<Guid>(type: "uuid", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_invoice_line_items", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_invoice_line_items_invoices_InvoiceId",
+                        column: x => x.InvoiceId,
+                        principalTable: "invoices",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_invoice_line_items_tenants_tenant_id",
+                        column: x => x.tenant_id,
+                        principalTable: "tenants",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "tenant_details",
                 columns: table => new
                 {
@@ -624,6 +698,21 @@ namespace Api.Migrations
                 table: "AspNetUsers",
                 column: "NormalizedUserName",
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_invoice_line_items_InvoiceId",
+                table: "invoice_line_items",
+                column: "InvoiceId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_invoice_line_items_tenant_id",
+                table: "invoice_line_items",
+                column: "tenant_id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_invoices_tenant_id",
+                table: "invoices",
+                column: "tenant_id");
 
             migrationBuilder.CreateIndex(
                 name: "IX_metrics_bronze_tenant_id",
@@ -730,6 +819,9 @@ namespace Api.Migrations
                 name: "daily_salt");
 
             migrationBuilder.DropTable(
+                name: "invoice_line_items");
+
+            migrationBuilder.DropTable(
                 name: "metrics_bronze");
 
             migrationBuilder.DropTable(
@@ -761,6 +853,9 @@ namespace Api.Migrations
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");
+
+            migrationBuilder.DropTable(
+                name: "invoices");
 
             migrationBuilder.DropTable(
                 name: "public_files");

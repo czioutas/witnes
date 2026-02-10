@@ -710,6 +710,57 @@ export interface JankMetric {
   d?: string | null;
 }
 
+export type InvoiceStatus = (typeof InvoiceStatus)[keyof typeof InvoiceStatus];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const InvoiceStatus = {
+  Pending: "Pending",
+  Due: "Due",
+  Paid: "Paid",
+  Overdue: "Overdue",
+} as const;
+
+export interface InvoiceLineItemModel {
+  amount?: number;
+  days_in_period?: number;
+  description?: string;
+  id?: number;
+  tier_name: string;
+  total_days_in_month?: number;
+  unit_price?: number;
+}
+
+export interface InvoiceModel {
+  /** @nullable */
+  city?: string | null;
+  /** @nullable */
+  company_registration_number?: string | null;
+  /** @nullable */
+  country?: string | null;
+  created_at?: string;
+  discount_amount?: number;
+  discount_percentage?: number;
+  id?: number;
+  invoice_number?: string;
+  line_items?: InvoiceLineItemModel[];
+  period_end?: string;
+  period_start?: string;
+  /** @nullable */
+  postal_code?: string | null;
+  /** @nullable */
+  state_province?: string | null;
+  status?: InvoiceStatus;
+  /** @nullable */
+  street_line1?: string | null;
+  /** @nullable */
+  street_line2?: string | null;
+  subtotal_amount?: number;
+  tenant_name?: string;
+  total_amount?: number;
+  /** @nullable */
+  vat_number?: string | null;
+}
+
 /**
  * @nullable
  */
@@ -1058,6 +1109,20 @@ The response is lightweight and does not perform any complex operations or datab
     });
   };
 
+  const getApiV1Invoice = () => {
+    return customInstance<InvoiceModel[]>({
+      url: `/api/v1/invoice`,
+      method: "GET",
+    });
+  };
+
+  const getApiV1InvoiceInvoiceId = (invoiceId: number) => {
+    return customInstance<InvoiceModel>({
+      url: `/api/v1/invoice/${invoiceId}`,
+      method: "GET",
+    });
+  };
+
   /**
    * @summary Gets all speed metrics for the current tenant
    */
@@ -1347,6 +1412,8 @@ Supports filtering by date range and pagination.
     getV1Features,
     getV1FeaturesFeatureKey,
     postApiV1Events,
+    getApiV1Invoice,
+    getApiV1InvoiceInvoiceId,
     getApiV1Metrics,
     getApiV1MetricsId,
     getApiV1PageLoadsId,
@@ -1438,6 +1505,16 @@ export type GetV1FeaturesFeatureKeyResult = NonNullable<
 >;
 export type PostApiV1EventsResult = NonNullable<
   Awaited<ReturnType<ReturnType<typeof getWitnesServerAPI>["postApiV1Events"]>>
+>;
+export type GetApiV1InvoiceResult = NonNullable<
+  Awaited<ReturnType<ReturnType<typeof getWitnesServerAPI>["getApiV1Invoice"]>>
+>;
+export type GetApiV1InvoiceInvoiceIdResult = NonNullable<
+  Awaited<
+    ReturnType<
+      ReturnType<typeof getWitnesServerAPI>["getApiV1InvoiceInvoiceId"]
+    >
+  >
 >;
 export type GetApiV1MetricsResult = NonNullable<
   Awaited<ReturnType<ReturnType<typeof getWitnesServerAPI>["getApiV1Metrics"]>>

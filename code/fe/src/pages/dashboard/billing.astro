@@ -1,0 +1,13 @@
+---
+import DashboardLayout from "../../layouts/DashboardLayout.astro";
+import DashboardPage from "../../components/DashboardPage.tsx";
+---
+
+<DashboardLayout title="Billing - Witnes">
+  <DashboardPage
+    client:only="react"
+    page="billing"
+    title="Billing"
+    description="View your invoices and billing history"
+  />
+</DashboardLayout>

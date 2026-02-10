@@ -48,7 +48,7 @@ public class GoldService : IGoldService
     {
         return await _context.MetricsGold
             .IgnoreQueryFilters()
-            .Where(m => m.TenantId == tenantId && m.PageRequestedAtByVisitor < cutoffDate)
+            .Where(m => m.PageRequestedAtByVisitor < cutoffDate)
             .ExecuteDeleteAsync();
     }
 

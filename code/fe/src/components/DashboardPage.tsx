@@ -15,6 +15,7 @@ import { OrganizationSettingsPage } from "./pages/OrganizationSettingsPage";
 import NotFoundPage from "./NotFoundPage";
 import { UsersPage } from "./pages/UsersPage";
 import { UsagePage } from "./pages/UsagePage";
+import { BillingPage } from "./pages/BillingPage";
 import { VisitorsPage } from "./pages/VisitorsPage";
 import UserDetailPage from "./pages/UserDetailPage";
 import PageLoadDetailPage from "./pages/PageLoadDetailPage";
@@ -35,6 +36,7 @@ const pageComponents = {
   "visitor-detail": UserDetailPage,
   "page-load-detail": PageLoadDetailPage,
   usage: UsagePage,
+  billing: BillingPage,
   "api-keys": ComingSoonPage,
   "cross-border-flows": ComingSoonPage,
   settings: ComingSoonPage,
@@ -68,7 +70,7 @@ function AuthenticatedDashboard({
   const auth = useRequireAuth();
 
   // Pages that require admin role
-  const adminOnlyPages = ["users", "accounting", "organization-settings"];
+  const adminOnlyPages = ["users", "accounting", "organization-settings", "billing"];
   const isAdminOnlyPage = adminOnlyPages.includes(page);
 
   // Use role-based auth for admin-only pages
@@ -130,6 +132,8 @@ function AuthenticatedDashboard({
         return <PageLoadDetailPage pageLoadId={rest.pageLoadId!} />;
       case "usage":
         return <UsagePage />;
+      case "billing":
+        return <BillingPage />;
       default:
         return <NotFoundPage />;
     }
