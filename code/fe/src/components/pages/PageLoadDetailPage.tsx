@@ -2,7 +2,10 @@
 
 import { useEffect, useState } from "react";
 import { useApiToast } from "../../hooks/useApiToast";
-import { getWitnesServerAPI, type PageLoadDetailModel } from "../../generated/api";
+import {
+  getWitnesServerAPI,
+  type PageLoadDetailModel,
+} from "../../generated/api";
 import { Button } from "../ui/button";
 import { ArrowLeft, Clock, TrendingUp, Gauge } from "lucide-react";
 import { NetworkWaterfall } from "../page-loads/NetworkWaterfall";
@@ -12,7 +15,9 @@ interface PageLoadDetailPageProps {
   pageLoadId: string;
 }
 
-export default function PageLoadDetailPage({ pageLoadId }: PageLoadDetailPageProps) {
+export default function PageLoadDetailPage({
+  pageLoadId,
+}: PageLoadDetailPageProps) {
   const { handleApiCall } = useApiToast();
   const [pageLoad, setPageLoad] = useState<PageLoadDetailModel | null>(null);
   const [loading, setLoading] = useState(true);
@@ -71,11 +76,7 @@ export default function PageLoadDetailPage({ pageLoadId }: PageLoadDetailPagePro
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-4">
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => window.history.back()}
-        >
+        <Button variant="ghost" size="sm" onClick={() => window.history.back()}>
           <ArrowLeft className="h-4 w-4 mr-2" />
           Back
         </Button>
@@ -84,17 +85,20 @@ export default function PageLoadDetailPage({ pageLoadId }: PageLoadDetailPagePro
       {/* Page Info Header */}
       <div className="space-y-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight mb-2">Page Load Details</h1>
+          <h1 className="text-3xl font-bold tracking-tight mb-2">
+            Page Load Details
+          </h1>
           <p className="text-muted-foreground break-all">{pageLoad.url}</p>
         </div>
 
         <div className="flex items-center gap-4 text-sm text-muted-foreground">
           <div className="flex items-center gap-2">
             <Clock className="h-4 w-4" />
-            {pageLoad.timestamp ? new Date(pageLoad.timestamp).toLocaleString() : "-"}
+            {pageLoad.timestamp
+              ? new Date(pageLoad.timestamp).toLocaleString()
+              : "-"}
           </div>
           <div>User: {pageLoad.user_id}</div>
-          <div>Session: {pageLoad.session_id}</div>
         </div>
       </div>
 
@@ -107,8 +111,12 @@ export default function PageLoadDetailPage({ pageLoadId }: PageLoadDetailPagePro
               <TrendingUp className="h-5 w-5 text-primary" />
               <h3 className="font-semibold">LCP</h3>
             </div>
-            <p className="text-3xl font-bold">{pageLoad.lcp_ms?.toFixed(0)}ms</p>
-            <p className="text-sm text-muted-foreground">Largest Contentful Paint</p>
+            <p className="text-3xl font-bold">
+              {pageLoad.lcp_ms?.toFixed(0)}ms
+            </p>
+            <p className="text-sm text-muted-foreground">
+              Largest Contentful Paint
+            </p>
           </div>
 
           <div className="p-6 border rounded-lg">
@@ -117,7 +125,9 @@ export default function PageLoadDetailPage({ pageLoadId }: PageLoadDetailPagePro
               <h3 className="font-semibold">CLS</h3>
             </div>
             <p className="text-3xl font-bold">{pageLoad.cls?.toFixed(3)}</p>
-            <p className="text-sm text-muted-foreground">Cumulative Layout Shift</p>
+            <p className="text-sm text-muted-foreground">
+              Cumulative Layout Shift
+            </p>
           </div>
 
           <div className="p-6 border rounded-lg">

@@ -185,7 +185,7 @@ public class AccountService : IAccountService
                 var starterTier = await _tenantPricingService.GetStarterTierAsync();
                 if (starterTier != null)
                 {
-                    var pricingResult = await _tenantPricingService.SetTenantPricingAsync(tenantResult.GetValue.Id, starterTier.Id);
+                    var pricingResult = await _tenantPricingService.SetTenantPricingAsync(tenantResult.GetValue.Id, starterTier.Id, isTrial: true);
                     if (pricingResult.IsFailure)
                     {
                         _logger.LogWarning("Failed to set Starter pricing tier for tenant {TenantId}: {Error}",

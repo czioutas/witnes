@@ -44,7 +44,7 @@ remove protocol
 remove trailing slash
 And compare only hostnames in code/api/Api/Application/ProjectKeys/ProjectKeyMiddleware.cs
 
-## [TODO] Task 4 - Tenant pricing
+## [DONE] Task 4 - Tenant pricing
 
 code/api/Api/Application/Pricing/Entities/TenantPricingTierEntity.cs
 
@@ -60,7 +60,7 @@ we dont do billing atm still
 
 changing the tenant pricing will come into effect immediately from the start of the current day of change. We will bother with billing elsehow
 
-## [TODO] Task 5 - Display Free trial info in Usage
+## [DONE] Task 5 - Display Free trial info in Usage
 
 In http://localhost:4321/dashboard/usage we need to display the free trial info. if the tenant is in free trial we will show a message saying "You are in a 7 day free trial, you have X days left" and if the free trial is expired we will show a message saying "Your free trial has expired, please upgrade to continue using the service"
 

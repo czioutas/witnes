@@ -464,8 +464,17 @@ namespace Api.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at");
 
+                    b.Property<decimal>("DiscountPercentage")
+                        .HasColumnType("numeric");
+
                     b.Property<DateOnly?>("EndDate")
                         .HasColumnType("date");
+
+                    b.Property<bool>("HasTrial")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("HasTrialExpired")
+                        .HasColumnType("boolean");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("boolean");

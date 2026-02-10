@@ -641,6 +641,12 @@ export interface PackageInfoModel {
   current_month_page_loads: number;
   /** Data retention in days */
   data_retention_days: number;
+  /** Discount percentage applied to this tenant's pricing */
+  discount_percentage?: number;
+  /** Indicates if the tenant is on a free trial */
+  has_trial?: boolean;
+  /** Indicates if the tenant's free trial has expired */
+  has_trial_expired?: boolean;
   /** Indicates if the tenant is active on this plan */
   is_active: boolean;
   /** Maximum team members allowed */
@@ -664,6 +670,8 @@ export interface PackageInfoModel {
    * @nullable
    */
   renewal_date?: string | null;
+  /** Number of trial days remaining (0 if not on trial or expired) */
+  trial_days_remaining?: number;
 }
 
 export interface NetworkModel {

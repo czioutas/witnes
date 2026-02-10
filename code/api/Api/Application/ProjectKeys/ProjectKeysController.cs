@@ -172,6 +172,16 @@ public class ProjectKeysController : ControllerBase
         // Calculate renewal date (start of next month)
         var renewalDate = firstDayOfMonth.AddMonths(1);
 
+        // Calculate trial days remaining
+        var trialDaysRemaining = 0;
+        if (tenantPricingTier.HasTrial && !tenantPricingTier.HasTrialExpired)
+        {
+            var trialEndDate = tenantPricingTier.StartDate.AddDays(7);
+            var today = DateOnly.FromDateTime(now.UtcDateTime);
+            var remaining = trialEndDate.DayNumber - today.DayNumber;
+            trialDaysRemaining = Math.Max(0, remaining);
+        }
+
         var packageInfo = new PackageInfoModel
         {
             PlanName = pricingTier.Name,
@@ -182,7 +192,11 @@ public class ProjectKeysController : ControllerBase
             MaxTeamMembers = pricingTier.MaxTeamMembers,
             DataRetentionDays = pricingTier.DataRetentionDays,
             RenewalDate = renewalDate.UtcDateTime,
-            IsActive = tenantPricingTier.IsActive
+            IsActive = tenantPricingTier.IsActive,
+            HasTrial = tenantPricingTier.HasTrial,
+            HasTrialExpired = tenantPricingTier.HasTrialExpired,
+            TrialDaysRemaining = trialDaysRemaining,
+            DiscountPercentage = tenantPricingTier.DiscountPercentage
         };
 
         return Ok(packageInfo);

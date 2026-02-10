@@ -19,13 +19,23 @@ public class TenantPricingTierEntity : TenantAwareEntity
 
     public bool IsActive { get; set; } = true;
 
+    public bool HasTrial { get; set; }
+
+    public bool HasTrialExpired { get; set; }
+
+    public decimal DiscountPercentage { get; set; }
+
     public TenantPricingTierEntity() { }
 
     public TenantPricingTierEntity(
         Guid pricingTierId,
-        DateOnly startDate)
+        DateOnly startDate,
+        bool hasTrial = false,
+        decimal discountPercentage = 0)
     {
         PricingTierId = pricingTierId;
         StartDate = startDate;
+        HasTrial = hasTrial;
+        DiscountPercentage = discountPercentage;
     }
 }

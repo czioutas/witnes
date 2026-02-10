@@ -10,7 +10,7 @@ namespace Api.Application.Pricing.Services;
 
 public interface ITenantPricingService
 {
-    Task<Result<TenantPricingTierEntity>> SetTenantPricingAsync(Guid tenantId, Guid pricingTierId, DateOnly? startDate = null);
+    Task<Result<TenantPricingTierEntity>> SetTenantPricingAsync(Guid tenantId, Guid pricingTierId, DateOnly? startDate = null, bool isTrial = false);
     Task<Result<TenantPricingTierEntity>> ChangeTenantPricingAsync(Guid tenantId, Guid newPricingTierId, DateOnly? startDate = null);
     Task<TenantPricingTierEntity> GetCurrentTenantPricingIgnoreFiltersAsync(Guid tenantId);
     Task<TenantPricingTierEntity?> GetTenantPricingAtDateAsync(Guid tenantId, DateOnly date);
@@ -47,13 +47,16 @@ public class TenantPricingService : ITenantPricingService
             StartDate = tenantPricing.StartDate,
             EndDate = tenantPricing.EndDate,
             IsActive = tenantPricing.IsActive,
-            MonthlyPageLoads = tenantPricing.PricingTier?.MonthlyPageLoads ?? 0
+            MonthlyPageLoads = tenantPricing.PricingTier?.MonthlyPageLoads ?? 0,
+            HasTrial = tenantPricing.HasTrial,
+            HasTrialExpired = tenantPricing.HasTrialExpired,
+            DiscountPercentage = tenantPricing.DiscountPercentage
         };
 
         await _redis.StringSetAsync(cacheKey, JsonSerializer.Serialize(cacheValue), TimeSpan.FromHours(24));
     }
 
-    public async Task<Result<TenantPricingTierEntity>> SetTenantPricingAsync(Guid tenantId, Guid pricingTierId, DateOnly? startDate = null)
+    public async Task<Result<TenantPricingTierEntity>> SetTenantPricingAsync(Guid tenantId, Guid pricingTierId, DateOnly? startDate = null, bool isTrial = false)
     {
         try
         {
@@ -78,7 +81,7 @@ public class TenantPricingService : ITenantPricingService
                 return Result<TenantPricingTierEntity>.BusinessError("TenantPricingOverlap", "Tenant already has pricing for this date");
             }
 
-            var tenantPricing = new TenantPricingTierEntity(pricingTierId, effectiveStartDate)
+            var tenantPricing = new TenantPricingTierEntity(pricingTierId, effectiveStartDate, hasTrial: isTrial)
             {
                 TenantId = tenantId
             };

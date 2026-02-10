@@ -59,4 +59,24 @@ public class PackageInfoModel
     /// </summary>
     [Required]
     public required bool IsActive { get; set; }
+
+    /// <summary>
+    /// Indicates if the tenant is on a free trial
+    /// </summary>
+    public bool HasTrial { get; set; }
+
+    /// <summary>
+    /// Indicates if the tenant's free trial has expired
+    /// </summary>
+    public bool HasTrialExpired { get; set; }
+
+    /// <summary>
+    /// Number of trial days remaining (0 if not on trial or expired)
+    /// </summary>
+    public int TrialDaysRemaining { get; set; }
+
+    /// <summary>
+    /// Discount percentage applied to this tenant's pricing
+    /// </summary>
+    public decimal DiscountPercentage { get; set; }
 }

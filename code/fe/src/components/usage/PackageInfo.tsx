@@ -7,7 +7,8 @@ import {
 } from "../ui/card";
 import { Progress } from "../ui/progress";
 import { Badge } from "../ui/badge";
-import { CalendarDays, Zap } from "lucide-react";
+import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
+import { CalendarDays, Clock, TriangleAlert, Zap } from "lucide-react";
 import type { PackageInfoModel } from "../../generated/api";
 
 interface PackageInfoProps {
@@ -87,12 +88,40 @@ export function PackageInfo({ packageInfo, loading }: PackageInfoProps) {
               Your current subscription plan and usage
             </CardDescription>
           </div>
-          <Badge variant={packageInfo.is_active ? "default" : "secondary"}>
-            {packageInfo.is_active ? "Active" : "Inactive"}
-          </Badge>
+          <div className="flex gap-2">
+            {packageInfo.has_trial && !packageInfo.has_trial_expired && (
+              <Badge variant="outline">Trial</Badge>
+            )}
+            <Badge variant={packageInfo.is_active ? "default" : "secondary"}>
+              {packageInfo.is_active ? "Active" : "Inactive"}
+            </Badge>
+          </div>
         </div>
       </CardHeader>
       <CardContent className="space-y-6">
+        {/* Free Trial Banner */}
+        {packageInfo.has_trial && !packageInfo.has_trial_expired && (
+          <Alert>
+            <Clock className="h-4 w-4" />
+            <AlertTitle>Free Trial</AlertTitle>
+            <AlertDescription>
+              You are on a 7 day free trial. You have{" "}
+              {packageInfo.trial_days_remaining}{" "}
+              {packageInfo.trial_days_remaining === 1 ? "day" : "days"} left.
+            </AlertDescription>
+          </Alert>
+        )}
+        {packageInfo.has_trial && packageInfo.has_trial_expired && (
+          <Alert variant="destructive">
+            <TriangleAlert className="h-4 w-4" />
+            <AlertTitle>Trial Expired</AlertTitle>
+            <AlertDescription>
+              Your free trial has expired. Please upgrade to continue using the
+              service.
+            </AlertDescription>
+          </Alert>
+        )}
+
         {/* Plan Details */}
         <div className="space-y-4">
           <div className="flex items-center justify-between">

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../../contexts/AuthContext";
-import { getWitnesServerAPI, type PublicFileModel } from "../../generated/api";
+import { getWitnesServerAPI } from "../../generated/api";
 import {
   Card,
   CardContent,

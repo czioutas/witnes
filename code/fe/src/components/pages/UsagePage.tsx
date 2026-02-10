@@ -1,13 +1,33 @@
 import { useEffect, useState } from "react";
-import { getWitnesServerAPI, type UsageStatsModel, type PackageInfoModel, type ProjectKeyModel, type CreateProjectKeyRequest } from "../../generated/api";
+import {
+  getWitnesServerAPI,
+  type UsageStatsModel,
+  type PackageInfoModel,
+  type ProjectKeyModel,
+  type CreateProjectKeyRequest,
+} from "../../generated/api";
 import { useApiToast } from "../../hooks/useApiToast";
 import { ProjectKeyDisplay } from "../usage/ProjectKeyDisplay";
 import { UsageStats } from "../usage/UsageStats";
 import { PackageInfo } from "../usage/PackageInfo";
 import { Button } from "../ui/button";
 import { RefreshCw } from "lucide-react";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "../ui/dialog";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "../ui/form";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "../ui/dialog";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "../ui/form";
 import { Input } from "../ui/input";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -16,7 +36,10 @@ import * as z from "zod";
 const api = getWitnesServerAPI();
 
 const createKeySchema = z.object({
-  name: z.string().min(1, "Name is required").max(200, "Name must be 200 characters or less"),
+  name: z
+    .string()
+    .min(1, "Name is required")
+    .max(200, "Name must be 200 characters or less"),
   domain: z.string().min(1, "Domain is required"),
 });
 
@@ -118,7 +141,9 @@ export function UsagePage() {
             </p>
           </div>
           <Button onClick={handleRefresh} variant="outline" disabled={loading}>
-            <RefreshCw className={`mr-2 h-4 w-4 ${loading ? "animate-spin" : ""}`} />
+            <RefreshCw
+              className={`mr-2 h-4 w-4 ${loading ? "animate-spin" : ""}`}
+            />
             Refresh
           </Button>
         </div>
@@ -127,7 +152,7 @@ export function UsagePage() {
         <UsageStats stats={usageStats} loading={loading} />
 
         {/* Package Information */}
-        <PackageInfo packageInfo={packageInfo} loading={loading} />
+        <PackageInfo packageInfo={packageInfo!} loading={loading} />
 
         {/* Project Key Display */}
         <ProjectKeyDisplay
