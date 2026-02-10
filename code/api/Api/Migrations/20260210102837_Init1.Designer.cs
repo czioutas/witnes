@@ -13,7 +13,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Api.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260210091309_Init1")]
+    [Migration("20260210102837_Init1")]
     partial class Init1
     {
         /// <inheritdoc />
@@ -971,7 +971,7 @@ namespace Api.Migrations
 
                     b.HasIndex("TenantId");
 
-                    b.ToTable("MetricsSilver", (string)null);
+                    b.ToTable("metrics_silver", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>

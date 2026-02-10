@@ -968,7 +968,7 @@ namespace Api.Migrations
 
                     b.HasIndex("TenantId");
 
-                    b.ToTable("MetricsSilver", (string)null);
+                    b.ToTable("metrics_silver", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>

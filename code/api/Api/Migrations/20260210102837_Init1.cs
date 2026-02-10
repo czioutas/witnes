@@ -236,7 +236,7 @@ namespace Api.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "MetricsSilver",
+                name: "metrics_silver",
                 columns: table => new
                 {
                     id = table.Column<Guid>(type: "uuid", nullable: false),
@@ -263,9 +263,9 @@ namespace Api.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_MetricsSilver", x => x.id);
+                    table.PrimaryKey("PK_metrics_silver", x => x.id);
                     table.ForeignKey(
-                        name: "FK_MetricsSilver_tenants_tenant_id",
+                        name: "FK_metrics_silver_tenants_tenant_id",
                         column: x => x.tenant_id,
                         principalTable: "tenants",
                         principalColumn: "id",
@@ -628,8 +628,8 @@ namespace Api.Migrations
                 columns: new[] { "UserId", "Timestamp" });
 
             migrationBuilder.CreateIndex(
-                name: "IX_MetricsSilver_tenant_id",
-                table: "MetricsSilver",
+                name: "IX_metrics_silver_tenant_id",
+                table: "metrics_silver",
                 column: "tenant_id");
 
             migrationBuilder.CreateIndex(
@@ -723,7 +723,7 @@ namespace Api.Migrations
                 name: "metrics_gold");
 
             migrationBuilder.DropTable(
-                name: "MetricsSilver");
+                name: "metrics_silver");
 
             migrationBuilder.DropTable(
                 name: "project_keys");

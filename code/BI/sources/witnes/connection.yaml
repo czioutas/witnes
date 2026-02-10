@@ -1,0 +1,7 @@
+# This file was automatically generated
+name: witnes
+type: postgres
+options:
+  database: witnes
+  host: 192.168.178.47
+  port: 5432

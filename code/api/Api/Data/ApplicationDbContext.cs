@@ -89,27 +89,27 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUserEntity, App
         LimitsSeeder.Seed(builder);
 
         builder.Entity<MetricSilverEntity>(entity =>
-    {
-        // 1. Map to jsonb for PostgreSQL
-        entity.Property(e => e.Waterfall)
-            .HasColumnType("jsonb")
-            .HasConversion(
-                v => JsonSerializer.Serialize(v, (JsonSerializerOptions)null!),
-                v => JsonSerializer.Deserialize<List<ProcessedResource>>(v, (JsonSerializerOptions)null!)
-                     ?? new List<ProcessedResource>()
-            );
+        {
+            // 1. Map to jsonb for PostgreSQL
+            entity.Property(e => e.Waterfall)
+                .HasColumnType("jsonb")
+                .HasConversion(
+                    v => JsonSerializer.Serialize(v, (JsonSerializerOptions)null!),
+                    v => JsonSerializer.Deserialize<List<ProcessedResource>>(v, (JsonSerializerOptions)null!)
+                        ?? new List<ProcessedResource>()
+                );
 
-        entity.Property(e => e.JankReports)
-            .HasColumnType("jsonb")
-            .HasConversion(
-                v => JsonSerializer.Serialize(v, (JsonSerializerOptions)null!),
-                v => JsonSerializer.Deserialize<List<string>>(v, (JsonSerializerOptions)null!)
-                     ?? new List<string>()
-            );
+            entity.Property(e => e.JankReports)
+                .HasColumnType("jsonb")
+                .HasConversion(
+                    v => JsonSerializer.Serialize(v, (JsonSerializerOptions)null!),
+                    v => JsonSerializer.Deserialize<List<string>>(v, (JsonSerializerOptions)null!)
+                        ?? new List<string>()
+                );
 
-        // 2. Ensure the tenant_id FK and other constraints
-        entity.ToTable("MetricsSilver");
-    });
+            // 2. Ensure the tenant_id FK and other constraints
+            entity.ToTable("metrics_silver");
+        });
 
         foreach (var entityType in builder.Model.GetEntityTypes())
         {
