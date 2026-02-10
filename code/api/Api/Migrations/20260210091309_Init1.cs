@@ -33,6 +33,21 @@ namespace Api.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "daily_salt",
+                columns: table => new
+                {
+                    id = table.Column<Guid>(type: "uuid", nullable: false),
+                    salt = table.Column<string>(type: "text", nullable: false),
+                    active_date = table.Column<DateOnly>(type: "date", nullable: false),
+                    created_at = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    updated_at = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_daily_salt", x => x.id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "features",
                 columns: table => new
                 {
@@ -150,13 +165,12 @@ namespace Api.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "MetricsBronze",
+                name: "metrics_bronze",
                 columns: table => new
                 {
                     id = table.Column<Guid>(type: "uuid", nullable: false),
                     UserId = table.Column<string>(type: "text", nullable: true),
-                    SessionId = table.Column<string>(type: "text", nullable: false),
-                    GuestId = table.Column<string>(type: "text", nullable: true),
+                    HashId = table.Column<string>(type: "text", nullable: false),
                     Url = table.Column<string>(type: "text", nullable: false),
                     EventType = table.Column<string>(type: "text", nullable: false),
                     Metadata = table.Column<string>(type: "jsonb", nullable: false),
@@ -171,9 +185,9 @@ namespace Api.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_MetricsBronze", x => x.id);
+                    table.PrimaryKey("PK_metrics_bronze", x => x.id);
                     table.ForeignKey(
-                        name: "FK_MetricsBronze_tenants_tenant_id",
+                        name: "FK_metrics_bronze_tenants_tenant_id",
                         column: x => x.tenant_id,
                         principalTable: "tenants",
                         principalColumn: "id",
@@ -181,13 +195,12 @@ namespace Api.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "MetricsGold",
+                name: "metrics_gold",
                 columns: table => new
                 {
                     id = table.Column<Guid>(type: "uuid", nullable: false),
                     SilverId = table.Column<Guid>(type: "uuid", nullable: false),
                     UserId = table.Column<string>(type: "text", nullable: true),
-                    SessionId = table.Column<string>(type: "text", nullable: false),
                     GuestId = table.Column<string>(type: "text", nullable: true),
                     UrlPath = table.Column<string>(type: "text", nullable: false),
                     Timestamp = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
@@ -213,9 +226,9 @@ namespace Api.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_MetricsGold", x => x.id);
+                    table.PrimaryKey("PK_metrics_gold", x => x.id);
                     table.ForeignKey(
-                        name: "FK_MetricsGold_tenants_tenant_id",
+                        name: "FK_metrics_gold_tenants_tenant_id",
                         column: x => x.tenant_id,
                         principalTable: "tenants",
                         principalColumn: "id",
@@ -229,7 +242,6 @@ namespace Api.Migrations
                     id = table.Column<Guid>(type: "uuid", nullable: false),
                     BronzeId = table.Column<Guid>(type: "uuid", nullable: false),
                     UserId = table.Column<string>(type: "text", nullable: true),
-                    SessionId = table.Column<string>(type: "text", nullable: false),
                     GuestId = table.Column<string>(type: "text", nullable: true),
                     Url = table.Column<string>(type: "text", nullable: false),
                     Timestamp = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
@@ -601,18 +613,18 @@ namespace Api.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_MetricsBronze_tenant_id",
-                table: "MetricsBronze",
+                name: "IX_metrics_bronze_tenant_id",
+                table: "metrics_bronze",
                 column: "tenant_id");
 
             migrationBuilder.CreateIndex(
-                name: "IX_MetricsGold_tenant_id",
-                table: "MetricsGold",
+                name: "IX_metrics_gold_tenant_id",
+                table: "metrics_gold",
                 column: "tenant_id");
 
             migrationBuilder.CreateIndex(
-                name: "IX_MetricsGold_UserId_Timestamp",
-                table: "MetricsGold",
+                name: "IX_metrics_gold_UserId_Timestamp",
+                table: "metrics_gold",
                 columns: new[] { "UserId", "Timestamp" });
 
             migrationBuilder.CreateIndex(
@@ -702,10 +714,13 @@ namespace Api.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
-                name: "MetricsBronze");
+                name: "daily_salt");
 
             migrationBuilder.DropTable(
-                name: "MetricsGold");
+                name: "metrics_bronze");
+
+            migrationBuilder.DropTable(
+                name: "metrics_gold");
 
             migrationBuilder.DropTable(
                 name: "MetricsSilver");

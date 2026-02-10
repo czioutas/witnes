@@ -1,17 +1,16 @@
+using System.ComponentModel.DataAnnotations.Schema;
 using Api.Application.Tenancy.Entities;
 using Libs.Domain;
 using Microsoft.EntityFrameworkCore;
 
 namespace Api.Product.MetricsProcessing.Gold;
 
-
-
+[Table("metrics_gold")]
 [Index(nameof(UserId), nameof(Timestamp))]
 public class MetricGoldEntity : TenantAwareEntity
 {
     public Guid SilverId { get; set; }
     public string? UserId { get; set; }
-    public string SessionId { get; set; } = null!;
     public string? GuestId { get; set; }
     public string UrlPath { get; set; } = null!;
     public DateTimeOffset Timestamp { get; set; }

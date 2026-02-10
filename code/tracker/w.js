@@ -1,39 +1,24 @@
 /**
  * Witnes.js - Lightweight "Black Box" Session Recorder
- * Focusing on: Session IDs, Environment, and Full Waterfall Latency.
+ * Focusing on: Environment, and Full Waterfall Latency.
+ * Zero-cookie: no client-side identity storage.
  */
 (function (window) {
     if (window.WitnesInitialized) return;
     window.WitnesInitialized = true;
 
-    // --- 1. Setup & Session Identity ---
+    // --- 1. Setup ---
     const config = window.witnesConfig || { debug: true };
     let identifiedUserId = config.userId || null;
     let lastUrl = window.location.href;
 
-    const KEYS = { 
-        REF: 'wit_ref', // original referrer
-        SID: 'wit_sid', // session id
-        GID: 'wit_gid'  // guest id
+    const KEYS = {
+        REF: 'wit_ref' // original referrer
     };
 
     // Set original referrer if not present
     if (!sessionStorage.getItem(KEYS.REF)) {
         sessionStorage.setItem(KEYS.REF, document.referrer || 'direct');
-    }
-
-    // Tab-specific Session ID
-    let sessionId = sessionStorage.getItem(KEYS.SID);
-    if (!sessionId) {
-        sessionId = 'sid_' + Math.random().toString(36).substr(2, 9) + '_' + Date.now();
-        sessionStorage.setItem(KEYS.SID, sessionId);
-    }
-
-    // STICKY Guest ID: The anchor
-    let guestId = localStorage.getItem(KEYS.GID);
-    if (!guestId) {
-        guestId = 'w-gid_' + Math.random().toString(36).substr(2, 9);
-        localStorage.setItem(KEYS.GID, guestId);
     }
 
     const sessionState = { lcp: 0, cls: 0, longTasks: [] };
@@ -62,7 +47,7 @@
         return performance.getEntriesByType('resource').map(r => {
             const ttfb = r.responseStart > 0 ? Math.round(r.responseStart - r.requestStart) : 0;
             const stalled = Math.round(r.requestStart - r.startTime);
-            
+
             return {
                 name: r.name.split('/').pop() || r.name,
                 fullUrl: r.name,
@@ -86,11 +71,11 @@
         const entries = performance.getEntriesByType('resource')
             .filter(r => r.initiatorType === 'img')
             .sort((a, b) => b.transferSize - a.transferSize);
-        
+
         if (entries.length > 0) {
             return entries[0].responseEnd; // Largest image load time
         }
-        
+
         // Fallback to FCP if no images
         const paint = performance.getEntriesByType('paint');
         return paint.find(p => p.name === 'first-contentful-paint')?.startTime || 0;
@@ -100,7 +85,7 @@
         const nav = performance.getEntriesByType('navigation')[0];
         const paint = performance.getEntriesByType('paint');
         if (!nav) return null;
-        
+
         return {
             pageLoad: {
                 interactive: Math.round(nav.domInteractive) + 'ms',
@@ -119,8 +104,8 @@
 
     new PerformanceObserver(l => { for (const e of l.getEntries()) if (!e.hadRecentInput) sessionState.cls += e.value; }).observe({ type: 'layout-shift', buffered: true });
     try {
-        new PerformanceObserver(l => { 
-            for (const e of l.getEntries()) sessionState.longTasks.push({ d: Math.round(e.duration) + 'ms' }); 
+        new PerformanceObserver(l => {
+            for (const e of l.getEntries()) sessionState.longTasks.push({ d: Math.round(e.duration) + 'ms' });
         }).observe({ type: 'longtask', buffered: true });
     } catch(e) {}
 
@@ -132,22 +117,20 @@
         },
         emit: (eventType, isPartial = false) => {
             const pk = config.projectKey || config.project_key;
-            if (!pk || (!identifiedUserId && !guestId)) return;
+            if (!pk) return;
 
             const isInitial = eventType === 'LOAD';
-            
+
             // Structured for easy .NET class mapping
             const payload = {
                 metadata: {
                     event: eventType,
                     pk: pk,
                     ts: new Date().toISOString(),
-                    incomplete: isPartial 
+                    incomplete: isPartial
                 },
                 session: {
                     userId: identifiedUserId,
-                    sessionId: sessionId,
-                    guestId: guestId,
                     url: window.location.href,
                     ref: sessionStorage.getItem(KEYS.REF)
                 },
@@ -162,7 +145,7 @@
 
             if (config.debug) {
                 const style = "background: #6e41e2; color: #fff; padding: 2px 5px; border-radius: 3px; font-weight: bold;";
-                console.groupCollapsed(`%cWITNES%c ${eventType} %c${sessionId}`, style, "color: #6e41e2; font-weight: bold;", "color: #888;");
+                console.groupCollapsed(`%cWITNES%c ${eventType}`, style, "color: #6e41e2; font-weight: bold;");
                 console.log("Environment:", { network: payload.network, device: payload.device });
                 console.log("Waterfall Timeline:");
                 console.table(payload.performance.waterfall);
@@ -171,7 +154,7 @@
 
             const blob = new Blob([JSON.stringify(payload)], { type: 'application/json' });
             const endpoint = `https://api-witnes.ziou.xyz/api/v1/events?pk=${pk}`;
-            
+
             if (navigator.sendBeacon) {
                 navigator.sendBeacon(endpoint, blob);
             } else {
@@ -183,7 +166,7 @@
     // --- 5. Event Listeners ---
     let spaNavTimeout = null;
     let dataEmitted = false;
-    
+
     window.addEventListener('load', () => {
         loadPending = setTimeout(() => {
             dataEmitted = true;

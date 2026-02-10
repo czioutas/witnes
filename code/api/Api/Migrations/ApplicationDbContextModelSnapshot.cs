@@ -697,6 +697,35 @@ namespace Api.Migrations
                     b.ToTable("user_invitations");
                 });
 
+            modelBuilder.Entity("Api.Product.DailySalt.DailySaltEntity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<DateOnly>("ActiveDate")
+                        .HasColumnType("date")
+                        .HasColumnName("active_date");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<string>("Salt")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("salt");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("daily_salt");
+                });
+
             modelBuilder.Entity("Api.Product.MetricsProcessing.Bronze.MetricBronzeEntity", b =>
                 {
                     b.Property<Guid>("Id")
@@ -715,7 +744,8 @@ namespace Api.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("GuestId")
+                    b.Property<string>("HashId")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<DateTime>("IngestedAt")
@@ -736,10 +766,6 @@ namespace Api.Migrations
                         .IsRequired()
                         .HasColumnType("jsonb");
 
-                    b.Property<string>("SessionId")
-                        .IsRequired()
-                        .HasColumnType("text");
-
                     b.Property<Guid>("TenantId")
                         .HasColumnType("uuid")
                         .HasColumnName("tenant_id");
@@ -759,7 +785,7 @@ namespace Api.Migrations
 
                     b.HasIndex("TenantId");
 
-                    b.ToTable("MetricsBronze");
+                    b.ToTable("metrics_bronze");
                 });
 
             modelBuilder.Entity("Api.Product.MetricsProcessing.Gold.MetricGoldEntity", b =>
@@ -828,10 +854,6 @@ namespace Api.Migrations
                     b.Property<int>("Rtt")
                         .HasColumnType("integer");
 
-                    b.Property<string>("SessionId")
-                        .IsRequired()
-                        .HasColumnType("text");
-
                     b.Property<Guid>("SilverId")
                         .HasColumnType("uuid");
 
@@ -862,7 +884,7 @@ namespace Api.Migrations
 
                     b.HasIndex("UserId", "Timestamp");
 
-                    b.ToTable("MetricsGold");
+                    b.ToTable("metrics_gold");
                 });
 
             modelBuilder.Entity("Api.Product.MetricsProcessing.Silver.MetricSilverEntity", b =>
@@ -915,10 +937,6 @@ namespace Api.Migrations
 
                     b.Property<int>("Rtt")
                         .HasColumnType("integer");
-
-                    b.Property<string>("SessionId")
-                        .IsRequired()
-                        .HasColumnType("text");
 
                     b.Property<Guid>("TenantId")
                         .HasColumnType("uuid")

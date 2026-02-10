@@ -7,7 +7,7 @@ namespace Api.Product.MetricsProcessing.Bronze;
 /// <summary>
 /// Subscriber for ingested speed metrics - stores in Bronze layer
 /// </summary>
-public class BronzeSubscriber : IConsumer<SpeedMetricIngestedEvent>
+public class BronzeSubscriber : IConsumer<MetricIngestedEvent>
 {
     private readonly IBronzeService _bronzeService;
     private readonly IRequestTenant _requestTenant;
@@ -23,7 +23,7 @@ public class BronzeSubscriber : IConsumer<SpeedMetricIngestedEvent>
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
-    public async Task Consume(ConsumeContext<SpeedMetricIngestedEvent> context)
+    public async Task Consume(ConsumeContext<MetricIngestedEvent> context)
     {
         var message = context.Message;
 
@@ -35,7 +35,8 @@ public class BronzeSubscriber : IConsumer<SpeedMetricIngestedEvent>
             var bronzeEntity = await _bronzeService.StoreAsync(
                 message.Event,
                 message.TenantId,
-                message.IngestedAt);
+                message.IngestedAt,
+                message.HashId);
 
             // Publish event for Silver processing
             await context.Publish(new BronzeProcessedEvent

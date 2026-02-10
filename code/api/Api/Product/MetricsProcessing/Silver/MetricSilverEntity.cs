@@ -1,12 +1,13 @@
+using System.ComponentModel.DataAnnotations.Schema;
 using Api.Application.Tenancy.Entities;
 
 namespace Api.Product.MetricsProcessing.Silver;
 
+[Table("metrics_silver")]
 public class MetricSilverEntity : TenantAwareEntity
 {
     public Guid BronzeId { get; set; }
     public string? UserId { get; set; }
-    public string SessionId { get; set; } = null!;
     public string? GuestId { get; set; }
     public string Url { get; set; } = null!;
     public DateTime Timestamp { get; set; }

@@ -31,9 +31,14 @@ using OpenTelemetry.Metrics;
 using OpenTelemetry.Trace;
 using Serilog;
 using StackExchange.Redis;
+using Api.Product.DailySalt;
 using Api.Product.Visitors;
 using Api.Product.PageLoads;
 using Usersr.API.Users.Services;
+using Api.Product.MetricsProcessing.Gold;
+using Api.Product.MetricsProcessing.Silver;
+using Api.Product.MetricsProcessing.Bronze;
+using Api.Product.Metrics;
 
 namespace Api;
 
@@ -247,11 +252,15 @@ public class Startup
         services.AddScoped<ProjectKeyMiddleware>();
         services.AddTransient<IProjectKeyService, ProjectKeyService>();
 
+        // Daily salt & visitor hashing
+        services.AddSingleton<IDailySaltService, DailySaltService>();
+        services.AddTransient<IVisitorHashService, VisitorHashService>();
+
         // Witnes services
-        services.AddTransient<Api.Product.MetricsProcessing.Bronze.IBronzeService, Api.Product.MetricsProcessing.Bronze.BronzeService>();
-        services.AddTransient<Api.Product.MetricsProcessing.Silver.ISilverService, Api.Product.MetricsProcessing.Silver.SilverService>();
-        services.AddTransient<Api.Product.MetricsProcessing.Gold.IGoldService, Api.Product.MetricsProcessing.Gold.GoldService>();
-        services.AddTransient<Api.Product.Metrics.IMetricsService, Api.Product.Metrics.MetricsService>();
+        services.AddTransient<IBronzeService, BronzeService>();
+        services.AddTransient<ISilverService, SilverService>();
+        services.AddTransient<IGoldService, GoldService>();
+        services.AddTransient<IMetricsService, MetricsService>();
     }
 
     protected virtual void SetupSettingsModels(IServiceCollection services, IConfiguration configuration)

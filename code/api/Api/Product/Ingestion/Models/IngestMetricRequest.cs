@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 namespace Api.Product.Ingestion.Models;
 
 // Root is still strict: we need the core objects to exist
-public record IngestSpeedMetricRequestModel(
+public record IngestMetricRequestModel(
     [property: JsonPropertyName("metadata")][Required] MetadataModel Metadata,
     [property: JsonPropertyName("session")][Required] SessionModel Session,
     [property: JsonPropertyName("performance")][Required] PerformanceModel Performance,
@@ -21,8 +21,6 @@ public record MetadataModel(
 
 public record SessionModel(
     [property: JsonPropertyName("userId")] string? UserId,
-    [property: JsonPropertyName("sessionId")][Required] string SessionId,
-    [property: JsonPropertyName("guestId")] string? GuestId,
     [property: JsonPropertyName("url")][Required] string Url,
     [property: JsonPropertyName("ref")] string? Ref
 );

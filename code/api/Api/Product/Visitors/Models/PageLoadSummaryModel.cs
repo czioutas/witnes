@@ -8,8 +8,6 @@ namespace Api.Product.Visitors.Models;
 public class PageLoadSummaryModel
 {
     public Guid Id { get; set; }
-    public string SessionId { get; set; } = null!;
-    public string? GuestId { get; set; }
     public DateTimeOffset Timestamp { get; set; }
     public string UrlPath { get; set; } = null!;
 

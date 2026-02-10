@@ -267,6 +267,7 @@ grafana-provisioning
 out/
 
 bin
+bin\\Debug
 obj
 
 .env

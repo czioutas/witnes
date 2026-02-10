@@ -3,13 +3,13 @@ using Api.Application.Tenancy.Entities;
 
 namespace Api.Product.MetricsProcessing.Bronze;
 
+[Table("metrics_bronze")]
 public class MetricBronzeEntity : TenantAwareEntity
 {
     // --- SEARCHABLE & STATIC (The "Known" Schema) ---
     // These are extracted during ingestion for fast querying.
     public string? UserId { get; set; }
-    public string SessionId { get; set; } = null!;
-    public string? GuestId { get; set; }
+    public string HashId { get; set; } = null!;
     public string Url { get; set; } = null!;
     public string EventType { get; set; } = null!; // LOAD, SPA_NAV
 

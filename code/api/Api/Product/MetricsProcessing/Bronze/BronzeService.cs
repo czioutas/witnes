@@ -9,7 +9,7 @@ public interface IBronzeService
     /// <summary>
     /// Stores raw speed metric in Bronze layer with full session context
     /// </summary>
-    Task<MetricBronzeEntity> StoreAsync(IngestSpeedMetricRequestModel request, Guid tenantId, DateTime ingestedAt);
+    Task<MetricBronzeEntity> StoreAsync(IngestMetricRequestModel request, Guid tenantId, DateTime ingestedAt, string hashId);
 }
 
 public class BronzeService : IBronzeService
@@ -27,9 +27,9 @@ public class BronzeService : IBronzeService
     }
 
     /// <inheritdoc/>
-    public async Task<MetricBronzeEntity> StoreAsync(IngestSpeedMetricRequestModel request, Guid tenantId, DateTime ingestedAt)
+    public async Task<MetricBronzeEntity> StoreAsync(IngestMetricRequestModel request, Guid tenantId, DateTime ingestedAt, string hashId)
     {
-        // We extract the "First Glance" metadata to columns, 
+        // We extract the "First Glance" metadata to columns,
         // and keep the "Deep Dive" data in the JSON payload.
         var entity = new MetricBronzeEntity
         {
@@ -38,8 +38,7 @@ public class BronzeService : IBronzeService
 
             // Searchable Identity
             UserId = request.Session.UserId,
-            SessionId = request.Session.SessionId,
-            GuestId = request.Session.GuestId,
+            HashId = hashId,
             Url = request.Session.Url,
             EventType = request.Metadata.Event,
 
@@ -55,8 +54,8 @@ public class BronzeService : IBronzeService
         await _context.MetricsBronze.AddAsync(entity);
         await _context.SaveChangesAsync();
 
-        _logger.LogInformation("Bronze metric stored for Session {SessionId} at {Url}",
-            entity.SessionId, entity.Url);
+        _logger.LogInformation("Bronze metric stored for HashId {HashId} at {Url}",
+            entity.HashId, entity.Url);
 
         return entity;
     }

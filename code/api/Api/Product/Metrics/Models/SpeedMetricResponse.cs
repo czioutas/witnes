@@ -8,7 +8,6 @@ public class SpeedMetricResponse
     public Guid Id { get; set; }
     public Guid SilverId { get; set; }
     public string UserId { get; set; } = null!;
-    public string SessionId { get; set; } = null!;
     public string UrlPath { get; set; } = null!;
     public DateTimeOffset Timestamp { get; set; }
 

@@ -47,7 +47,6 @@ public class GoldService : IGoldService
         {
             SilverId = silver.Id,
             UserId = silver.UserId,
-            SessionId = silver.SessionId,
             GuestId = silver.GuestId,
             UrlPath = ExtractPath(silver.Url),
             Timestamp = silver.Timestamp,

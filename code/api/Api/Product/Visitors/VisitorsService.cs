@@ -169,7 +169,6 @@ public class VisitorsService : IVisitorsService
             .Select(m => new PageLoadSummaryModel
             {
                 Id = m.Id,
-                SessionId = m.SessionId,
                 Timestamp = m.Timestamp,
                 UrlPath = m.UrlPath,
                 LcpMs = m.LcpMs,

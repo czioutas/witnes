@@ -1,4 +1,5 @@
 using Api.Application.Tenancy.Services;
+using Api.Product.DailySalt;
 using Api.Product.Ingestion.Events;
 using Api.Product.Ingestion.Models;
 using MassTransit;
@@ -17,15 +18,18 @@ public class IngestionController : ControllerBase
     private readonly IPublishEndpoint _publishEndpoint;
     private readonly ILogger<IngestionController> _logger;
     private readonly IRequestTenant _requestTenant;
+    private readonly IVisitorHashService _visitorHashService;
 
     public IngestionController(
         IPublishEndpoint publishEndpoint,
         ILogger<IngestionController> logger,
-        IRequestTenant requestTenant)
+        IRequestTenant requestTenant,
+        IVisitorHashService visitorHashService)
     {
         _publishEndpoint = publishEndpoint ?? throw new ArgumentNullException(nameof(publishEndpoint));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _requestTenant = requestTenant ?? throw new ArgumentNullException(nameof(requestTenant));
+        _visitorHashService = visitorHashService ?? throw new ArgumentNullException(nameof(visitorHashService));
     }
 
     /// <summary>
@@ -35,14 +39,19 @@ public class IngestionController : ControllerBase
     /// <returns>Acknowledgment response</returns>
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status202Accepted)]
-    public async Task<IActionResult> IngestSpeedMetric([FromBody] IngestSpeedMetricRequestModel request)
+    public async Task<IActionResult> IngestSpeedMetric([FromBody] IngestMetricRequestModel request)
     {
+        var ip = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+        var userAgent = Request.Headers.UserAgent.ToString();
+        var hashId = await _visitorHashService.ComputeHashIdAsync(ip, userAgent);
+
         // Publish event to message queue for Bronze processing
-        await _publishEndpoint.Publish(new SpeedMetricIngestedEvent
+        await _publishEndpoint.Publish(new MetricIngestedEvent
         {
             Event = request,
             TenantId = _requestTenant.TenantId, // Set by ProjectKeyMiddleware
-            IngestedAt = DateTime.UtcNow
+            IngestedAt = DateTime.UtcNow,
+            HashId = hashId
         });
 
         _logger.LogInformation("Speed metric ingestion acknowledged");

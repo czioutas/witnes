@@ -16,11 +16,6 @@ public class PageLoadDetailModel
     public string UserId { get; set; } = null!;
 
     /// <summary>
-    /// Session ID
-    /// </summary>
-    public string SessionId { get; set; } = null!;
-
-    /// <summary>
     /// URL of the page
     /// </summary>
     public string Url { get; set; } = null!;

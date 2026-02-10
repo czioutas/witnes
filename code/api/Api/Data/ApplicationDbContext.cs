@@ -9,6 +9,7 @@ using Api.Application.Tenancy.Entities;
 using Api.Application.Tenancy.Services;
 using Api.Application.Users;
 using Api.Data.Seeders;
+using Api.Product.DailySalt;
 using Api.Product.MetricsProcessing.Bronze;
 using Api.Product.MetricsProcessing.Gold;
 using Api.Product.MetricsProcessing.Silver;
@@ -62,6 +63,9 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUserEntity, App
     public virtual DbSet<TenantFeatureEntity> TenantFeatures => Set<TenantFeatureEntity>();
     public virtual DbSet<TenantLimitEntity> TenantLimits => Set<TenantLimitEntity>();
     public virtual DbSet<ProjectKeyEntity> ProjectKeys => Set<ProjectKeyEntity>();
+
+    // Daily Salt (for visitor hash ID generation)
+    public virtual DbSet<DailySaltEntity> DailySalts => Set<DailySaltEntity>();
 
     // Witnes Metrics (Medallion Architecture)
     public virtual DbSet<MetricBronzeEntity> MetricsBronze => Set<MetricBronzeEntity>();

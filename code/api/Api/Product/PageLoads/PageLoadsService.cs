@@ -53,7 +53,6 @@ public class PageLoadsService : IPageLoadsService
         {
             Id = silverMetric.Id,
             UserId = silverMetric.UserId,
-            SessionId = silverMetric.SessionId,
             Url = silverMetric.Url,
             Timestamp = silverMetric.Timestamp,
             LcpMs = silverMetric.LcpMs,
