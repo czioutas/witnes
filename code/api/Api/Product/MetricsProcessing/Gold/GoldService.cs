@@ -8,6 +8,11 @@ namespace Api.Product.MetricsProcessing.Gold;
 public interface IGoldService
 {
     Task<MetricGoldEntity> ProcessFromSilverAsync(Guid silverId, Guid tenantId);
+
+    /// <summary>
+    /// Deletes Gold metrics older than the specified cutoff date for a tenant.
+    /// </summary>
+    Task<int> DeleteOlderThanAsync(Guid tenantId, DateTimeOffset cutoffDate);
 }
 
 public class GoldService : IGoldService
@@ -38,6 +43,15 @@ public class GoldService : IGoldService
         return goldEntity;
     }
 
+    /// <inheritdoc/>
+    public async Task<int> DeleteOlderThanAsync(Guid tenantId, DateTimeOffset cutoffDate)
+    {
+        return await _context.MetricsGold
+            .IgnoreQueryFilters()
+            .Where(m => m.TenantId == tenantId && m.PageRequestedAtByVisitor < cutoffDate)
+            .ExecuteDeleteAsync();
+    }
+
     public static MetricGoldEntity TransformToGold(MetricSilverEntity silver)
     {
         var lcpMs = (int)silver.LcpMs;
@@ -49,7 +63,7 @@ public class GoldService : IGoldService
             UserId = silver.UserId,
             GuestId = silver.GuestId,
             UrlPath = ExtractPath(silver.Url),
-            Timestamp = silver.Timestamp,
+            PageRequestedAtByVisitor = silver.PageRequestedAtByVisitor,
 
             // Speed & Stability
             LcpMs = lcpMs,

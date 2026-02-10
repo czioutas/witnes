@@ -115,7 +115,7 @@
         identify: (id) => {
             identifiedUserId = id;
         },
-        emit: (eventType, isPartial = false) => {
+        emit: (eventType, isPartial = false, eventFiredAt = null) => {
             const pk = config.projectKey || config.project_key;
             if (!pk) return;
 
@@ -126,7 +126,9 @@
                 metadata: {
                     event: eventType,
                     pk: pk,
-                    ts: new Date().toISOString(),
+                    pageRequestedAtByVisitor: new Date(performance.timeOrigin).toISOString(),
+                    listenerCalledAtByEmitEvent: eventFiredAt || new Date().toISOString(),
+                    callWitnesAt: new Date().toISOString(),
                     incomplete: isPartial
                 },
                 session: {
@@ -166,11 +168,13 @@
     // --- 5. Event Listeners ---
     let spaNavTimeout = null;
     let dataEmitted = false;
+    let loadFiredAt = null;
 
     window.addEventListener('load', () => {
+        loadFiredAt = new Date().toISOString();
         loadPending = setTimeout(() => {
             dataEmitted = true;
-            Witnes.emit('LOAD', false);
+            Witnes.emit('LOAD', false, loadFiredAt);
         }, 2500);
     });
 
@@ -178,7 +182,7 @@
         if (!dataEmitted) {
             clearTimeout(loadPending);
             dataEmitted = true;
-            Witnes.emit('LOAD', true);
+            Witnes.emit('LOAD', true, loadFiredAt);
         }
         if (spaNavTimeout) clearTimeout(spaNavTimeout); // Clear pending SPA nav
     });
@@ -186,7 +190,8 @@
     const onNav = () => {
         if (window.location.href !== lastUrl) {
             lastUrl = window.location.href;
-            spaNavTimeout = setTimeout(() => Witnes.emit('SPA_NAV'), 800);
+            const firedAt = new Date().toISOString();
+            spaNavTimeout = setTimeout(() => Witnes.emit('SPA_NAV', false, firedAt), 800);
         }
     };
 

@@ -19,17 +19,20 @@ public class IngestionController : ControllerBase
     private readonly ILogger<IngestionController> _logger;
     private readonly IRequestTenant _requestTenant;
     private readonly IVisitorHashService _visitorHashService;
+    private readonly TimeProvider _timeProvider;
 
     public IngestionController(
         IPublishEndpoint publishEndpoint,
         ILogger<IngestionController> logger,
         IRequestTenant requestTenant,
-        IVisitorHashService visitorHashService)
+        IVisitorHashService visitorHashService,
+        TimeProvider timeProvider)
     {
         _publishEndpoint = publishEndpoint ?? throw new ArgumentNullException(nameof(publishEndpoint));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _requestTenant = requestTenant ?? throw new ArgumentNullException(nameof(requestTenant));
         _visitorHashService = visitorHashService ?? throw new ArgumentNullException(nameof(visitorHashService));
+        _timeProvider = timeProvider ?? throw new ArgumentNullException(nameof(timeProvider));
     }
 
     /// <summary>
@@ -50,7 +53,7 @@ public class IngestionController : ControllerBase
         {
             Event = request,
             TenantId = _requestTenant.TenantId, // Set by ProjectKeyMiddleware
-            IngestedAt = DateTime.UtcNow,
+            IngestedAt = _timeProvider.GetUtcNow(),
             HashId = hashId
         });
 

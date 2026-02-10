@@ -36,6 +36,7 @@ using Usersr.API.Users.Services;
 using Api.Product.MetricsProcessing.Gold;
 using Api.Product.MetricsProcessing.Silver;
 using Api.Product.MetricsProcessing.Bronze;
+using Api.Product.MetricCleanup;
 using Api.Product.Metrics;
 
 namespace Api;
@@ -260,6 +261,10 @@ public class Startup
         services.AddTransient<ISilverService, SilverService>();
         services.AddTransient<IGoldService, GoldService>();
         services.AddTransient<IMetricsService, MetricsService>();
+
+        // Metric cleanup
+        services.AddTransient<IMetricCleanupService, MetricCleanupService>();
+        services.AddTransient<MetricCleanupJob>();
     }
 
     protected virtual void SetupSettingsModels(IServiceCollection services, IConfiguration configuration)

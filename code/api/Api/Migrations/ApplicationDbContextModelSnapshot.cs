@@ -774,7 +774,7 @@ namespace Api.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<DateTime>("IngestedAt")
+                    b.Property<DateTimeOffset>("IngestedAt")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Metadata")
@@ -806,6 +806,9 @@ namespace Api.Migrations
 
                     b.Property<string>("UserId")
                         .HasColumnType("text");
+
+                    b.Property<DateTimeOffset>("VisitorRequestedPageAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 
@@ -877,6 +880,9 @@ namespace Api.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<DateTimeOffset>("PageRequestedAtByVisitor")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<int>("Rtt")
                         .HasColumnType("integer");
 
@@ -886,9 +892,6 @@ namespace Api.Migrations
                     b.Property<Guid>("TenantId")
                         .HasColumnType("uuid")
                         .HasColumnName("tenant_id");
-
-                    b.Property<DateTimeOffset>("Timestamp")
-                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("TtfbMs")
                         .HasColumnType("integer");
@@ -908,7 +911,7 @@ namespace Api.Migrations
 
                     b.HasIndex("TenantId");
 
-                    b.HasIndex("UserId", "Timestamp");
+                    b.HasIndex("UserId", "PageRequestedAtByVisitor");
 
                     b.ToTable("metrics_gold");
                 });
@@ -954,6 +957,9 @@ namespace Api.Migrations
                     b.Property<bool>("Incomplete")
                         .HasColumnType("boolean");
 
+                    b.Property<DateTimeOffset>("IngestionEndpointFiredAt")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<string>("JankReports")
                         .IsRequired()
                         .HasColumnType("jsonb");
@@ -961,15 +967,15 @@ namespace Api.Migrations
                     b.Property<decimal>("LcpMs")
                         .HasColumnType("numeric");
 
+                    b.Property<DateTimeOffset>("PageRequestedAtByVisitor")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<int>("Rtt")
                         .HasColumnType("integer");
 
                     b.Property<Guid>("TenantId")
                         .HasColumnType("uuid")
                         .HasColumnName("tenant_id");
-
-                    b.Property<DateTime>("Timestamp")
-                        .HasColumnType("timestamp with time zone");
 
                     b.Property<DateTimeOffset?>("UpdatedAt")
                         .HasColumnType("timestamp with time zone")
@@ -985,6 +991,9 @@ namespace Api.Migrations
 
                     b.Property<string>("UserId")
                         .HasColumnType("text");
+
+                    b.Property<DateTimeOffset>("WTrackerListenerCalledAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Waterfall")
                         .IsRequired()

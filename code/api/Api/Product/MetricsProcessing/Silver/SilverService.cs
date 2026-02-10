@@ -12,6 +12,11 @@ public interface ISilverService
     /// Transforms raw Bronze JSON into structured Silver deep-dive data.
     /// </summary>
     Task<MetricSilverEntity> ProcessFromBronzeAsync(Guid bronzeId, Guid tenantId);
+
+    /// <summary>
+    /// Deletes Silver metrics older than the specified cutoff date for a tenant.
+    /// </summary>
+    Task<int> DeleteOlderThanAsync(Guid tenantId, DateTimeOffset cutoffDate);
 }
 
 public class SilverService : ISilverService
@@ -59,7 +64,9 @@ public class SilverService : ISilverService
             UserId = bronze.UserId,
             GuestId = bronze.UserId == null ? bronze.HashId : null,
             Url = bronze.Url,
-            Timestamp = bronze.IngestedAt,
+            PageRequestedAtByVisitor = metadata!.PageRequestedAtByVisitor,
+            WTrackerListenerCalledAt = metadata.ListenerCalledAtByEmitEvent,
+            IngestionEndpointFiredAt = metadata.CallWitnesAt,
             Incomplete = metadata?.Incomplete ?? false,
 
             // --- Network Extraction ---
@@ -101,6 +108,15 @@ public class SilverService : ISilverService
 
         _logger.LogInformation("Silver record saved successfully: {SilverId}", silverEntity.Id);
         return silverEntity;
+    }
+
+    /// <inheritdoc/>
+    public async Task<int> DeleteOlderThanAsync(Guid tenantId, DateTimeOffset cutoffDate)
+    {
+        return await _context.MetricsSilver
+            .IgnoreQueryFilters()
+            .Where(m => m.TenantId == tenantId && m.PageRequestedAtByVisitor < cutoffDate)
+            .ExecuteDeleteAsync();
     }
 
     // --- Helper Parsers to handle the browser strings ---

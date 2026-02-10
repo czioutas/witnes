@@ -684,11 +684,12 @@ export interface NetworkModel {
 }
 
 export interface MetadataModel {
+  call_witnes_at?: string;
   event?: string;
   incomplete?: boolean;
+  listener_called_at_by_emit_event?: string;
+  page_requested_at_by_visitor?: string;
   pk?: string;
-  /** @nullable */
-  ts?: string | null;
 }
 
 export interface LoginModel {

@@ -1,4 +1,4 @@
-using Api.Application.Limits.Jobs;
+using Api.Product.MetricCleanup;
 using Coravel;
 
 namespace Api.Application.Extensions;
@@ -9,6 +9,8 @@ public static class SchedulerExtensions
     {
         serviceProvider.UseScheduler(scheduler =>
         {
+            scheduler.Schedule<MetricCleanupJob>()
+                .DailyAtHour(0);
         });
     }
 }

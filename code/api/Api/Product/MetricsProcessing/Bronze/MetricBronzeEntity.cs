@@ -31,5 +31,6 @@ public class MetricBronzeEntity : TenantAwareEntity
     public string? Device { get; set; }
 
     // --- AUDIT ---
-    public DateTime IngestedAt { get; set; }
+    public DateTimeOffset IngestedAt { get; set; }
+    public DateTimeOffset VisitorRequestedPageAt { get; set; }
 }

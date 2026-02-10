@@ -15,8 +15,10 @@ public record IngestMetricRequestModel(
 public record MetadataModel(
     [property: JsonPropertyName("event")][Required] string Event,
     [property: JsonPropertyName("pk")][Required] string Pk,
-    [property: JsonPropertyName("ts")] DateTime? Ts,
-    [property: JsonPropertyName("incomplete")] bool Incomplete
+    [property: JsonPropertyName("incomplete")] bool Incomplete,
+    [property: JsonPropertyName("callWitnesAt")] DateTime CallWitnesAt,
+    [property: JsonPropertyName("pageRequestedAtByVisitor")] DateTime PageRequestedAtByVisitor,
+    [property: JsonPropertyName("listenerCalledAtByEmitEvent")] DateTime ListenerCalledAtByEmitEvent
 );
 
 public record SessionModel(

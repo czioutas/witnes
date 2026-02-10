@@ -23,7 +23,7 @@ public class PageLoadDetailModel
     /// <summary>
     /// When the page load occurred
     /// </summary>
-    public DateTime Timestamp { get; set; }
+    public DateTimeOffset Timestamp { get; set; }
 
     /// <summary>
     /// Largest Contentful Paint in milliseconds

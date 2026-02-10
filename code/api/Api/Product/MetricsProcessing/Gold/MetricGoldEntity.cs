@@ -6,14 +6,14 @@ using Microsoft.EntityFrameworkCore;
 namespace Api.Product.MetricsProcessing.Gold;
 
 [Table("metrics_gold")]
-[Index(nameof(UserId), nameof(Timestamp))]
+[Index(nameof(UserId), nameof(PageRequestedAtByVisitor))]
 public class MetricGoldEntity : TenantAwareEntity
 {
     public Guid SilverId { get; set; }
     public string? UserId { get; set; }
     public string? GuestId { get; set; }
     public string UrlPath { get; set; } = null!;
-    public DateTimeOffset Timestamp { get; set; }
+    public DateTimeOffset PageRequestedAtByVisitor { get; set; }
 
     // 1. LCP (Speed)
     public int LcpMs { get; set; }

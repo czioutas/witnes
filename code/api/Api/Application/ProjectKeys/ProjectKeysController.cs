@@ -113,15 +113,15 @@ public class ProjectKeysController : ControllerBase
         // Get current month page loads
         var currentMonthPageLoads = await _contextRead.MetricsGold
             .AsNoTracking()
-            .Where(m => m.TenantId == tenantId && m.Timestamp >= firstDayOfMonth)
+            .Where(m => m.TenantId == tenantId && m.PageRequestedAtByVisitor >= firstDayOfMonth)
             .CountAsync();
 
         // Get last page load timestamp
         var lastPageLoad = await _contextRead.MetricsGold
             .AsNoTracking()
             .Where(m => m.TenantId == tenantId)
-            .OrderByDescending(m => m.Timestamp)
-            .Select(m => m.Timestamp)
+            .OrderByDescending(m => m.PageRequestedAtByVisitor)
+            .Select(m => m.PageRequestedAtByVisitor)
             .FirstOrDefaultAsync();
 
         var stats = new UsageStatsModel
@@ -166,7 +166,7 @@ public class ProjectKeysController : ControllerBase
 
         var currentMonthPageLoads = await _contextRead.MetricsGold
             .AsNoTracking()
-            .Where(m => m.TenantId == tenantId && m.Timestamp >= firstDayOfMonth)
+            .Where(m => m.TenantId == tenantId && m.PageRequestedAtByVisitor >= firstDayOfMonth)
             .CountAsync();
 
         // Calculate renewal date (start of next month)

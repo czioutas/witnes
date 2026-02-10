@@ -181,7 +181,8 @@ namespace Api.Migrations
                     Performance = table.Column<string>(type: "jsonb", nullable: false),
                     Network = table.Column<string>(type: "jsonb", nullable: true),
                     Device = table.Column<string>(type: "jsonb", nullable: true),
-                    IngestedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    IngestedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    VisitorRequestedPageAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
                     created_at = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
                     updated_at = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
                     tenant_id = table.Column<Guid>(type: "uuid", nullable: false)
@@ -206,7 +207,7 @@ namespace Api.Migrations
                     UserId = table.Column<string>(type: "text", nullable: true),
                     GuestId = table.Column<string>(type: "text", nullable: true),
                     UrlPath = table.Column<string>(type: "text", nullable: false),
-                    Timestamp = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    PageRequestedAtByVisitor = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
                     LcpMs = table.Column<int>(type: "integer", nullable: false),
                     LcpVerdict = table.Column<string>(type: "text", nullable: false),
                     ClsScore = table.Column<decimal>(type: "numeric", nullable: false),
@@ -247,7 +248,9 @@ namespace Api.Migrations
                     UserId = table.Column<string>(type: "text", nullable: true),
                     GuestId = table.Column<string>(type: "text", nullable: true),
                     Url = table.Column<string>(type: "text", nullable: false),
-                    Timestamp = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    PageRequestedAtByVisitor = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    WTrackerListenerCalledAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    IngestionEndpointFiredAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
                     LcpMs = table.Column<decimal>(type: "numeric", nullable: false),
                     Cls = table.Column<decimal>(type: "numeric", nullable: false),
                     AvgTtfbMs = table.Column<int>(type: "integer", nullable: false),
@@ -633,9 +636,9 @@ namespace Api.Migrations
                 column: "tenant_id");
 
             migrationBuilder.CreateIndex(
-                name: "IX_metrics_gold_UserId_Timestamp",
+                name: "IX_metrics_gold_UserId_PageRequestedAtByVisitor",
                 table: "metrics_gold",
-                columns: new[] { "UserId", "Timestamp" });
+                columns: new[] { "UserId", "PageRequestedAtByVisitor" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_metrics_silver_tenant_id",

@@ -9,6 +9,6 @@ public class MetricIngestedEvent
 {
     public required IngestMetricRequestModel Event { get; set; }
     public Guid TenantId { get; set; }
-    public DateTime IngestedAt { get; set; }
+    public DateTimeOffset IngestedAt { get; set; }
     public required string HashId { get; set; }
 }

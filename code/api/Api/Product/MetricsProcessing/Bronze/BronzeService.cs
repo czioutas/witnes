@@ -1,5 +1,6 @@
 using Api.Data;
 using Api.Product.Ingestion.Models;
+using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
 
 namespace Api.Product.MetricsProcessing.Bronze;
@@ -9,7 +10,12 @@ public interface IBronzeService
     /// <summary>
     /// Stores raw speed metric in Bronze layer with full session context
     /// </summary>
-    Task<MetricBronzeEntity> StoreAsync(IngestMetricRequestModel request, Guid tenantId, DateTime ingestedAt, string hashId);
+    Task<MetricBronzeEntity> StoreAsync(IngestMetricRequestModel request, Guid tenantId, DateTimeOffset ingestedAt, string hashId);
+
+    /// <summary>
+    /// Deletes Bronze metrics older than the specified cutoff date for a tenant.
+    /// </summary>
+    Task<int> DeleteOlderThanAsync(Guid tenantId, DateTimeOffset cutoffDate);
 }
 
 public class BronzeService : IBronzeService
@@ -27,7 +33,7 @@ public class BronzeService : IBronzeService
     }
 
     /// <inheritdoc/>
-    public async Task<MetricBronzeEntity> StoreAsync(IngestMetricRequestModel request, Guid tenantId, DateTime ingestedAt, string hashId)
+    public async Task<MetricBronzeEntity> StoreAsync(IngestMetricRequestModel request, Guid tenantId, DateTimeOffset ingestedAt, string hashId)
     {
         // We extract the "First Glance" metadata to columns,
         // and keep the "Deep Dive" data in the JSON payload.
@@ -41,6 +47,7 @@ public class BronzeService : IBronzeService
             HashId = hashId,
             Url = request.Session.Url,
             EventType = request.Metadata.Event,
+            VisitorRequestedPageAt = request.Metadata.PageRequestedAtByVisitor,
 
             // Store the dynamic blocks separately as JSONB
             // This makes it easier to debug and avoids a single gigantic JSON blob
@@ -58,5 +65,14 @@ public class BronzeService : IBronzeService
             entity.HashId, entity.Url);
 
         return entity;
+    }
+
+    /// <inheritdoc/>
+    public async Task<int> DeleteOlderThanAsync(Guid tenantId, DateTimeOffset cutoffDate)
+    {
+        return await _context.MetricsBronze
+            .IgnoreQueryFilters()
+            .Where(m => m.TenantId == tenantId && m.VisitorRequestedPageAt < cutoffDate)
+            .ExecuteDeleteAsync();
     }
 }

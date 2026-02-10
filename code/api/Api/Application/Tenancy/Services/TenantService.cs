@@ -21,6 +21,7 @@ public interface ITenantService
     Task<Result<TenantModel>> UpdateTenantDetailsAsync(Guid tenantId, UpdateTenantDetailsRequest request);
     Task<Result<bool>> UpdateLogoAsync(Guid tenantId, Guid logoFileId);
     Task<int> GetEmployeeCountAsync(Guid tenantId);
+    Task<List<Guid>> GetAllTenantIdsAsync();
     string GetRandomIdentifier();
 }
 
@@ -298,6 +299,14 @@ public class TenantService : ITenantService
             .FirstOrDefaultAsync();
 
         return tenantDetails?.NumberOfEmployees ?? 0;
+    }
+
+    public async Task<List<Guid>> GetAllTenantIdsAsync()
+    {
+        return await _dbContext.Tenants
+            .IgnoreQueryFilters()
+            .Select(t => t.Id)
+            .ToListAsync();
     }
 
     public string GetRandomIdentifier()

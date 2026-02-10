@@ -70,7 +70,7 @@ public class VisitorsService : IVisitorsService
             var startDateUtc = request.StartDate.Value.Kind == DateTimeKind.Utc
                 ? request.StartDate.Value
                 : DateTime.SpecifyKind(request.StartDate.Value, DateTimeKind.Utc);
-            query = query.Where(m => m.Timestamp >= startDateUtc);
+            query = query.Where(m => m.PageRequestedAtByVisitor >= startDateUtc);
         }
 
         if (request.EndDate.HasValue)
@@ -78,7 +78,7 @@ public class VisitorsService : IVisitorsService
             var endDateUtc = request.EndDate.Value.Kind == DateTimeKind.Utc
                 ? request.EndDate.Value
                 : DateTime.SpecifyKind(request.EndDate.Value, DateTimeKind.Utc);
-            query = query.Where(m => m.Timestamp <= endDateUtc);
+            query = query.Where(m => m.PageRequestedAtByVisitor <= endDateUtc);
         }
 
         // Group by UserId (if present) or GuestId (for anonymous visitors)
@@ -89,7 +89,7 @@ public class VisitorsService : IVisitorsService
                 UserId = g.Key.UserId,
                 GuestId = g.Key.GuestId,
                 TotalPageLoads = g.Count(),
-                LastSeenAt = g.Max(m => m.Timestamp),
+                LastSeenAt = g.Max(m => m.PageRequestedAtByVisitor),
                 Browsers = new List<string>(),
                 OperatingSystems = new List<string>()
             });
@@ -147,7 +147,7 @@ public class VisitorsService : IVisitorsService
             var startDateUtc = request.StartDate.Value.Kind == DateTimeKind.Utc
                 ? request.StartDate.Value
                 : DateTime.SpecifyKind(request.StartDate.Value, DateTimeKind.Utc);
-            query = query.Where(m => m.Timestamp >= startDateUtc);
+            query = query.Where(m => m.PageRequestedAtByVisitor >= startDateUtc);
         }
 
         if (request.EndDate.HasValue)
@@ -155,7 +155,7 @@ public class VisitorsService : IVisitorsService
             var endDateUtc = request.EndDate.Value.Kind == DateTimeKind.Utc
                 ? request.EndDate.Value
                 : DateTime.SpecifyKind(request.EndDate.Value, DateTimeKind.Utc);
-            query = query.Where(m => m.Timestamp <= endDateUtc);
+            query = query.Where(m => m.PageRequestedAtByVisitor <= endDateUtc);
         }
 
         // Get total count before pagination
@@ -163,13 +163,13 @@ public class VisitorsService : IVisitorsService
 
         // Apply ordering (most recent first) and pagination
         var pageLoads = await query
-            .OrderByDescending(m => m.Timestamp)
+            .OrderByDescending(m => m.PageRequestedAtByVisitor)
             .Skip(request.Skip)
             .Take(request.Take)
             .Select(m => new PageLoadSummaryModel
             {
                 Id = m.Id,
-                Timestamp = m.Timestamp,
+                Timestamp = m.PageRequestedAtByVisitor,
                 UrlPath = m.UrlPath,
                 LcpMs = m.LcpMs,
                 LcpVerdict = m.LcpVerdict,

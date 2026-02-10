@@ -52,9 +52,9 @@ public class PageLoadsService : IPageLoadsService
         var detail = new PageLoadDetailModel
         {
             Id = silverMetric.Id,
-            UserId = silverMetric.UserId,
+            UserId = silverMetric.UserId ?? silverMetric.GuestId ?? "Unknown",
             Url = silverMetric.Url,
-            Timestamp = silverMetric.Timestamp,
+            Timestamp = silverMetric.PageRequestedAtByVisitor,
             LcpMs = silverMetric.LcpMs,
             Cls = silverMetric.Cls,
             AvgTtfbMs = silverMetric.AvgTtfbMs,

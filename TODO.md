@@ -67,7 +67,7 @@ In http://localhost:4321/dashboard/usage we need to display the free trial info.
 we need to enhance the info from http://localhost:4321/dashboard/usage
 from tenant_pricing
 
-## [TODO]Task 6 - Data cleanup
+## [DONE] Task 6 - Data cleanup
 
 we need to be cleaning up the data of tenants based on their pricing model.
 

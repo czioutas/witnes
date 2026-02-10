@@ -10,7 +10,9 @@ public class MetricSilverEntity : TenantAwareEntity
     public string? UserId { get; set; }
     public string? GuestId { get; set; }
     public string Url { get; set; } = null!;
-    public DateTime Timestamp { get; set; }
+    public DateTimeOffset PageRequestedAtByVisitor { get; set; }
+    public DateTimeOffset WTrackerListenerCalledAt { get; set; }
+    public DateTimeOffset IngestionEndpointFiredAt { get; set; }
 
     // --- Core Vitals for Triage ---
     public decimal LcpMs { get; set; }
