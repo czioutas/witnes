@@ -2,15 +2,7 @@
 import PublicLayout from "../layouts/PublicLayout.astro";
 import Navbar from "../components/landing/Navbar.astro";
 import Footer from "../components/landing/Footer.astro";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "../components/ui/card";
-import { Badge } from "../components/ui/badge";
 import { Button } from "../components/ui/button";
-import { Separator } from "../components/ui/separator";
 ---
 
 <PublicLayout
@@ -85,367 +77,284 @@ import { Separator } from "../components/ui/separator";
         </section>
 
         <!-- Main Privacy Content -->
-        <section class="section-frame py-32 md:py-48 px-6 md:px-12 bg-white">
-          <div class="max-w-4xl mx-auto space-y-12">
-            <!-- Section 01: Introduction -->
-            <Card className="border-zinc-200">
-              <CardHeader>
-                <div class="flex items-center gap-3 mb-2">
-                  <Badge variant="outline" className="text-sm">01</Badge>
-                  <CardTitle className="text-xl uppercase tracking-widest"
-                    >Introduction</CardTitle
-                  >
-                </div>
-              </CardHeader>
-              <CardContent>
-                <p class="text-base leading-relaxed text-zinc-600">
-                  Welcome to <strong>Witnes</strong> ("we," "us," or "our"). We
-                  provide a lightweight, privacy-focused session recording and
-                  analytics tool designed to respect user data. We operate with a
-                  strict "Privacy by Design" philosophy: we do not track visitors
-                  across the web, we do not sell data, and we do not use
-                  persistent cookies.
-                </p>
-                <p class="text-base leading-relaxed text-zinc-600 mt-4">
-                  This Privacy Policy explains how we collect, use, and protect
-                  data when you visit our website or use our analytics software
-                  on your own website.
-                </p>
-              </CardContent>
-            </Card>
+        <section class="py-16 md:py-24 px-6 bg-background">
+          <div class="mx-auto max-w-3xl space-y-20">
 
-            <!-- Section 02: Our Role under GDPR -->
-            <Card className="border-zinc-200">
-              <CardHeader>
-                <div class="flex items-center gap-3 mb-2">
-                  <Badge variant="outline" className="text-sm">02</Badge>
-                  <CardTitle className="text-xl uppercase tracking-widest"
-                    >Our Role under GDPR</CardTitle
-                  >
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <p class="text-base leading-relaxed text-zinc-600">
-                  We operate under two distinct capacities depending on how you
-                  interact with our services:
-                </p>
-                <ul class="space-y-3 text-zinc-600">
-                  <li class="flex gap-2">
-                    <span class="text-[#A68B6A]">•</span>
-                    <span
-                      ><strong>For Visitors of Customer Websites:</strong> We act
-                      as a <strong>Data Processor</strong>. We process data on
-                      behalf of our customers (the website owners) to provide
-                      them with analytics.</span
-                    >
-                  </li>
-                  <li class="flex gap-2">
-                    <span class="text-[#A68B6A]">•</span>
-                    <span
-                      ><strong>For Our Customers (Account Holders):</strong> We
-                      act as a <strong>Data Controller</strong>. We collect your
-                      account and billing information to provide the service to
-                      you.</span
-                    >
-                  </li>
-                </ul>
-              </CardContent>
-            </Card>
+            <!-- 01: Introduction -->
+            <div>
+              <div class="flex items-baseline gap-4 mb-4">
+                <span class="text-4xl font-extralight text-muted-foreground/40 font-mono">01</span>
+                <p class="text-sm font-semibold uppercase tracking-widest text-muted-foreground">Introduction</p>
+              </div>
+              <h2 class="text-2xl font-bold tracking-tight text-foreground md:text-3xl">
+                Introduction
+              </h2>
+              <p class="mt-4 text-lg leading-relaxed text-muted-foreground">
+                Welcome to <strong class="text-foreground">Witnes</strong> ("we," "us," or "our"). We
+                provide a lightweight, privacy-focused session recording and
+                analytics tool designed to respect user data. We operate with a
+                strict "Privacy by Design" philosophy: we do not track visitors
+                across the web, we do not sell data, and we do not use
+                persistent cookies.
+              </p>
+              <p class="mt-4 text-lg leading-relaxed text-muted-foreground">
+                This Privacy Policy explains how we collect, use, and protect
+                data when you visit our website or use our analytics software
+                on your own website.
+              </p>
+            </div>
 
-            <!-- Section 03: Data We Process (The Visitor) -->
-            <Card className="border-zinc-200">
-              <CardHeader>
-                <div class="flex items-center gap-3 mb-2">
-                  <Badge variant="outline" className="text-sm">03</Badge>
-                  <CardTitle className="text-xl uppercase tracking-widest"
-                    >Data We Process (Visitors)</CardTitle
-                  >
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-8">
-                <p class="text-base leading-relaxed text-zinc-600">
-                  When the Witnes tracker runs on a website, we collect minimal
-                  data to provide performance metrics and session flows.
-                </p>
+            <!-- Divider -->
+            <div class="h-px bg-border"></div>
+
+            <!-- 02: Our Role under GDPR -->
+            <div>
+              <div class="flex items-baseline gap-4 mb-4">
+                <span class="text-4xl font-extralight text-muted-foreground/40 font-mono">02</span>
+                <p class="text-sm font-semibold uppercase tracking-widest text-muted-foreground">GDPR Role</p>
+              </div>
+              <h2 class="text-2xl font-bold tracking-tight text-foreground md:text-3xl">
+                Our Role under GDPR
+              </h2>
+              <p class="mt-4 text-lg leading-relaxed text-muted-foreground">
+                We operate under two distinct capacities depending on how you
+                interact with our services:
+              </p>
+
+              <ul class="mt-6 space-y-4">
+                <li class="flex gap-3 text-muted-foreground">
+                  <span class="inline-block h-1 w-1 mt-2.5 rounded-full bg-foreground/40 shrink-0"></span>
+                  <span><strong class="text-foreground">For Visitors of Customer Websites:</strong> We act as a <strong class="text-foreground">Data Processor</strong>. We process data on behalf of our customers (the website owners) to provide them with analytics.</span>
+                </li>
+                <li class="flex gap-3 text-muted-foreground">
+                  <span class="inline-block h-1 w-1 mt-2.5 rounded-full bg-foreground/40 shrink-0"></span>
+                  <span><strong class="text-foreground">For Our Customers (Account Holders):</strong> We act as a <strong class="text-foreground">Data Controller</strong>. We collect your account and billing information to provide the service to you.</span>
+                </li>
+              </ul>
+            </div>
+
+            <!-- Divider -->
+            <div class="h-px bg-border"></div>
+
+            <!-- 03: Data We Process (The Visitor) -->
+            <div>
+              <div class="flex items-baseline gap-4 mb-4">
+                <span class="text-4xl font-extralight text-muted-foreground/40 font-mono">03</span>
+                <p class="text-sm font-semibold uppercase tracking-widest text-muted-foreground">Visitor Data</p>
+              </div>
+              <h2 class="text-2xl font-bold tracking-tight text-foreground md:text-3xl">
+                Data We Process (Visitors)
+              </h2>
+              <p class="mt-4 text-lg leading-relaxed text-muted-foreground">
+                When the Witnes tracker runs on a website, we collect minimal
+                data to provide performance metrics and session flows.
+              </p>
+
+              <div class="mt-8 space-y-8">
                 <div>
-                  <h3
-                    class="text-base font-bold text-black uppercase tracking-tight mb-4"
-                  >
+                  <h3 class="text-base font-semibold text-foreground uppercase tracking-tight mb-4">
                     a) The "No-Cookie" Approach
                   </h3>
-                  <p class="text-base leading-relaxed text-zinc-600 mb-4">
-                    We do <strong>not</strong> use cookies, LocalStorage, or
+                  <p class="text-base leading-relaxed text-muted-foreground mb-4">
+                    We do <strong class="text-foreground">not</strong> use cookies, LocalStorage, or
                     persistent identifiers to track visitors. Instead, we use a
                     privacy-preserving hashing mechanism.
                   </p>
-                  <ul class="space-y-3 text-zinc-600">
-                    <li class="flex gap-2">
-                      <span class="text-[#A68B6A]">•</span>
-                      <span
-                        ><strong>Unique Visitor Identification:</strong> We
-                        generate a daily unique ID by creating a cryptographic
-                        hash of the visitor's <strong>IP Address</strong> + <strong
-                          >User Agent</strong
-                        > + <strong>Daily Salt</strong>.</span
-                      >
+                  <ul class="space-y-3">
+                    <li class="flex gap-3 text-sm text-muted-foreground">
+                      <span class="inline-block h-1 w-1 mt-2 rounded-full bg-foreground/40 shrink-0"></span>
+                      <span><strong class="text-foreground">Unique Visitor Identification:</strong> We generate a daily unique ID by creating a cryptographic hash of the visitor's <strong class="text-foreground">IP Address</strong> + <strong class="text-foreground">User Agent</strong> + <strong class="text-foreground">Daily Salt</strong>.</span>
                     </li>
-                    <li class="flex gap-2">
-                      <span class="text-[#A68B6A]">•</span>
-                      <span
-                        ><strong>The Daily Salt:</strong> This salt is a random
-                        string that rotates automatically every 24 hours. This
-                        means a visitor's ID is reset daily, making it impossible
-                        to track individual users across multiple days.</span
-                      >
+                    <li class="flex gap-3 text-sm text-muted-foreground">
+                      <span class="inline-block h-1 w-1 mt-2 rounded-full bg-foreground/40 shrink-0"></span>
+                      <span><strong class="text-foreground">The Daily Salt:</strong> This salt is a random string that rotates automatically every 24 hours. This means a visitor's ID is reset daily, making it impossible to track individual users across multiple days.</span>
                     </li>
-                    <li class="flex gap-2">
-                      <span class="text-[#A68B6A]">•</span>
-                      <span
-                        ><strong>No IP Storage:</strong> We do <strong
-                          >not</strong
-                        > store raw IP addresses in our database. IP addresses
-                        are processed in volatile memory solely to generate the
-                        hash and are immediately discarded.</span
-                      >
+                    <li class="flex gap-3 text-sm text-muted-foreground">
+                      <span class="inline-block h-1 w-1 mt-2 rounded-full bg-foreground/40 shrink-0"></span>
+                      <span><strong class="text-foreground">No IP Storage:</strong> We do <strong class="text-foreground">not</strong> store raw IP addresses in our database. IP addresses are processed in volatile memory solely to generate the hash and are immediately discarded.</span>
                     </li>
                   </ul>
                 </div>
                 <div>
-                  <h3
-                    class="text-base font-bold text-black uppercase tracking-tight mb-4"
-                  >
+                  <h3 class="text-base font-semibold text-foreground uppercase tracking-tight mb-4">
                     b) Technical Metrics
                   </h3>
-                  <p class="text-base leading-relaxed text-zinc-600 mb-4">
+                  <p class="text-base leading-relaxed text-muted-foreground mb-4">
                     We collect the following non-identifiable technical data:
                   </p>
-                  <ul class="space-y-3 text-zinc-600">
-                    <li class="flex gap-2">
-                      <span class="text-[#A68B6A]">•</span>
-                      <span
-                        ><strong>Performance Vitals:</strong> LCP (Largest
-                        Contentful Paint), CLS (Cumulative Layout Shift), TTFB
-                        (Time to First Byte).</span
-                      >
+                  <ul class="space-y-3">
+                    <li class="flex gap-3 text-sm text-muted-foreground">
+                      <span class="inline-block h-1 w-1 mt-2 rounded-full bg-foreground/40 shrink-0"></span>
+                      <span><strong class="text-foreground">Performance Vitals:</strong> LCP (Largest Contentful Paint), CLS (Cumulative Layout Shift), TTFB (Time to First Byte).</span>
                     </li>
-                    <li class="flex gap-2">
-                      <span class="text-[#A68B6A]">•</span>
-                      <span
-                        ><strong>Device Context:</strong> User Agent, Screen
-                        Dimensions, Viewport Size, Connection Type (e.g.,
-                        4G/WiFi).</span
-                      >
+                    <li class="flex gap-3 text-sm text-muted-foreground">
+                      <span class="inline-block h-1 w-1 mt-2 rounded-full bg-foreground/40 shrink-0"></span>
+                      <span><strong class="text-foreground">Device Context:</strong> User Agent, Screen Dimensions, Viewport Size, Connection Type (e.g., 4G/WiFi).</span>
                     </li>
-                    <li class="flex gap-2">
-                      <span class="text-[#A68B6A]">•</span>
-                      <span
-                        ><strong>Session Flow:</strong> URLs visited, Referrer
-                        (where they came from), and Waterfall latency data.</span
-                      >
+                    <li class="flex gap-3 text-sm text-muted-foreground">
+                      <span class="inline-block h-1 w-1 mt-2 rounded-full bg-foreground/40 shrink-0"></span>
+                      <span><strong class="text-foreground">Session Flow:</strong> URLs visited, Referrer (where they came from), and Waterfall latency data.</span>
                     </li>
                   </ul>
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
 
-            <!-- Section 04: Data We Collect (The Customer) -->
-            <Card className="border-zinc-200">
-              <CardHeader>
-                <div class="flex items-center gap-3 mb-2">
-                  <Badge variant="outline" className="text-sm">04</Badge>
-                  <CardTitle className="text-xl uppercase tracking-widest"
-                    >Data We Collect (Customers)</CardTitle
-                  >
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <p class="text-base leading-relaxed text-zinc-600">
-                  When you sign up for a Witnes account, we collect:
-                </p>
-                <ul class="space-y-3 text-zinc-600">
-                  <li class="flex gap-2">
-                    <span class="text-[#A68B6A]">•</span>
-                    <span
-                      ><strong>Account Information:</strong> Email address,
-                      Password (hashed), and Company Name.</span
-                    >
-                  </li>
-                  <li class="flex gap-2">
-                    <span class="text-[#A68B6A]">•</span>
-                    <span
-                      ><strong>Billing Information:</strong> VAT/Tax ID and
-                      Billing Address.</span
-                    >
-                  </li>
-                  <li class="flex gap-2">
-                    <span class="text-[#A68B6A]">•</span>
-                    <span
-                      ><strong>Payment Data:</strong> All payments are processed
-                      securely by <strong>Stripe</strong>. We do not store or
-                      have access to your full credit card number.</span
-                    >
-                  </li>
-                </ul>
-              </CardContent>
-            </Card>
+            <!-- Divider -->
+            <div class="h-px bg-border"></div>
 
-            <!-- Section 05: Data Retention & Deletion -->
-            <Card className="border-zinc-200">
-              <CardHeader>
-                <div class="flex items-center gap-3 mb-2">
-                  <Badge variant="outline" className="text-sm">05</Badge>
-                  <CardTitle className="text-xl uppercase tracking-widest"
-                    >Data Retention & Deletion</CardTitle
-                  >
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <p class="text-base leading-relaxed text-zinc-600">
-                  We believe in "Data Minimalism." We do not hoard data.
-                </p>
-                <ul class="space-y-3 text-zinc-600">
-                  <li class="flex gap-2">
-                    <span class="text-[#A68B6A]">•</span>
-                    <span
-                      ><strong>Visitor Analytics:</strong> All raw event data
-                      (metrics, waterfalls, session logs) is strictly retained
-                      according to your subscription plan (<strong
-                        >7, 14, or 30 days</strong
-                      >). After this period, data is automatically and
-                      permanently purged from our systems.</span
-                    >
-                  </li>
-                  <li class="flex gap-2">
-                    <span class="text-[#A68B6A]">•</span>
-                    <span
-                      ><strong>Account Data:</strong> If you choose to close your
-                      account, we will delete all your personal data (name,
-                      email, settings) within <strong>30 days</strong>, except
-                      where retention is required by law (e.g., for tax and
-                      accounting purposes).</span
-                    >
-                  </li>
-                </ul>
-              </CardContent>
-            </Card>
+            <!-- 04: Data We Collect (The Customer) -->
+            <div>
+              <div class="flex items-baseline gap-4 mb-4">
+                <span class="text-4xl font-extralight text-muted-foreground/40 font-mono">04</span>
+                <p class="text-sm font-semibold uppercase tracking-widest text-muted-foreground">Customer Data</p>
+              </div>
+              <h2 class="text-2xl font-bold tracking-tight text-foreground md:text-3xl">
+                Data We Collect (Customers)
+              </h2>
+              <p class="mt-4 text-lg leading-relaxed text-muted-foreground">
+                When you sign up for a Witnes account, we collect:
+              </p>
 
-            <!-- Section 06: Where We Store Your Data -->
-            <Card className="border-zinc-200">
-              <CardHeader>
-                <div class="flex items-center gap-3 mb-2">
-                  <Badge variant="outline" className="text-sm">06</Badge>
-                  <CardTitle className="text-xl uppercase tracking-widest"
-                    >Where We Store Your Data</CardTitle
-                  >
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <p class="text-base leading-relaxed text-zinc-600">
-                  We are committed to keeping data within the European Union.
-                </p>
-                <ul class="space-y-3 text-zinc-600">
-                  <li class="flex gap-2">
-                    <span class="text-[#A68B6A]">•</span>
-                    <span
-                      ><strong>Primary Infrastructure:</strong>
-                      <strong>Hetzner Online GmbH</strong> (Germany). All
-                      processing and storage of event data occur here.</span
-                    >
-                  </li>
-                  <li class="flex gap-2">
-                    <span class="text-[#A68B6A]">•</span>
-                    <span
-                      ><strong>CDN & Security:</strong>
-                      <strong>Cloudflare, Inc.</strong> (Global Edge Network).
-                      Used for fast delivery of our script and DDoS
-                      protection.</span
-                    >
-                  </li>
-                  <li class="flex gap-2">
-                    <span class="text-[#A68B6A]">•</span>
-                    <span
-                      ><strong>Transactional Email:</strong>
-                      <strong>Mailtrap</strong> (Railsware Products, Inc.). Used
-                      for sending password resets and system alerts.</span
-                    >
-                  </li>
-                </ul>
-              </CardContent>
-            </Card>
+              <ul class="mt-6 space-y-4">
+                <li class="flex gap-3 text-muted-foreground">
+                  <span class="inline-block h-1 w-1 mt-2.5 rounded-full bg-foreground/40 shrink-0"></span>
+                  <span><strong class="text-foreground">Account Information:</strong> Email address, Password (hashed), and Company Name.</span>
+                </li>
+                <li class="flex gap-3 text-muted-foreground">
+                  <span class="inline-block h-1 w-1 mt-2.5 rounded-full bg-foreground/40 shrink-0"></span>
+                  <span><strong class="text-foreground">Billing Information:</strong> VAT/Tax ID and Billing Address.</span>
+                </li>
+                <li class="flex gap-3 text-muted-foreground">
+                  <span class="inline-block h-1 w-1 mt-2.5 rounded-full bg-foreground/40 shrink-0"></span>
+                  <span><strong class="text-foreground">Payment Data:</strong> All payments are processed securely by <strong class="text-foreground">Stripe</strong>. We do not store or have access to your full credit card number.</span>
+                </li>
+              </ul>
+            </div>
 
-            <!-- Section 07: Your Rights -->
-            <Card className="border-zinc-200">
-              <CardHeader>
-                <div class="flex items-center gap-3 mb-2">
-                  <Badge variant="outline" className="text-sm">07</Badge>
-                  <CardTitle className="text-xl uppercase tracking-widest"
-                    >Your Rights</CardTitle
-                  >
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <p class="text-base leading-relaxed text-zinc-600">
-                  Under the GDPR and similar privacy laws, you have the right to:
-                </p>
-                <ul class="grid grid-cols-2 gap-4 text-zinc-600 font-medium">
-                  <li class="flex gap-2">
-                    <span class="text-[#A68B6A]">•</span>
-                    <span
-                      ><strong>Access</strong> — Request a copy of the personal
-                      data we hold about you</span
-                    >
-                  </li>
-                  <li class="flex gap-2">
-                    <span class="text-[#A68B6A]">•</span>
-                    <span
-                      ><strong>Rectification</strong> — Correct any inaccurate
-                      data</span
-                    >
-                  </li>
-                  <li class="flex gap-2">
-                    <span class="text-[#A68B6A]">•</span>
-                    <span
-                      ><strong>Erasure</strong> — Request that we delete your
-                      data ("Right to be Forgotten")</span
-                    >
-                  </li>
-                  <li class="flex gap-2">
-                    <span class="text-[#A68B6A]">•</span>
-                    <span
-                      ><strong>Portability</strong> — Request your data in a
-                      structured, machine-readable format</span
-                    >
-                  </li>
-                </ul>
-                <p class="text-base leading-relaxed text-zinc-600">
-                  To exercise these rights, please contact us at <strong
-                    >support@witnes.io</strong
-                  >.
-                </p>
-              </CardContent>
-            </Card>
+            <!-- Divider -->
+            <div class="h-px bg-border"></div>
 
-            <!-- Section 08: Changes to This Policy -->
-            <Card className="border-zinc-200">
-              <CardHeader>
-                <div class="flex items-center gap-3 mb-2">
-                  <Badge variant="outline" className="text-sm">08</Badge>
-                  <CardTitle className="text-xl uppercase tracking-widest"
-                    >Changes to This Policy</CardTitle
-                  >
+            <!-- 05: Data Retention & Deletion -->
+            <div>
+              <div class="flex items-baseline gap-4 mb-4">
+                <span class="text-4xl font-extralight text-muted-foreground/40 font-mono">05</span>
+                <p class="text-sm font-semibold uppercase tracking-widest text-muted-foreground">Retention</p>
+              </div>
+              <h2 class="text-2xl font-bold tracking-tight text-foreground md:text-3xl">
+                Data Retention & Deletion
+              </h2>
+              <p class="mt-4 text-lg leading-relaxed text-muted-foreground">
+                We believe in "Data Minimalism." We do not hoard data.
+              </p>
+
+              <ul class="mt-6 space-y-4">
+                <li class="flex gap-3 text-muted-foreground">
+                  <span class="inline-block h-1 w-1 mt-2.5 rounded-full bg-foreground/40 shrink-0"></span>
+                  <span><strong class="text-foreground">Visitor Analytics:</strong> All raw event data (metrics, waterfalls, session logs) is strictly retained according to your subscription plan (<strong class="text-foreground">7, 14, or 30 days</strong>). After this period, data is automatically and permanently purged from our systems.</span>
+                </li>
+                <li class="flex gap-3 text-muted-foreground">
+                  <span class="inline-block h-1 w-1 mt-2.5 rounded-full bg-foreground/40 shrink-0"></span>
+                  <span><strong class="text-foreground">Account Data:</strong> If you choose to close your account, we will delete all your personal data (name, email, settings) within <strong class="text-foreground">30 days</strong>, except where retention is required by law (e.g., for tax and accounting purposes).</span>
+                </li>
+              </ul>
+            </div>
+
+            <!-- Divider -->
+            <div class="h-px bg-border"></div>
+
+            <!-- 06: Where We Store Your Data -->
+            <div>
+              <div class="flex items-baseline gap-4 mb-4">
+                <span class="text-4xl font-extralight text-muted-foreground/40 font-mono">06</span>
+                <p class="text-sm font-semibold uppercase tracking-widest text-muted-foreground">Storage</p>
+              </div>
+              <h2 class="text-2xl font-bold tracking-tight text-foreground md:text-3xl">
+                Where We Store Your Data
+              </h2>
+              <p class="mt-4 text-lg leading-relaxed text-muted-foreground">
+                We are committed to keeping data within the European Union.
+              </p>
+
+              <ul class="mt-6 space-y-4">
+                <li class="flex gap-3 text-muted-foreground">
+                  <span class="inline-block h-1 w-1 mt-2.5 rounded-full bg-foreground/40 shrink-0"></span>
+                  <span><strong class="text-foreground">Primary Infrastructure:</strong> <strong class="text-foreground">Hetzner Online GmbH</strong> (Germany). All processing and storage of event data occur here.</span>
+                </li>
+                <li class="flex gap-3 text-muted-foreground">
+                  <span class="inline-block h-1 w-1 mt-2.5 rounded-full bg-foreground/40 shrink-0"></span>
+                  <span><strong class="text-foreground">CDN & Security:</strong> <strong class="text-foreground">Cloudflare, Inc.</strong> (Global Edge Network). Used for fast delivery of our script and DDoS protection.</span>
+                </li>
+                <li class="flex gap-3 text-muted-foreground">
+                  <span class="inline-block h-1 w-1 mt-2.5 rounded-full bg-foreground/40 shrink-0"></span>
+                  <span><strong class="text-foreground">Transactional Email:</strong> <strong class="text-foreground">Mailtrap</strong> (Railsware Products, Inc.). Used for sending password resets and system alerts.</span>
+                </li>
+              </ul>
+            </div>
+
+            <!-- Divider -->
+            <div class="h-px bg-border"></div>
+
+            <!-- 07: Your Rights -->
+            <div>
+              <div class="flex items-baseline gap-4 mb-4">
+                <span class="text-4xl font-extralight text-muted-foreground/40 font-mono">07</span>
+                <p class="text-sm font-semibold uppercase tracking-widest text-muted-foreground">Your Rights</p>
+              </div>
+              <h2 class="text-2xl font-bold tracking-tight text-foreground md:text-3xl">
+                Your Rights
+              </h2>
+              <p class="mt-4 text-lg leading-relaxed text-muted-foreground">
+                Under the GDPR and similar privacy laws, you have the right to:
+              </p>
+
+              <div class="mt-6 grid gap-4 sm:grid-cols-2">
+                <div class="flex gap-3 text-muted-foreground">
+                  <span class="inline-block h-1 w-1 mt-2.5 rounded-full bg-foreground/40 shrink-0"></span>
+                  <span><strong class="text-foreground">Access</strong> — Request a copy of the personal data we hold about you</span>
                 </div>
-              </CardHeader>
-              <CardContent>
-                <p class="text-base leading-relaxed text-zinc-600">
-                  We may update this policy to reflect changes in our technology
-                  or legal requirements. We will notify active customers of any
-                  significant changes via email.
-                </p>
-              </CardContent>
-            </Card>
+                <div class="flex gap-3 text-muted-foreground">
+                  <span class="inline-block h-1 w-1 mt-2.5 rounded-full bg-foreground/40 shrink-0"></span>
+                  <span><strong class="text-foreground">Rectification</strong> — Correct any inaccurate data</span>
+                </div>
+                <div class="flex gap-3 text-muted-foreground">
+                  <span class="inline-block h-1 w-1 mt-2.5 rounded-full bg-foreground/40 shrink-0"></span>
+                  <span><strong class="text-foreground">Erasure</strong> — Request that we delete your data ("Right to be Forgotten")</span>
+                </div>
+                <div class="flex gap-3 text-muted-foreground">
+                  <span class="inline-block h-1 w-1 mt-2.5 rounded-full bg-foreground/40 shrink-0"></span>
+                  <span><strong class="text-foreground">Portability</strong> — Request your data in a structured, machine-readable format</span>
+                </div>
+              </div>
+
+              <p class="mt-6 text-base leading-relaxed text-muted-foreground">
+                To exercise these rights, please contact us at <strong class="text-foreground">support@witnes.io</strong>.
+              </p>
+            </div>
+
+            <!-- Divider -->
+            <div class="h-px bg-border"></div>
+
+            <!-- 08: Changes to This Policy -->
+            <div>
+              <div class="flex items-baseline gap-4 mb-4">
+                <span class="text-4xl font-extralight text-muted-foreground/40 font-mono">08</span>
+                <p class="text-sm font-semibold uppercase tracking-widest text-muted-foreground">Changes</p>
+              </div>
+              <h2 class="text-2xl font-bold tracking-tight text-foreground md:text-3xl">
+                Changes to This Policy
+              </h2>
+              <p class="mt-4 text-lg leading-relaxed text-muted-foreground">
+                We may update this policy to reflect changes in our technology
+                or legal requirements. We will notify active customers of any
+                significant changes via email.
+              </p>
+            </div>
+
+            <!-- Divider -->
+            <div class="h-px bg-border"></div>
 
             <!-- Closing -->
-            <Separator className="my-12" />
             <div class="flex flex-col items-center gap-8">
               <Button variant="outline" className="gap-2" asChild client:load>
                 <a href="/">
