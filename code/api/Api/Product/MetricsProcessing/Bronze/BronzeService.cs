@@ -47,7 +47,7 @@ public class BronzeService : IBronzeService
             HashId = hashId,
             Url = request.Session.Url,
             EventType = request.Metadata.Event,
-            VisitorRequestedPageAt = request.Metadata.PageRequestedAtByVisitor,
+            PageRequestedAtByVisitor = request.Metadata.PageRequestedAtByVisitor,
 
             // Store the dynamic blocks separately as JSONB
             // This makes it easier to debug and avoids a single gigantic JSON blob
@@ -72,7 +72,7 @@ public class BronzeService : IBronzeService
     {
         return await _context.MetricsBronze
             .IgnoreQueryFilters()
-            .Where(m => m.TenantId == tenantId && m.VisitorRequestedPageAt < cutoffDate)
+            .Where(m => m.TenantId == tenantId && m.PageRequestedAtByVisitor < cutoffDate)
             .ExecuteDeleteAsync();
     }
 }

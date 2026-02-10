@@ -182,7 +182,7 @@ namespace Api.Migrations
                     Network = table.Column<string>(type: "jsonb", nullable: true),
                     Device = table.Column<string>(type: "jsonb", nullable: true),
                     IngestedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
-                    VisitorRequestedPageAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    PageRequestedAtByVisitor = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
                     created_at = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
                     updated_at = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
                     tenant_id = table.Column<Guid>(type: "uuid", nullable: false)

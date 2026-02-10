@@ -32,5 +32,5 @@ public class MetricBronzeEntity : TenantAwareEntity
 
     // --- AUDIT ---
     public DateTimeOffset IngestedAt { get; set; }
-    public DateTimeOffset VisitorRequestedPageAt { get; set; }
+    public DateTimeOffset PageRequestedAtByVisitor { get; set; }
 }

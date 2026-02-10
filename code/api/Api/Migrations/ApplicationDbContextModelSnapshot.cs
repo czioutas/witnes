@@ -784,6 +784,9 @@ namespace Api.Migrations
                     b.Property<string>("Network")
                         .HasColumnType("jsonb");
 
+                    b.Property<DateTimeOffset>("PageRequestedAtByVisitor")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<string>("Performance")
                         .IsRequired()
                         .HasColumnType("jsonb");
@@ -806,9 +809,6 @@ namespace Api.Migrations
 
                     b.Property<string>("UserId")
                         .HasColumnType("text");
-
-                    b.Property<DateTimeOffset>("VisitorRequestedPageAt")
-                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 
