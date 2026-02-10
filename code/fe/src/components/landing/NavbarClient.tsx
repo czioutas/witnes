@@ -11,31 +11,16 @@ export default function NavbarClient() {
     <>
       <nav className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
         <a href="/" className="flex items-center gap-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
-            <svg
-              width="16"
-              height="16"
-              viewBox="0 0 16 16"
-              fill="none"
-              className="text-primary-foreground"
-            >
-              <path
-                d="M2 8a6 6 0 1112 0A6 6 0 012 8z"
-                stroke="currentColor"
-                strokeWidth="1.5"
-                fill="none"
-              />
-              <path
-                d="M8 4v4l2.5 2.5"
-                stroke="currentColor"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-              />
-            </svg>
-          </div>
-          <span className="text-lg font-bold tracking-tight text-foreground">
-            Witnes
-          </span>
+          <img
+            src="/logo/witnes-dark.svg"
+            alt="Witnes"
+            className="h-12 w-auto hidden dark:block"
+          />
+          <img
+            src="/logo/witnes-light.svg"
+            alt="Witnes"
+            className="h-12 w-auto dark:hidden"
+          />
         </a>
 
         <div className="hidden items-center gap-8 md:flex">
