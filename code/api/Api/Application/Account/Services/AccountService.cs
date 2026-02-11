@@ -74,7 +74,7 @@ public class AccountService : IAccountService
 
     public async Task<Result<ApplicationUserModel>> RegisterAsync(RegisterModel registerModel, AccountRoles[]? roles, bool bypassTenantCheck = false)
     {
-        // if there is no registed user
+        // if there is no registed user 
         // if there is no registered tenant
         Result<ApplicationUserEntity>? userRegisterResult = null;
         AccountRoles[] _roles = [];
@@ -116,7 +116,7 @@ public class AccountService : IAccountService
 
             if (result.IsFailure)
             {
-                return Result<ApplicationUserModel>.BusinessError("TenantCreation", "Could not create tenant.");
+                return result.ToErrorResult<ApplicationUserModel>();
             }
 
             _roles = roles ?? [AccountRoles.AdminUserRole];

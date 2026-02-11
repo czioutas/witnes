@@ -108,8 +108,8 @@ function RegisterFormContent({ joinCode, company }: RegisterFormContentProps) {
       const { confirmPassword, ...registerData } = formData;
       await register({ ...registerData, joinCode: joinCode || undefined });
 
-      // Redirect to dashboard after successful registration
-      window.location.href = "/dashboard";
+      // Redirect to check-email page — user must verify before logging in
+      window.location.href = "/authenticate/check-email";
     } catch (err) {
       // Error is handled by the auth context
       console.error("Registration failed:", err);

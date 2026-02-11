@@ -89,7 +89,8 @@ public class AccountController : ControllerBase
 
         if (newRegisteredUserResult.IsFailure)
         {
-            throw new ServiceException(new ServiceError("Could not create user."));
+            var problem = newRegisteredUserResult.ErrorModel.ToApplicationProblemDetails(HttpContext);
+            return StatusCode(problem.Status ?? 400, problem);
         }
 
         if (string.IsNullOrEmpty(registerModel.InvitationToken))

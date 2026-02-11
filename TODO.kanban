@@ -92,6 +92,26 @@
           ],
           "checkboxes": [],
           "comments": []
+        },
+        {
+          "id": "63d2cc3d-b2f6-4b97-923c-4a64e310fb9a",
+          "listId": "1c7b07a3-8aa4-4c54-93c7-4cea40d0df16",
+          "title": "Apply Pricing Limits to Users",
+          "description": "In the users management page https://witnes.io/dashboard/users we allow the admin to invite more users. We should limit to how many users based on the pricing tier they have.\n\nThis should be blocked in the backend and in the frontend it should be disabled with a tooltip",
+          "labels": [
+            {
+              "id": "2633c7da-7d04-4a38-8239-148cb27a04d3",
+              "title": "Easy",
+              "color": "#61bd4f"
+            },
+            {
+              "id": "87cf91b2-3f14-483b-9407-79c45a60d96a",
+              "title": "Get-Go",
+              "color": "#eb5a46"
+            }
+          ],
+          "checkboxes": [],
+          "comments": []
         }
       ]
     },

@@ -336,12 +336,13 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   /**
    * Register function
+   * Does NOT store tokens — user must verify email first, then log in.
    */
   const register = async (data: RegisterData) => {
     dispatch({ type: "AUTH_START" });
 
     try {
-      const response = await api.postV1AccountRegister({
+      await api.postV1AccountRegister({
         email: data.email,
         password: data.password,
         first_name: data.firstName,
@@ -349,18 +350,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
         normalized_tenant_identifier: data.company,
       });
 
-      const tokenData = response.data;
-
-      const tokens: AuthTokens = {
-        accessToken: tokenData.access_token || "",
-        refreshToken: tokenData.refresh_token || "",
-      };
-
-      // Set tokens in API client
-      setTokens(tokens);
-
-      // Get user info after registration
-      await getCurrentUser();
+      // Registration succeeded — don't store tokens.
+      // The user needs to verify their email before they can log in.
+      dispatch({ type: "SET_LOADING", payload: false });
     } catch (error: any) {
       const errorMessage =
         error?.status === 400 || error?.response?.status === 400
