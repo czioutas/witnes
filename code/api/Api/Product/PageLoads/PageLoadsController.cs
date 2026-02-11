@@ -9,7 +9,7 @@ namespace Api.Product.PageLoads;
 /// Controller for retrieving detailed page load data including network waterfall and jank metrics
 /// </summary>
 [ApiController]
-[Route("api/v1/page-loads")]
+[Route("v1/page-loads")]
 [Authorize]
 public class PageLoadsController : ControllerBase
 {

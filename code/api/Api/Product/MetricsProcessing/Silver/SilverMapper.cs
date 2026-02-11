@@ -10,6 +10,6 @@ public class SilverMapper : Profile
     public SilverMapper()
     {
         // Add mappings here as needed
-        // Example: CreateMap<SpeedMetricSilverEntity, SilverDto>();
+        // Example: CreateMap<MetricSilverEntity, SilverDto>();
     }
 }

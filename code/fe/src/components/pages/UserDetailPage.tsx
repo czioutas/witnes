@@ -2,7 +2,10 @@
 
 import { useEffect, useState } from "react";
 import { useApiToast } from "../../hooks/useApiToast";
-import { getWitnesServerAPI, type VisitorSummaryModel } from "../../generated/api";
+import {
+  getWitnesServerAPI,
+  type VisitorSummaryModel,
+} from "../../generated/api";
 import { UserInfoHeader } from "../visitors/UserInfoHeader";
 import { UserPageLoadsTable } from "../visitors/UserPageLoadsTable";
 import { Button } from "../ui/button";
@@ -14,7 +17,9 @@ interface UserDetailPageProps {
 
 export default function UserDetailPage({ userId }: UserDetailPageProps) {
   const { handleApiCall } = useApiToast();
-  const [userSummary, setUserSummary] = useState<VisitorSummaryModel | null>(null);
+  const [userSummary, setUserSummary] = useState<VisitorSummaryModel | null>(
+    null,
+  );
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -23,7 +28,7 @@ export default function UserDetailPage({ userId }: UserDetailPageProps) {
       const api = getWitnesServerAPI();
       await handleApiCall({
         apiCall: async () => {
-          const response = await api.getApiV1Visitors({
+          const response = await api.getV1Visitors({
             UserIdSearch: userId,
             PageNumber: 1,
             PageSize: 1,
@@ -46,11 +51,7 @@ export default function UserDetailPage({ userId }: UserDetailPageProps) {
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-4">
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => window.history.back()}
-        >
+        <Button variant="ghost" size="sm" onClick={() => window.history.back()}>
           <ArrowLeft className="h-4 w-4 mr-2" />
           Back
         </Button>

@@ -10,6 +10,6 @@ public class BronzeMapper : Profile
     public BronzeMapper()
     {
         // Add mappings here as needed
-        // Example: CreateMap<SpeedMetricBronzeEntity, BronzeDto>();
+        // Example: CreateMap<MetricBronzeEntity, BronzeDto>();
     }
 }

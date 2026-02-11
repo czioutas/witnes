@@ -3,7 +3,7 @@ using Api.Product.Ingestion.Models;
 namespace Api.Product.Ingestion.Events;
 
 /// <summary>
-/// Event published when a speed metric is ingested
+/// Event published when a metric is ingested
 /// </summary>
 public class MetricIngestedEvent
 {

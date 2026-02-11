@@ -28,11 +28,16 @@ public class Program
 
         // read config and adjust the logger
         var logtailSecret = configuration.GetValue<string>("LogtailSecret");
+        var logtailHost = configuration.GetValue<string>("LogtailHost");
 
         var loggerConfig = new LoggerConfiguration()
             .ReadFrom.Configuration(configuration)
             .Enrich.WithProperty("Environment", env.EnvironmentName)
-            .Enrich.WithProperty("AppName", env.ApplicationName);
+            .Enrich.WithProperty("AppName", env.ApplicationName)
+            .Enrich.FromLogContext()
+            .WriteTo.BetterStack(
+                sourceToken: logtailSecret ?? "",
+                betterStackEndpoint: logtailHost ?? "");
 
         Log.Logger = loggerConfig.CreateLogger();
 

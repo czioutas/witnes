@@ -12,7 +12,7 @@ namespace Api.Application.ProjectKeys;
 /// Controller for managing project keys
 /// </summary>
 [ApiController]
-[Route("api/v1/project-keys")]
+[Route("v1/project-keys")]
 [Authorize]
 public class ProjectKeysController : ControllerBase
 {

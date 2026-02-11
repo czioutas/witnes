@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Api.Product.Billing;
 
 [ApiController]
-[Route("api/v1/[controller]")]
+[Route("v1/[controller]")]
 [Authorize(Roles = nameof(AccountRoles.AdminUserRole))]
 public class InvoiceController : ControllerBase
 {

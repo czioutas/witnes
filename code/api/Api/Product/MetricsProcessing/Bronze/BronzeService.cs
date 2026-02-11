@@ -8,7 +8,7 @@ namespace Api.Product.MetricsProcessing.Bronze;
 public interface IBronzeService
 {
     /// <summary>
-    /// Stores raw speed metric in Bronze layer with full session context
+    /// Stores raw metric in Bronze layer with full session context
     /// </summary>
     Task<MetricBronzeEntity> StoreAsync(IngestMetricRequestModel request, Guid tenantId, DateTimeOffset ingestedAt, string hashId);
 

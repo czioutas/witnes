@@ -67,7 +67,7 @@ export function UsagePage() {
 
     // Fetch usage stats
     await handleApiCall({
-      apiCall: () => api.getApiV1ProjectKeysUsage(),
+      apiCall: () => api.getV1ProjectKeysUsage(),
       onSuccess: (response) => {
         setUsageStats(response.data);
       },
@@ -76,7 +76,7 @@ export function UsagePage() {
 
     // Fetch package info
     await handleApiCall({
-      apiCall: () => api.getApiV1ProjectKeysPackage(),
+      apiCall: () => api.getV1ProjectKeysPackage(),
       onSuccess: (response) => {
         setPackageInfo(response.data);
       },
@@ -85,7 +85,7 @@ export function UsagePage() {
 
     // Fetch project keys
     await handleApiCall({
-      apiCall: () => api.getApiV1ProjectKeys(),
+      apiCall: () => api.getV1ProjectKeys(),
       onSuccess: (response) => {
         setProjectKeys(response.data);
       },
@@ -117,7 +117,7 @@ export function UsagePage() {
     };
 
     await handleApiCall({
-      apiCall: () => api.postApiV1ProjectKeys(createRequest),
+      apiCall: () => api.postV1ProjectKeys(createRequest),
       successMessage: "Project key created successfully",
       onSuccess: () => {
         setCreateDialogOpen(false);

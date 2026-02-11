@@ -1,13 +1,45 @@
 import { useState } from "react";
 import { Button } from "../ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../ui/card";
-import { Copy, Check, Plus, AlertCircle, Edit, Trash2, Globe } from "lucide-react";
-import { getWitnesServerAPI, type ProjectKeyModel, type UpdateProjectKeyRequest } from "../../generated/api";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "../ui/card";
+import {
+  Copy,
+  Check,
+  Plus,
+  AlertCircle,
+  Edit,
+  Trash2,
+  Globe,
+} from "lucide-react";
+import {
+  getWitnesServerAPI,
+  type ProjectKeyModel,
+  type UpdateProjectKeyRequest,
+} from "../../generated/api";
 import { Alert, AlertDescription } from "../ui/alert";
 import { Badge } from "../ui/badge";
 import { useApiToast } from "../../hooks/useApiToast";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "../ui/dialog";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "../ui/form";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "../ui/dialog";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "../ui/form";
 import { Input } from "../ui/input";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -16,7 +48,10 @@ import * as z from "zod";
 const api = getWitnesServerAPI();
 
 const updateKeySchema = z.object({
-  name: z.string().min(1, "Name is required").max(200, "Name must be 200 characters or less"),
+  name: z
+    .string()
+    .min(1, "Name is required")
+    .max(200, "Name must be 200 characters or less"),
   domain: z.string().min(1, "Domain is required"),
 });
 
@@ -29,7 +64,12 @@ interface ProjectKeyDisplayProps {
   loading: boolean;
 }
 
-export function ProjectKeyDisplay({ projectKeys, onCreateKey, onUpdateKey, loading }: ProjectKeyDisplayProps) {
+export function ProjectKeyDisplay({
+  projectKeys,
+  onCreateKey,
+  onUpdateKey,
+  loading,
+}: ProjectKeyDisplayProps) {
   const { handleApiCall } = useApiToast();
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [editingKey, setEditingKey] = useState<ProjectKeyModel | null>(null);
@@ -71,7 +111,7 @@ export function ProjectKeyDisplay({ projectKeys, onCreateKey, onUpdateKey, loadi
     };
 
     await handleApiCall({
-      apiCall: () => api.putApiV1ProjectKeysId(editingKey.id!, updateRequest),
+      apiCall: () => api.putV1ProjectKeysId(editingKey.id!, updateRequest),
       successMessage: "Project key updated successfully",
       onSuccess: () => {
         setEditingKey(null);
@@ -83,12 +123,16 @@ export function ProjectKeyDisplay({ projectKeys, onCreateKey, onUpdateKey, loadi
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this project key? This action cannot be undone.")) {
+    if (
+      !confirm(
+        "Are you sure you want to delete this project key? This action cannot be undone.",
+      )
+    ) {
       return;
     }
 
     await handleApiCall({
-      apiCall: () => api.deleteApiV1ProjectKeysId(id),
+      apiCall: () => api.deleteV1ProjectKeysId(id),
       successMessage: "Project key deleted successfully",
       onSuccess: () => {
         onUpdateKey();
@@ -112,13 +156,16 @@ export function ProjectKeyDisplay({ projectKeys, onCreateKey, onUpdateKey, loadi
       <Card>
         <CardHeader>
           <CardTitle>Project Keys</CardTitle>
-          <CardDescription>No project keys found for your organization</CardDescription>
+          <CardDescription>
+            No project keys found for your organization
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <Alert>
             <AlertCircle className="h-4 w-4" />
             <AlertDescription>
-              You need to create a project key to start tracking page loads. Click the button below to generate your first key.
+              You need to create a project key to start tracking page loads.
+              Click the button below to generate your first key.
             </AlertDescription>
           </Alert>
           <Button onClick={onCreateKey} className="mt-4">
@@ -149,18 +196,37 @@ export function ProjectKeyDisplay({ projectKeys, onCreateKey, onUpdateKey, loadi
                   <CardTitle className="text-lg">{key.name}</CardTitle>
                   <CardDescription className="flex items-center gap-2">
                     {key.is_active ? (
-                      <Badge variant="outline" className="text-green-600 border-green-200 bg-green-50">Active</Badge>
+                      <Badge
+                        variant="outline"
+                        className="text-green-600 border-green-200 bg-green-50"
+                      >
+                        Active
+                      </Badge>
                     ) : (
-                      <Badge variant="outline" className="text-red-600 border-red-200 bg-red-50">Inactive</Badge>
+                      <Badge
+                        variant="outline"
+                        className="text-red-600 border-red-200 bg-red-50"
+                      >
+                        Inactive
+                      </Badge>
                     )}
                   </CardDescription>
                 </div>
                 <div className="flex gap-2">
-                  <Button variant="outline" size="icon" onClick={() => handleEdit(key)}>
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={() => handleEdit(key)}
+                  >
                     <Edit className="h-4 w-4" />
                   </Button>
                   {key.id && (
-                    <Button variant="outline" size="icon" className="text-red-600" onClick={() => handleDelete(key.id!)}>
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      className="text-red-600"
+                      onClick={() => handleDelete(key.id!)}
+                    >
                       <Trash2 className="h-4 w-4" />
                     </Button>
                   )}
@@ -177,7 +243,11 @@ export function ProjectKeyDisplay({ projectKeys, onCreateKey, onUpdateKey, loadi
                   <Button
                     variant="outline"
                     size="icon"
-                    onClick={() => key.id && key.project_key && handleCopy(key.id, key.project_key)}
+                    onClick={() =>
+                      key.id &&
+                      key.project_key &&
+                      handleCopy(key.id, key.project_key)
+                    }
                     disabled={!key.project_key}
                   >
                     {copiedId === key.id ? (
@@ -206,7 +276,10 @@ export function ProjectKeyDisplay({ projectKeys, onCreateKey, onUpdateKey, loadi
       </div>
 
       {/* Edit Project Key Dialog */}
-      <Dialog open={!!editingKey} onOpenChange={(open) => !open && setEditingKey(null)}>
+      <Dialog
+        open={!!editingKey}
+        onOpenChange={(open) => !open && setEditingKey(null)}
+      >
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Edit Project Key</DialogTitle>

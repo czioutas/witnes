@@ -17,6 +17,12 @@ public interface ISilverService
     /// Deletes Silver metrics older than the specified cutoff date for a tenant.
     /// </summary>
     Task<int> DeleteOlderThanAsync(Guid tenantId, DateTimeOffset cutoffDate);
+
+    /// <summary>
+    /// Recalculates all Silver metrics for a tenant by re-processing from Bronze.
+    /// Returns the IDs of newly created Silver records.
+    /// </summary>
+    Task RecalculateAllForTenantAsync(Guid tenantId);
 }
 
 public class SilverService : ISilverService
@@ -116,6 +122,30 @@ public class SilverService : ISilverService
         return await _context.MetricsSilver
             .Where(m => m.PageRequestedAtByVisitor < cutoffDate)
             .ExecuteDeleteAsync();
+    }
+
+    /// <inheritdoc/>
+    public async Task RecalculateAllForTenantAsync(Guid tenantId)
+    {
+        _logger.LogInformation("Recalculating all Silver metrics for TenantId={TenantId}", tenantId);
+
+        var deleted = await _context.MetricsSilver
+            .Where(m => m.TenantId == tenantId)
+            .ExecuteDeleteAsync();
+        _logger.LogInformation("Deleted {Count} existing Silver records for TenantId={TenantId}", deleted, tenantId);
+
+        var bronzeRecords = await _context.MetricsBronze
+            .Where(b => b.TenantId == tenantId)
+            .ToListAsync();
+
+        _logger.LogInformation("Found {Count} Bronze records to reprocess for TenantId={TenantId}", bronzeRecords.Count, tenantId);
+
+        foreach (var bronze in bronzeRecords)
+        {
+            await ProcessFromBronzeAsync(bronze.Id, tenantId);
+        }
+
+        _logger.LogInformation("Silver recalculation complete for TenantId={TenantId}", tenantId);
     }
 
     // --- Helper Parsers to handle the browser strings ---

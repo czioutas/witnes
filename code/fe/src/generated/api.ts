@@ -6,7 +6,7 @@
  * OpenAPI spec version: v1
  */
 import { customInstance } from "../lib/axios-instance";
-export type GetApiV1VisitorsUserIdPageLoadsParams = {
+export type GetV1VisitorsUserIdPageLoadsParams = {
   /**
    * Page number (default: 1)
    */
@@ -25,7 +25,7 @@ export type GetApiV1VisitorsUserIdPageLoadsParams = {
   endDate?: string;
 };
 
-export type GetApiV1VisitorsParams = {
+export type GetV1VisitorsParams = {
   /**
    * Search filter for user IDs (case-insensitive contains)
    */
@@ -355,30 +355,6 @@ export interface TenantDetailsModel {
  */
 export type TenantModelDetails = TenantDetailsModel | null;
 
-/**
- * Response model for speed metric data
- */
-export interface SpeedMetricResponse {
-  browser_icon?: string;
-  cls_score?: number;
-  cls_verdict?: string;
-  connection_quality?: string;
-  created_at?: string;
-  device_icon?: string;
-  id?: string;
-  incomplete?: boolean;
-  is_backend_fault?: boolean;
-  is_connection_fault?: boolean;
-  is_frontend_fault?: boolean;
-  lcp_ms?: number;
-  lcp_verdict?: string;
-  silver_id?: string;
-  timestamp?: string;
-  ttfb_ms?: number;
-  url_path?: string;
-  user_id?: string;
-}
-
 export interface SlimApplicationUserModel {
   disabled?: boolean;
   /** @minLength 1 */
@@ -681,6 +657,30 @@ export interface NetworkModel {
   effective_type?: string | null;
   /** @nullable */
   rtt?: string | null;
+}
+
+/**
+ * Response model for metric data
+ */
+export interface MetricResponse {
+  browser_icon?: string;
+  cls_score?: number;
+  cls_verdict?: string;
+  connection_quality?: string;
+  created_at?: string;
+  device_icon?: string;
+  id?: string;
+  incomplete?: boolean;
+  is_backend_fault?: boolean;
+  is_connection_fault?: boolean;
+  is_frontend_fault?: boolean;
+  lcp_ms?: number;
+  lcp_verdict?: string;
+  silver_id?: string;
+  timestamp?: string;
+  ttfb_ms?: number;
+  url_path?: string;
+  user_id?: string;
 }
 
 export interface MetadataModel {
@@ -1096,49 +1096,47 @@ The response is lightweight and does not perform any complex operations or datab
   };
 
   /**
-   * @summary Ingests a speed metric
+   * @summary Ingests a metric
    */
-  const postApiV1Events = (
-    ingestMetricRequestModel: IngestMetricRequestModel,
-  ) => {
+  const postV1Events = (ingestMetricRequestModel: IngestMetricRequestModel) => {
     return customInstance<void>({
-      url: `/api/v1/events`,
+      url: `/v1/events`,
       method: "POST",
       headers: { "Content-Type": "application/json" },
       data: ingestMetricRequestModel,
     });
   };
 
-  const getApiV1Invoice = () => {
+  const getV1Invoice = () => {
     return customInstance<InvoiceModel[]>({
-      url: `/api/v1/invoice`,
+      url: `/v1/invoice`,
       method: "GET",
     });
   };
 
-  const getApiV1InvoiceInvoiceId = (invoiceId: number) => {
+  const getV1InvoiceInvoiceId = (invoiceId: number) => {
     return customInstance<InvoiceModel>({
-      url: `/api/v1/invoice/${invoiceId}`,
+      url: `/v1/invoice/${invoiceId}`,
       method: "GET",
     });
   };
 
   /**
-   * @summary Gets all speed metrics for the current tenant
+   * @summary Gets all metrics for the current tenant
    */
-  const getApiV1Metrics = () => {
-    return customInstance<SpeedMetricResponse[]>({
-      url: `/api/v1/metrics`,
+  const getV1Metrics = () => {
+    return customInstance<MetricResponse[]>({
+      url: `/v1/metrics`,
       method: "GET",
     });
   };
 
   /**
-   * @summary Gets a specific speed metric by ID
+   * @summary Gets a specific metric by ID
    */
-  const getApiV1MetricsId = (id: string) => {
-    return customInstance<SpeedMetricResponse>({
-      url: `/api/v1/metrics/${id}`,
+  const getV1MetricsId = (id: string) => {
+    return customInstance<MetricResponse>({
+      url: `/v1/metrics/${id}`,
       method: "GET",
     });
   };
@@ -1154,9 +1152,9 @@ Returns detailed metrics including:
 - Jank reports (performance issues detected)
  * @summary Gets detailed information for a specific page load including network waterfall and jank reports
  */
-  const getApiV1PageLoadsId = (id: string) => {
+  const getV1PageLoadsId = (id: string) => {
     return customInstance<PageLoadDetailModel>({
-      url: `/api/v1/page-loads/${id}`,
+      url: `/v1/page-loads/${id}`,
       method: "GET",
     });
   };
@@ -1164,12 +1162,11 @@ Returns detailed metrics including:
   /**
    * @summary Sets the initial pricing tier for a tenant.
    */
-  const postV1PricingTenantTenantIdPricing = (
-    tenantId: string,
+  const postV1PricingTenantPricing = (
     setTenantPricingRequest: SetTenantPricingRequest,
   ) => {
     return customInstance<void>({
-      url: `/v1/pricing-tenant/${tenantId}/pricing`,
+      url: `/v1/pricing-tenant/pricing`,
       method: "POST",
       headers: { "Content-Type": "application/json" },
       data: setTenantPricingRequest,
@@ -1179,12 +1176,11 @@ Returns detailed metrics including:
   /**
    * @summary Changes the pricing tier for a tenant. Automatically ends the current pricing tier.
    */
-  const putV1PricingTenantTenantIdPricing = (
-    tenantId: string,
+  const putV1PricingTenantPricing = (
     changeTenantPricingRequest: ChangeTenantPricingRequest,
   ) => {
     return customInstance<void>({
-      url: `/v1/pricing-tenant/${tenantId}/pricing`,
+      url: `/v1/pricing-tenant/pricing`,
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       data: changeTenantPricingRequest,
@@ -1194,9 +1190,9 @@ Returns detailed metrics including:
   /**
    * @summary Gets the current active pricing tier for a tenant.
    */
-  const getV1PricingTenantTenantIdPricingCurrent = (tenantId: string) => {
+  const getV1PricingTenantPricingCurrent = () => {
     return customInstance<void>({
-      url: `/v1/pricing-tenant/${tenantId}/pricing/current`,
+      url: `/v1/pricing-tenant/pricing/current`,
       method: "GET",
     });
   };
@@ -1204,9 +1200,9 @@ Returns detailed metrics including:
   /**
    * @summary Gets the complete pricing history for a tenant.
    */
-  const getV1PricingTenantTenantIdPricingHistory = (tenantId: string) => {
+  const getV1PricingTenantPricingHistory = () => {
     return customInstance<void>({
-      url: `/v1/pricing-tenant/${tenantId}/pricing/history`,
+      url: `/v1/pricing-tenant/pricing/history`,
       method: "GET",
     });
   };
@@ -1214,12 +1210,9 @@ Returns detailed metrics including:
   /**
    * @summary Gets the pricing tier that was active for a tenant on a specific date.
    */
-  const getV1PricingTenantTenantIdPricingDateDate = (
-    tenantId: string,
-    date: string,
-  ) => {
+  const getV1PricingTenantPricingDateDate = (date: string) => {
     return customInstance<void>({
-      url: `/v1/pricing-tenant/${tenantId}/pricing/date/${date}`,
+      url: `/v1/pricing-tenant/pricing/date/${date}`,
       method: "GET",
     });
   };
@@ -1227,9 +1220,9 @@ Returns detailed metrics including:
   /**
    * @summary Get all project keys for the current tenant
    */
-  const getApiV1ProjectKeys = () => {
+  const getV1ProjectKeys = () => {
     return customInstance<ProjectKeyModel[]>({
-      url: `/api/v1/project-keys`,
+      url: `/v1/project-keys`,
       method: "GET",
     });
   };
@@ -1237,11 +1230,11 @@ Returns detailed metrics including:
   /**
    * @summary Create a new project key for the current tenant
    */
-  const postApiV1ProjectKeys = (
+  const postV1ProjectKeys = (
     createProjectKeyRequest: CreateProjectKeyRequest,
   ) => {
     return customInstance<ProjectKeyModel>({
-      url: `/api/v1/project-keys`,
+      url: `/v1/project-keys`,
       method: "POST",
       headers: { "Content-Type": "application/json" },
       data: createProjectKeyRequest,
@@ -1251,12 +1244,12 @@ Returns detailed metrics including:
   /**
    * @summary Update a project key
    */
-  const putApiV1ProjectKeysId = (
+  const putV1ProjectKeysId = (
     id: string,
     updateProjectKeyRequest: UpdateProjectKeyRequest,
   ) => {
     return customInstance<ProjectKeyModel>({
-      url: `/api/v1/project-keys/${id}`,
+      url: `/v1/project-keys/${id}`,
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       data: updateProjectKeyRequest,
@@ -1266,9 +1259,9 @@ Returns detailed metrics including:
   /**
    * @summary Delete a project key
    */
-  const deleteApiV1ProjectKeysId = (id: string) => {
+  const deleteV1ProjectKeysId = (id: string) => {
     return customInstance<void>({
-      url: `/api/v1/project-keys/${id}`,
+      url: `/v1/project-keys/${id}`,
       method: "DELETE",
     });
   };
@@ -1276,9 +1269,9 @@ Returns detailed metrics including:
   /**
    * @summary Get usage statistics for the current tenant
    */
-  const getApiV1ProjectKeysUsage = () => {
+  const getV1ProjectKeysUsage = () => {
     return customInstance<UsageStatsModel>({
-      url: `/api/v1/project-keys/usage`,
+      url: `/v1/project-keys/usage`,
       method: "GET",
     });
   };
@@ -1286,9 +1279,9 @@ Returns detailed metrics including:
   /**
    * @summary Get package and pricing information for the current tenant
    */
-  const getApiV1ProjectKeysPackage = () => {
+  const getV1ProjectKeysPackage = () => {
     return customInstance<PackageInfoModel>({
-      url: `/api/v1/project-keys/package`,
+      url: `/v1/project-keys/package`,
       method: "GET",
     });
   };
@@ -1370,9 +1363,9 @@ These will be populated in future enhancements when device info is added to the 
  * @summary Gets a paginated list of monitored visitors (end-users) with their activity summary.
 Supports filtering by user ID search, date range, and pagination.
  */
-  const getApiV1Visitors = (params?: GetApiV1VisitorsParams) => {
+  const getV1Visitors = (params?: GetV1VisitorsParams) => {
     return customInstance<VisitorSummaryModelPagedResult>({
-      url: `/api/v1/visitors`,
+      url: `/v1/visitors`,
       method: "GET",
       params,
     });
@@ -1387,12 +1380,12 @@ Returns page loads ordered by most recent first (Timestamp descending).
  * @summary Gets a paginated list of page loads for a specific visitor (end-user).
 Supports filtering by date range and pagination.
  */
-  const getApiV1VisitorsUserIdPageLoads = (
+  const getV1VisitorsUserIdPageLoads = (
     userId: string,
-    params?: GetApiV1VisitorsUserIdPageLoadsParams,
+    params?: GetV1VisitorsUserIdPageLoadsParams,
   ) => {
     return customInstance<PageLoadSummaryModelPagedResult>({
-      url: `/api/v1/visitors/${userId}/page-loads`,
+      url: `/v1/visitors/${userId}/page-loads`,
       method: "GET",
       params,
     });
@@ -1411,23 +1404,23 @@ Supports filtering by date range and pagination.
     getV1Ping,
     getV1Features,
     getV1FeaturesFeatureKey,
-    postApiV1Events,
-    getApiV1Invoice,
-    getApiV1InvoiceInvoiceId,
-    getApiV1Metrics,
-    getApiV1MetricsId,
-    getApiV1PageLoadsId,
-    postV1PricingTenantTenantIdPricing,
-    putV1PricingTenantTenantIdPricing,
-    getV1PricingTenantTenantIdPricingCurrent,
-    getV1PricingTenantTenantIdPricingHistory,
-    getV1PricingTenantTenantIdPricingDateDate,
-    getApiV1ProjectKeys,
-    postApiV1ProjectKeys,
-    putApiV1ProjectKeysId,
-    deleteApiV1ProjectKeysId,
-    getApiV1ProjectKeysUsage,
-    getApiV1ProjectKeysPackage,
+    postV1Events,
+    getV1Invoice,
+    getV1InvoiceInvoiceId,
+    getV1Metrics,
+    getV1MetricsId,
+    getV1PageLoadsId,
+    postV1PricingTenantPricing,
+    putV1PricingTenantPricing,
+    getV1PricingTenantPricingCurrent,
+    getV1PricingTenantPricingHistory,
+    getV1PricingTenantPricingDateDate,
+    getV1ProjectKeys,
+    postV1ProjectKeys,
+    putV1ProjectKeysId,
+    deleteV1ProjectKeysId,
+    getV1ProjectKeysUsage,
+    getV1ProjectKeysPackage,
     getV1Tenant,
     putV1Tenant,
     userUpdate,
@@ -1437,8 +1430,8 @@ Supports filtering by date range and pagination.
     userInvite,
     userInvitationsPendingGetAll,
     userInvitationDelete,
-    getApiV1Visitors,
-    getApiV1VisitorsUserIdPageLoads,
+    getV1Visitors,
+    getV1VisitorsUserIdPageLoads,
   };
 };
 export type PostV1AccountRegisterResult = NonNullable<
@@ -1503,109 +1496,87 @@ export type GetV1FeaturesFeatureKeyResult = NonNullable<
     ReturnType<ReturnType<typeof getWitnesServerAPI>["getV1FeaturesFeatureKey"]>
   >
 >;
-export type PostApiV1EventsResult = NonNullable<
-  Awaited<ReturnType<ReturnType<typeof getWitnesServerAPI>["postApiV1Events"]>>
+export type PostV1EventsResult = NonNullable<
+  Awaited<ReturnType<ReturnType<typeof getWitnesServerAPI>["postV1Events"]>>
 >;
-export type GetApiV1InvoiceResult = NonNullable<
-  Awaited<ReturnType<ReturnType<typeof getWitnesServerAPI>["getApiV1Invoice"]>>
+export type GetV1InvoiceResult = NonNullable<
+  Awaited<ReturnType<ReturnType<typeof getWitnesServerAPI>["getV1Invoice"]>>
 >;
-export type GetApiV1InvoiceInvoiceIdResult = NonNullable<
+export type GetV1InvoiceInvoiceIdResult = NonNullable<
+  Awaited<
+    ReturnType<ReturnType<typeof getWitnesServerAPI>["getV1InvoiceInvoiceId"]>
+  >
+>;
+export type GetV1MetricsResult = NonNullable<
+  Awaited<ReturnType<ReturnType<typeof getWitnesServerAPI>["getV1Metrics"]>>
+>;
+export type GetV1MetricsIdResult = NonNullable<
+  Awaited<ReturnType<ReturnType<typeof getWitnesServerAPI>["getV1MetricsId"]>>
+>;
+export type GetV1PageLoadsIdResult = NonNullable<
+  Awaited<ReturnType<ReturnType<typeof getWitnesServerAPI>["getV1PageLoadsId"]>>
+>;
+export type PostV1PricingTenantPricingResult = NonNullable<
   Awaited<
     ReturnType<
-      ReturnType<typeof getWitnesServerAPI>["getApiV1InvoiceInvoiceId"]
+      ReturnType<typeof getWitnesServerAPI>["postV1PricingTenantPricing"]
     >
   >
 >;
-export type GetApiV1MetricsResult = NonNullable<
-  Awaited<ReturnType<ReturnType<typeof getWitnesServerAPI>["getApiV1Metrics"]>>
->;
-export type GetApiV1MetricsIdResult = NonNullable<
-  Awaited<
-    ReturnType<ReturnType<typeof getWitnesServerAPI>["getApiV1MetricsId"]>
-  >
->;
-export type GetApiV1PageLoadsIdResult = NonNullable<
-  Awaited<
-    ReturnType<ReturnType<typeof getWitnesServerAPI>["getApiV1PageLoadsId"]>
-  >
->;
-export type PostV1PricingTenantTenantIdPricingResult = NonNullable<
+export type PutV1PricingTenantPricingResult = NonNullable<
   Awaited<
     ReturnType<
-      ReturnType<
-        typeof getWitnesServerAPI
-      >["postV1PricingTenantTenantIdPricing"]
+      ReturnType<typeof getWitnesServerAPI>["putV1PricingTenantPricing"]
     >
   >
 >;
-export type PutV1PricingTenantTenantIdPricingResult = NonNullable<
+export type GetV1PricingTenantPricingCurrentResult = NonNullable<
   Awaited<
     ReturnType<
-      ReturnType<typeof getWitnesServerAPI>["putV1PricingTenantTenantIdPricing"]
+      ReturnType<typeof getWitnesServerAPI>["getV1PricingTenantPricingCurrent"]
     >
   >
 >;
-export type GetV1PricingTenantTenantIdPricingCurrentResult = NonNullable<
+export type GetV1PricingTenantPricingHistoryResult = NonNullable<
   Awaited<
     ReturnType<
-      ReturnType<
-        typeof getWitnesServerAPI
-      >["getV1PricingTenantTenantIdPricingCurrent"]
+      ReturnType<typeof getWitnesServerAPI>["getV1PricingTenantPricingHistory"]
     >
   >
 >;
-export type GetV1PricingTenantTenantIdPricingHistoryResult = NonNullable<
+export type GetV1PricingTenantPricingDateDateResult = NonNullable<
   Awaited<
     ReturnType<
-      ReturnType<
-        typeof getWitnesServerAPI
-      >["getV1PricingTenantTenantIdPricingHistory"]
+      ReturnType<typeof getWitnesServerAPI>["getV1PricingTenantPricingDateDate"]
     >
   >
 >;
-export type GetV1PricingTenantTenantIdPricingDateDateResult = NonNullable<
+export type GetV1ProjectKeysResult = NonNullable<
+  Awaited<ReturnType<ReturnType<typeof getWitnesServerAPI>["getV1ProjectKeys"]>>
+>;
+export type PostV1ProjectKeysResult = NonNullable<
   Awaited<
-    ReturnType<
-      ReturnType<
-        typeof getWitnesServerAPI
-      >["getV1PricingTenantTenantIdPricingDateDate"]
-    >
+    ReturnType<ReturnType<typeof getWitnesServerAPI>["postV1ProjectKeys"]>
   >
 >;
-export type GetApiV1ProjectKeysResult = NonNullable<
+export type PutV1ProjectKeysIdResult = NonNullable<
   Awaited<
-    ReturnType<ReturnType<typeof getWitnesServerAPI>["getApiV1ProjectKeys"]>
+    ReturnType<ReturnType<typeof getWitnesServerAPI>["putV1ProjectKeysId"]>
   >
 >;
-export type PostApiV1ProjectKeysResult = NonNullable<
+export type DeleteV1ProjectKeysIdResult = NonNullable<
   Awaited<
-    ReturnType<ReturnType<typeof getWitnesServerAPI>["postApiV1ProjectKeys"]>
+    ReturnType<ReturnType<typeof getWitnesServerAPI>["deleteV1ProjectKeysId"]>
   >
 >;
-export type PutApiV1ProjectKeysIdResult = NonNullable<
+export type GetV1ProjectKeysUsageResult = NonNullable<
   Awaited<
-    ReturnType<ReturnType<typeof getWitnesServerAPI>["putApiV1ProjectKeysId"]>
+    ReturnType<ReturnType<typeof getWitnesServerAPI>["getV1ProjectKeysUsage"]>
   >
 >;
-export type DeleteApiV1ProjectKeysIdResult = NonNullable<
+export type GetV1ProjectKeysPackageResult = NonNullable<
   Awaited<
-    ReturnType<
-      ReturnType<typeof getWitnesServerAPI>["deleteApiV1ProjectKeysId"]
-    >
-  >
->;
-export type GetApiV1ProjectKeysUsageResult = NonNullable<
-  Awaited<
-    ReturnType<
-      ReturnType<typeof getWitnesServerAPI>["getApiV1ProjectKeysUsage"]
-    >
-  >
->;
-export type GetApiV1ProjectKeysPackageResult = NonNullable<
-  Awaited<
-    ReturnType<
-      ReturnType<typeof getWitnesServerAPI>["getApiV1ProjectKeysPackage"]
-    >
+    ReturnType<ReturnType<typeof getWitnesServerAPI>["getV1ProjectKeysPackage"]>
   >
 >;
 export type GetV1TenantResult = NonNullable<
@@ -1641,13 +1612,13 @@ export type UserInvitationDeleteResult = NonNullable<
     ReturnType<ReturnType<typeof getWitnesServerAPI>["userInvitationDelete"]>
   >
 >;
-export type GetApiV1VisitorsResult = NonNullable<
-  Awaited<ReturnType<ReturnType<typeof getWitnesServerAPI>["getApiV1Visitors"]>>
+export type GetV1VisitorsResult = NonNullable<
+  Awaited<ReturnType<ReturnType<typeof getWitnesServerAPI>["getV1Visitors"]>>
 >;
-export type GetApiV1VisitorsUserIdPageLoadsResult = NonNullable<
+export type GetV1VisitorsUserIdPageLoadsResult = NonNullable<
   Awaited<
     ReturnType<
-      ReturnType<typeof getWitnesServerAPI>["getApiV1VisitorsUserIdPageLoads"]
+      ReturnType<typeof getWitnesServerAPI>["getV1VisitorsUserIdPageLoads"]
     >
   >
 >;

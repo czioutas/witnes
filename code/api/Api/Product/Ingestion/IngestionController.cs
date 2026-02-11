@@ -8,10 +8,10 @@ using Microsoft.AspNetCore.Mvc;
 namespace Api.Product.Ingestion;
 
 /// <summary>
-/// Controller for ingesting speed metrics
+/// Controller for ingesting metrics
 /// </summary>
 [ApiController]
-[Route("api/v1/events")]
+[Route("v1/events")]
 // [Authorize]
 public class IngestionController : ControllerBase
 {
@@ -36,13 +36,13 @@ public class IngestionController : ControllerBase
     }
 
     /// <summary>
-    /// Ingests a speed metric
+    /// Ingests a metric
     /// </summary>
-    /// <param name="request">Speed metric data</param>
+    /// <param name="request">Metric data</param>
     /// <returns>Acknowledgment response</returns>
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status202Accepted)]
-    public async Task<IActionResult> IngestSpeedMetric([FromBody] IngestMetricRequestModel request)
+    public async Task<IActionResult> IngestMetric([FromBody] IngestMetricRequestModel request)
     {
         var ip = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
         var userAgent = Request.Headers.UserAgent.ToString();
@@ -57,7 +57,7 @@ public class IngestionController : ControllerBase
             HashId = hashId
         });
 
-        _logger.LogInformation("Speed metric ingestion acknowledged");
+        _logger.LogInformation("Metric ingestion acknowledged");
 
         return Accepted();
     }

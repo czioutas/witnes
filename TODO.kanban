@@ -118,7 +118,23 @@
     {
       "id": "06b4fd60-bb2d-4e05-a46a-0da7c54cbae3",
       "title": "To Do",
-      "cards": []
+      "cards": [
+        {
+          "id": "edf64b17-9e9b-4e4b-9d48-267a74e41131",
+          "listId": "06b4fd60-bb2d-4e05-a46a-0da7c54cbae3",
+          "title": "Endpoint to recalculate whole Medalion Stage for Tenant",
+          "description": "In code/api/Api/Product/Metrics/MetricsController.cs we added an endpoint that when called it should redo the specific stage (silver or gold) for all metrics for a specific tenant id.\n\nthe code/api/Api/Product/Metrics/MetricsService.cs should issue an Event with the tenantid.\n\nThere should be a different event for Gold and Silver.\n\nThen we need a new subscriber for each that will listen and recalculate all the metrics.\n\nWhen the subscriber runs it should set the TenantId from the msg using the IRequestTenant and call any service it needs to get the metrics and then recalculate them.\n\nAsk if you have questions.",
+          "labels": [
+            {
+              "id": "15b727f4-2078-4524-804c-9b0e0d60c398",
+              "title": "Semi-Complex",
+              "color": "#ff9f1a"
+            }
+          ],
+          "checkboxes": [],
+          "comments": []
+        }
+      ]
     },
     {
       "id": "2b5c32cf-76fd-44c6-898e-31ed08da63a5",

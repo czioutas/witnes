@@ -1,9 +1,9 @@
 namespace Api.Product.Metrics.Models;
 
 /// <summary>
-/// Response model for speed metric data
+/// Response model for metric data
 /// </summary>
-public class SpeedMetricResponse
+public class MetricResponse
 {
     public Guid Id { get; set; }
     public Guid SilverId { get; set; }

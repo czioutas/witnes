@@ -39,7 +39,7 @@ public class PricingTenantController : ControllerBase
     /// <response code="400">Invalid request or pricing tier already exists for the specified date</response>
     /// <response code="401">Unauthorized - admin access required</response>
     /// <response code="404">Pricing tier not found</response>
-    [HttpPost("{tenantId}/pricing")]
+    [HttpPost("pricing")]
     public async Task<IActionResult> SetTenantPricing([FromBody] SetTenantPricingRequest request)
     {
         var result = await _tenantPricingService.SetTenantPricingAsync(
@@ -63,7 +63,7 @@ public class PricingTenantController : ControllerBase
     /// <response code="400">Invalid request or new pricing tier not found</response>
     /// <response code="401">Unauthorized - admin access required</response>
     /// <response code="404">New pricing tier not found</response>
-    [HttpPut("{tenantId}/pricing")]
+    [HttpPut("pricing")]
     public async Task<IActionResult> ChangeTenantPricing([FromBody] ChangeTenantPricingRequest request)
     {
         var result = await _tenantPricingService.ChangeTenantPricingAsync(
@@ -85,7 +85,7 @@ public class PricingTenantController : ControllerBase
     /// <response code="200">Current pricing tier retrieved successfully</response>
     /// <response code="401">Unauthorized - admin access required</response>
     /// <response code="404">No active pricing found for tenant</response>
-    [HttpGet("{tenantId}/pricing/current")]
+    [HttpGet("pricing/current")]
     public async Task<IActionResult> GetCurrentTenantPricing()
     {
         var pricing = await _tenantPricingService.GetCurrentTenantPricingAsync();
@@ -104,7 +104,7 @@ public class PricingTenantController : ControllerBase
     /// <returns>List of all pricing tiers for the tenant, ordered by start date</returns>
     /// <response code="200">Pricing history retrieved successfully</response>
     /// <response code="401">Unauthorized - admin access required</response>
-    [HttpGet("{tenantId}/pricing/history")]
+    [HttpGet("pricing/history")]
     public async Task<IActionResult> GetTenantPricingHistory()
     {
         var history = await _tenantPricingService.GetTenantPricingHistoryAsync();
@@ -119,7 +119,7 @@ public class PricingTenantController : ControllerBase
     /// <response code="200">Pricing tier retrieved successfully</response>
     /// <response code="401">Unauthorized - admin access required</response>
     /// <response code="404">No pricing found for tenant on the specified date</response>
-    [HttpGet("{tenantId}/pricing/date/{date}")]
+    [HttpGet("pricing/date/{date}")]
     public async Task<IActionResult> GetTenantPricingAtDate(DateOnly date)
     {
         var pricing = await _tenantPricingService.GetTenantPricingAtDateAsync(date);

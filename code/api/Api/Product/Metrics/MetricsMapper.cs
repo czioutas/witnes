@@ -11,6 +11,6 @@ public class MetricsMapper : Profile
 {
     public MetricsMapper()
     {
-        CreateMap<MetricGoldEntity, SpeedMetricResponse>();
+        CreateMap<MetricGoldEntity, MetricResponse>();
     }
 }

@@ -28,7 +28,7 @@ export default function PageLoadDetailPage({
       const api = getWitnesServerAPI();
       await handleApiCall({
         apiCall: async () => {
-          const response = await api.getApiV1PageLoadsId(pageLoadId);
+          const response = await api.getV1PageLoadsId(pageLoadId);
           return response.data;
         },
         onSuccess: (data) => {

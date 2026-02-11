@@ -52,6 +52,7 @@ Product/Activities/
 **ALL database queries are automatically filtered by TenantId and/or BusinessId** via EF Core query filters.
 
 **Entity Base Classes:**
+
 ```csharp
 // Tenant-scoped only
 public class MyEntity : TenantAwareEntity
@@ -69,6 +70,7 @@ public class MyEntity : BusinessTenantAwareEntity
 ```
 
 **Middleware automatically sets tenant/business context** from JWT claims:
+
 - `MultiTenantServiceMiddleware` → sets `IRequestTenant.TenantId`
 - `BusinessServiceMiddleware` → sets `IRequestBusiness.BusinessId`
 
@@ -117,6 +119,7 @@ public class MyService
 ### 4. Code-First Database Migrations
 
 **Workflow:**
+
 1. Modify entities in `/Entities/`
 2. Run migration command from `/code/api/Api/`:
    ```bash
@@ -131,7 +134,7 @@ public class MyService
 
 ```csharp
 [ApiController]
-[Route("api/v1/[controller]")]
+[Route("v1/[controller]")]
 [Authorize]  // Requires authentication (remove for public endpoints)
 [CustomExceptionFilter]  // Global error handling
 public class MyController : ControllerBase
@@ -175,6 +178,7 @@ public class MyController : ControllerBase
 ```
 
 **Key Points:**
+
 - Use `[Authorize]` for protected endpoints
 - Apply `[OutputCache]` for read-heavy endpoints
 - Return `ActionResult<T>` for typed responses
@@ -182,6 +186,7 @@ public class MyController : ControllerBase
 - Follow RESTful conventions (GET, POST, PUT, DELETE)
 
 **Available Output Cache Policies:**
+
 - `OutputCachePolicyFiveMinutes`
 - `OutputCachePolicyOneHour`
 - `OutputCachePolicyTwoDays`
@@ -195,6 +200,7 @@ services.AddTransient<IMyService, MyService>();
 ```
 
 **Lifetimes:**
+
 - `AddTransient` - New instance per request (default for services)
 - `AddScoped` - One instance per HTTP request (for context-dependent services like middleware)
 - `AddSingleton` - Single instance app-wide (for stateless services, caches)
@@ -242,11 +248,13 @@ public class MyService
 ```
 
 **When to cache:**
+
 - Emission factors (rarely change)
 - User permissions (change infrequently)
 - Reference data (territories, units, action codes)
 
 **When NOT to cache:**
+
 - Frequently updated data (activities, products)
 - Real-time calculations
 - User-specific data (unless keyed properly)
@@ -270,6 +278,7 @@ public static class SchedulerExtensions
 ```
 
 **Job implementation**:
+
 ```csharp
 public class MyJob : IInvocable
 {
@@ -299,6 +308,7 @@ public class MyJob : IInvocable
 ```
 
 **Existing jobs:**
+
 - `DropZoneLlmJob` - Processes PDF uploads with LLM (every minute)
 - `DropZoneOutboundJob` - Creates activities from processed files (every minute)
 - `ResetMonthlyLimitsJob` - Resets usage limits (monthly at 00:01 UTC)
@@ -307,6 +317,7 @@ public class MyJob : IInvocable
 ## Message Queue (RabbitMQ + MassTransit)
 
 **Publishing messages:**
+
 ```csharp
 public class MyService
 {
@@ -324,6 +335,7 @@ public class MyService
 ```
 
 **Consuming messages:**
+
 ```csharp
 public class ActivityCreatedConsumer : IConsumer<ActivityCreatedEvent>
 {
@@ -343,6 +355,7 @@ public class ActivityCreatedConsumer : IConsumer<ActivityCreatedEvent>
 ### Key Concepts
 
 **ActionCode** - Activity types:
+
 - `Transport` - Vehicle travel, flights, shipping
 - `Energy` - Electricity, heating, cooling
 - `Water` - Water consumption
@@ -351,12 +364,14 @@ public class ActivityCreatedConsumer : IConsumer<ActivityCreatedEvent>
 - See: `/code/libs/Libs/Domain/ActionCode.cs`
 
 **ThingGroup** - Thing categories:
+
 - `Fuels` - Petrol, diesel, natural gas
 - `Electricity` - Grid electricity
 - `Materials` - Steel, plastic, paper
 - See: `/code/libs/Libs/Domain/ThingGroup.cs`
 
 **EmissionScope**:
+
 - `Scope1` - Direct emissions (owned/controlled sources)
 - `Scope2` - Indirect emissions from purchased energy
 - `Scope3` - All other indirect emissions (supply chain)
@@ -393,6 +408,7 @@ public async Task CalculateAsync(Guid activityId)
 ```
 
 **Emission factors** stored in `EmissionFactorEntity` with fields:
+
 - `ActionCode`, `ThingGroup`, `TerritoryCode`, `Year`
 - `Value` (kg CO₂e per unit)
 - `Unit` (e.g., "kWh", "kg", "km")
@@ -400,6 +416,7 @@ public async Task CalculateAsync(Guid activityId)
 ## File Storage (MinIO)
 
 **Upload pattern:**
+
 ```csharp
 public class MyService
 {
@@ -420,6 +437,7 @@ public class MyService
 ```
 
 **Buckets:**
+
 - `files` - Private files (PDFs, invoices)
 - `public-files` - Public assets (images, exports)
 
@@ -462,6 +480,7 @@ public class MyServiceTests
 ```
 
 **Run tests:**
+
 ```bash
 dotnet test
 ```
@@ -471,6 +490,7 @@ dotnet test
 **Development settings**: `/code/api/Api/appsettings.Development.json`
 
 **Connection strings:**
+
 ```json
 {
   "ConnectionStrings": {
@@ -481,6 +501,7 @@ dotnet test
 ```
 
 **Custom settings**:
+
 ```json
 {
   "LlmSettings": {
@@ -492,6 +513,7 @@ dotnet test
 ```
 
 **Bind to strongly-typed classes**:
+
 ```csharp
 // In Startup.SetupSettingsModels()
 services.Configure<LlmSettings>(Configuration.GetSection(nameof(LlmSettings)));
@@ -508,6 +530,7 @@ public MyService(IOptions<LlmSettings> llmSettings)
 **Access locally**: http://localhost:7070/swagger
 
 **Generate OpenAPI spec**:
+
 ```bash
 ./scripts/generate-openapi.sh
 ```
@@ -515,6 +538,7 @@ public MyService(IOptions<LlmSettings> llmSettings)
 This generates `/code/openapi.json` which is used by the frontend to generate the TypeScript client.
 
 **Document endpoints:**
+
 ```csharp
 [HttpPost]
 [ProducesResponseType(typeof(MyDto), StatusCodes.Status201Created)]
@@ -528,12 +552,14 @@ public async Task<ActionResult<MyDto>> Create([FromBody] CreateMyRequest request
 ## Error Handling
 
 **Global exception filter** (`CustomExceptionFilter`) automatically handles:
+
 - `ValidationException` → 400 Bad Request
 - `NotFoundException` → 404 Not Found
 - `UnauthorizedException` → 401 Unauthorized
 - Generic exceptions → 500 Internal Server Error
 
 **Return standardized errors**:
+
 ```csharp
 throw new ValidationException("Name is required");
 // Returns: { "detail": "Name is required", "status": 400, ... }
@@ -573,6 +599,7 @@ public class MyService
 **Prometheus endpoint**: http://localhost:7070/metrics
 
 **Custom metrics:**
+
 ```csharp
 public class ApplicationMetrics
 {
@@ -640,14 +667,17 @@ public class ApplicationMetrics
 ## Quick Reference
 
 **Entry points:**
+
 - `/code/api/Api/Program.cs` - Startup, migrations, seeding
 - `/code/api/Api/Startup.cs` - Service registration, middleware
 
 **Core services:**
+
 - `/code/api/Api/Data/ApplicationDbContext.cs` - All entities
 - `/code/api/Api/Application/Extensions/StartupServiceExtentions.cs` - Service setup
 
 **Scripts:**
+
 ```bash
 dotnet run                      # Start API (localhost:7070)
 dotnet build                    # Build
@@ -658,6 +688,7 @@ dotnet ef migrations add <Name> # Create migration
 ```
 
 **Infrastructure:**
+
 ```bash
 docker-compose -f code/development-infra.yml up -d    # Start infrastructure
 docker-compose -f code/development-infra.yml down -v  # Stop and remove volumes

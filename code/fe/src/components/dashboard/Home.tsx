@@ -22,7 +22,7 @@ export function Home() {
 
     try {
       // Step 1: Check if project key exists
-      const keysResponse = await api.getApiV1ProjectKeys();
+      const keysResponse = await api.getV1ProjectKeys();
       const keys = keysResponse.data;
 
       if (!keys || keys.length === 0) {
@@ -37,7 +37,7 @@ export function Home() {
       const oneDayAgo = new Date();
       oneDayAgo.setDate(oneDayAgo.getDate() - 1);
 
-      const visitorsResponse = await api.getApiV1Visitors({
+      const visitorsResponse = await api.getV1Visitors({
         StartDate: oneDayAgo.toISOString(),
         PageNumber: 1,
         PageSize: 4,

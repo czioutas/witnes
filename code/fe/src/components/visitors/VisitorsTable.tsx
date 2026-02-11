@@ -37,7 +37,7 @@ export function VisitorsTable() {
     const api = getWitnesServerAPI();
     await handleApiCall({
       apiCall: async () => {
-        const response = await api.getApiV1Visitors({
+        const response = await api.getV1Visitors({
           UserIdSearch: userIdSearch || undefined,
           StartDate: timeRange.startDate?.toISOString(),
           EndDate: timeRange.endDate?.toISOString(),
@@ -129,14 +129,15 @@ export function VisitorsTable() {
                 </TableRow>
               )}
             {visitors?.data?.map((visitor: VisitorSummaryModel) => {
-              const displayId = visitor.user_id || visitor.guest_id || "Unknown";
+              const displayId =
+                visitor.user_id || visitor.guest_id || "Unknown";
               const isGuest = !visitor.user_id && !!visitor.guest_id;
               const visitorUrl = `/dashboard/visitors/${encodeURIComponent(displayId)}`;
               return (
                 <TableRow
                   key={visitor.user_id || visitor.guest_id}
                   className="cursor-pointer hover:bg-muted/50"
-                  onClick={() => window.location.href = visitorUrl}
+                  onClick={() => (window.location.href = visitorUrl)}
                   onAuxClick={(e) => {
                     if (e.button === 1) {
                       e.preventDefault();
@@ -147,7 +148,9 @@ export function VisitorsTable() {
                   <TableCell className="font-medium">
                     {displayId}
                     {isGuest && (
-                      <span className="ml-2 text-xs px-1.5 py-0.5 rounded bg-muted text-muted-foreground">Guest</span>
+                      <span className="ml-2 text-xs px-1.5 py-0.5 rounded bg-muted text-muted-foreground">
+                        Guest
+                      </span>
                     )}
                   </TableCell>
                   <TableCell>{visitor.total_page_loads}</TableCell>

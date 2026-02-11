@@ -154,15 +154,12 @@ export function UserPageLoadsTable({ userId }: UserPageLoadsTableProps) {
     const api = getWitnesServerAPI();
     await handleApiCall({
       apiCall: async () => {
-        const response = await api.getApiV1VisitorsUserIdPageLoads(
-          userId,
-          {
-            startDate: timeRange.startDate?.toISOString(),
-            endDate: timeRange.endDate?.toISOString(),
-            pageNumber: page,
-            pageSize: pageSize,
-          },
-        );
+        const response = await api.getV1VisitorsUserIdPageLoads(userId, {
+          startDate: timeRange.startDate?.toISOString(),
+          endDate: timeRange.endDate?.toISOString(),
+          pageNumber: page,
+          pageSize: pageSize,
+        });
         return response.data;
       },
       onSuccess: (data) => {

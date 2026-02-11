@@ -165,6 +165,8 @@ public class Startup
 
         app.UseSerilogRequestLogging();
 
+        app.UseMiddleware<PrometheusBasicAuthMiddleware>();
+
         app.UseRouting();
 
         app.UseCors();

@@ -5,7 +5,7 @@ using MassTransit;
 namespace Api.Product.MetricsProcessing.Bronze;
 
 /// <summary>
-/// Subscriber for ingested speed metrics - stores in Bronze layer
+/// Subscriber for ingested metrics - stores in Bronze layer
 /// </summary>
 public class BronzeSubscriber : IConsumer<MetricIngestedEvent>
 {

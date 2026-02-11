@@ -10,6 +10,6 @@ public class GoldMapper : Profile
     public GoldMapper()
     {
         // Add mappings here as needed
-        // Example: CreateMap<SpeedMetricGoldEntity, GoldDto>();
+        // Example: CreateMap<MetricGoldEntity, GoldDto>();
     }
 }

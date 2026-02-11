@@ -11,7 +11,7 @@ namespace Api.Product.Visitors;
 /// These are the website visitors being monitored, NOT Witnes application users.
 /// </summary>
 [ApiController]
-[Route("api/v1/visitors")]
+[Route("v1/visitors")]
 [Authorize]
 public class VisitorsController : ControllerBase
 {

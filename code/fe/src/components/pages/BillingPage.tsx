@@ -65,7 +65,7 @@ export function BillingPage() {
   const fetchInvoices = async () => {
     setLoading(true);
     await handleApiCall({
-      apiCall: () => api.getApiV1Invoice(),
+      apiCall: () => api.getV1Invoice(),
       onSuccess: (response) => {
         setInvoices(response.data);
       },
@@ -129,10 +129,7 @@ export function BillingPage() {
                     {invoice.invoice_number}
                   </TableCell>
                   <TableCell>
-                    {formatPeriod(
-                      invoice.period_start,
-                      invoice.period_end,
-                    )}
+                    {formatPeriod(invoice.period_start, invoice.period_end)}
                   </TableCell>
                   <TableCell>{formatCurrency(invoice.total_amount)}</TableCell>
                   <TableCell>{getStatusBadge(invoice.status)}</TableCell>

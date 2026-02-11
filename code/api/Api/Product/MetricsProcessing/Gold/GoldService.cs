@@ -13,6 +13,16 @@ public interface IGoldService
     /// Deletes Gold metrics older than the specified cutoff date for a tenant.
     /// </summary>
     Task<int> DeleteOlderThanAsync(Guid tenantId, DateTimeOffset cutoffDate);
+
+    /// <summary>
+    /// Deletes all Gold metrics for a tenant.
+    /// </summary>
+    Task<int> DeleteAllForTenantAsync(Guid tenantId);
+
+    /// <summary>
+    /// Recalculates all Gold metrics for a tenant by re-transforming from Silver.
+    /// </summary>
+    Task RecalculateAllForTenantAsync(Guid tenantId);
 }
 
 public class GoldService : IGoldService
@@ -50,6 +60,39 @@ public class GoldService : IGoldService
             .IgnoreQueryFilters()
             .Where(m => m.PageRequestedAtByVisitor < cutoffDate)
             .ExecuteDeleteAsync();
+    }
+
+    /// <inheritdoc/>
+    public async Task<int> DeleteAllForTenantAsync(Guid tenantId)
+    {
+        return await _context.MetricsGold
+            .Where(m => m.TenantId == tenantId)
+            .ExecuteDeleteAsync();
+    }
+
+    /// <inheritdoc/>
+    public async Task RecalculateAllForTenantAsync(Guid tenantId)
+    {
+        _logger.LogInformation("Recalculating all Gold metrics for TenantId={TenantId}", tenantId);
+
+        var deleted = await DeleteAllForTenantAsync(tenantId);
+        _logger.LogInformation("Deleted {Count} existing Gold records for TenantId={TenantId}", deleted, tenantId);
+
+        var silverRecords = await _context.MetricsSilver
+            .Where(s => s.TenantId == tenantId)
+            .ToListAsync();
+
+        _logger.LogInformation("Found {Count} Silver records to reprocess for TenantId={TenantId}", silverRecords.Count, tenantId);
+
+        foreach (var silver in silverRecords)
+        {
+            var goldEntity = TransformToGold(silver);
+            goldEntity.TenantId = tenantId;
+            _context.MetricsGold.Add(goldEntity);
+        }
+
+        await _context.SaveChangesAsync();
+        _logger.LogInformation("Gold recalculation complete for TenantId={TenantId}", tenantId);
     }
 
     public static MetricGoldEntity TransformToGold(MetricSilverEntity silver)
@@ -123,7 +166,7 @@ public class GoldService : IGoldService
         if (Uri.TryCreate(url, UriKind.Absolute, out var uri))
         {
             var path = uri.AbsolutePath;
-            return path == "/" ? "Home" : path.TrimEnd('/');
+            return path == "/" ? "/" : path.TrimEnd('/');
         }
         return url.Split('?')[0];
     }
