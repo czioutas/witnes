@@ -1,0 +1,31 @@
+---
+import FaqAccordion from "./FaqAccordion";
+---
+
+<section id="faq" class="relative py-24 md:py-32">
+  <div
+    class="pointer-events-none absolute left-1/2 top-0 -translate-x-1/2 h-px w-2/3 bg-border"
+  >
+  </div>
+
+  <div class="mx-auto max-w-6xl px-6">
+    <div class="mx-auto max-w-2xl text-center">
+      <p
+        class="mb-4 text-sm font-semibold uppercase tracking-widest text-muted-foreground"
+      >
+        Got questions?
+      </p>
+      <h2
+        class="text-balance text-3xl font-bold tracking-tight text-foreground md:text-4xl lg:text-5xl"
+      >
+        Frequently asked questions
+      </h2>
+      <p class="mt-6 text-lg leading-relaxed text-muted-foreground">
+        Everything you need to know about Witnes, whether you're in support or
+        engineering.
+      </p>
+    </div>
+
+    <FaqAccordion client:load />
+  </div>
+</section>
