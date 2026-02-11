@@ -1,0 +1,324 @@
+{
+  "lists": [
+    {
+      "id": "1c7b07a3-8aa4-4c54-93c7-4cea40d0df16",
+      "title": "Backlog",
+      "cards": [
+        {
+          "id": "5aee355d-7fcb-4597-9d25-e0e014d9b9b9",
+          "listId": "1c7b07a3-8aa4-4c54-93c7-4cea40d0df16",
+          "title": "Use Result pattern in Invoice billing and TenantPricing",
+          "description": "InvoiceService and BillingService and TenantPricingService should use the Result pattern to return the result of the operation. this way we can return more information about the error if something goes wrong and we can also return warnings if there are any.\n\ncode/libs/Libs/Result/Result.cs",
+          "labels": [
+            {
+              "id": "2633c7da-7d04-4a38-8239-148cb27a04d3",
+              "title": "Easy",
+              "color": "#61bd4f"
+            }
+          ],
+          "checkboxes": [],
+          "comments": []
+        },
+        {
+          "id": "3551b1e4-bc2b-4598-a6aa-f636876d3a29",
+          "listId": "1c7b07a3-8aa4-4c54-93c7-4cea40d0df16",
+          "title": "Use AutoMapper in Invoice, billing and TenantPricing",
+          "description": "Invoice Service and Billing Service and TenantPricingService should use AutoMapper to map the entities to the models and vice versa. this will make the code cleaner and easier to maintain.\n",
+          "labels": [
+            {
+              "id": "2633c7da-7d04-4a38-8239-148cb27a04d3",
+              "title": "Easy",
+              "color": "#61bd4f"
+            }
+          ],
+          "checkboxes": [],
+          "comments": []
+        },
+        {
+          "id": "c94e855f-3145-40ea-a371-c46486515472",
+          "listId": "1c7b07a3-8aa4-4c54-93c7-4cea40d0df16",
+          "title": "Invoice controller xml documentation",
+          "description": "we should add xml docs to the invoice controller and also add swagger documentation for the endpoints. this will make it easier for the customers to understand how to use the endpoints and what data they need to send.\n",
+          "labels": [
+            {
+              "id": "2633c7da-7d04-4a38-8239-148cb27a04d3",
+              "title": "Easy",
+              "color": "#61bd4f"
+            }
+          ],
+          "checkboxes": [],
+          "comments": []
+        },
+        {
+          "id": "b2da308b-18ac-4255-8bfe-4e76172099d8",
+          "listId": "1c7b07a3-8aa4-4c54-93c7-4cea40d0df16",
+          "title": "CORS Cache invalidation is too aggressive",
+          "description": "When we make any change to a project key we clear the cache of the allowed origins for CORS. this is too aggressive and can cause performance issues if we have a lot of changes to the project keys.\n\nWe should edit the cache content instead of clearing it. so if we add a new origin we just add it to the cache and if we remove an origin we just remove it from the cache.\n",
+          "labels": [
+            {
+              "id": "f11a1ada-0c6d-4dd0-b8df-6ca9b8d927c0",
+              "title": "50+ Customers",
+              "color": "#ff9f1a"
+            },
+            {
+              "id": "15b727f4-2078-4524-804c-9b0e0d60c398",
+              "title": "Semi-Complex",
+              "color": "#ff9f1a"
+            }
+          ],
+          "checkboxes": [],
+          "comments": []
+        },
+        {
+          "id": "0477eb51-0e1b-47d9-9f83-ec9962307fab",
+          "listId": "1c7b07a3-8aa4-4c54-93c7-4cea40d0df16",
+          "title": "Checking usage and applying limits",
+          "description": "We will have a cronjob that will run every day at midnight and will check the usage of each tenant and will apply the limits based on their pricing tier.\n",
+          "labels": [],
+          "checkboxes": [],
+          "comments": []
+        },
+        {
+          "id": "0e3747f8-43e5-473d-9cf1-b4ededd53048",
+          "listId": "1c7b07a3-8aa4-4c54-93c7-4cea40d0df16",
+          "title": "Ingestion Idempotency",
+          "description": "  - The pipeline is idempotency-aware in billing but not in metric ingestion (no dedupe) — could be a blog post on “where we chose to accept duplicates vs enforce idempotency” and why.",
+          "labels": [
+            {
+              "id": "15b727f4-2078-4524-804c-9b0e0d60c398",
+              "title": "Semi-Complex",
+              "color": "#ff9f1a"
+            }
+          ],
+          "checkboxes": [],
+          "comments": []
+        }
+      ]
+    },
+    {
+      "id": "06b4fd60-bb2d-4e05-a46a-0da7c54cbae3",
+      "title": "To Do",
+      "cards": []
+    },
+    {
+      "id": "2b5c32cf-76fd-44c6-898e-31ed08da63a5",
+      "title": "Doing",
+      "cards": [
+        {
+          "id": "5e71cccb-cb6f-4b28-8dba-abb9f69fd6e7",
+          "listId": "2b5c32cf-76fd-44c6-898e-31ed08da63a5",
+          "title": "Billing",
+          "description": "We will create a module under Product called Billing. in there we will have a service which will be responsible for billing the tenants based on their pricing tier.\n\nAny info it needs it will use other services and will not directly access the db. for example it will use the tenant pricing service to get the pricing tier of the tenant and then calculate the billing amount based on that.\n\nRules for billing:\n\n- We process billing on the 1st day of each month for the previous month. so on the 1st of July we will process billing for June.\n- Tiers can have a 7 day free trial (there is a flag called is_trial)\n- Even if the invoice is 0, we generate it\n- We use prorated billing\n  - so if they sign up on the middle of the month they will be charged for half of the month.\n  - when we do prorated billing we need to take into account the 7 day free trial. so if they sign up on X day of the month, they have 7 more days free, after that they will be billed for the remainder of the month. so if they sign up on the 20th of the month, they will have 7 days free until the 27th, and then they will be billed for the remaining 4 days of the month.\n  - if however they sign up for the trial on the 25th of the month, they will have 7 days free until the 1st of the next month, and then they will be billed for the full month of the next month.\n  - we will change the has_trial_expired when we do billing, but if the month didnt have fully 7 days we wont set it to expired until the 7 days are over. so if they sign up on the 20th of the month, we will set has_trial_expired to true on the 27th of the month, but if they sign up on the 25th of the month, we will set has_trial_expired to true on the 1st of the next month.\n\nthe invoice entity should use a long id\nthen when we make the entity we should leave the invoice number empty and then after we save it to the db we can generate the invoice number based on the id and update the entity with the invoice number. this way we ensure that the invoice number is unique and we dont have any issues with concurrency when generating the invoice number. we can use a format like INV-{id} for the invoice number. so if the id is 1 the invoice number will be INV-1 and if the id is 2 the invoice number will be INV-2 and so on.\n\n",
+          "labels": [
+            {
+              "id": "851ff7ad-abf0-4a29-9965-a84a8eaadde1",
+              "title": "Complex",
+              "color": "#c377e0"
+            },
+            {
+              "id": "87cf91b2-3f14-483b-9407-79c45a60d96a",
+              "title": "Get-Go",
+              "color": "#eb5a46"
+            }
+          ],
+          "checkboxes": [],
+          "comments": []
+        },
+        {
+          "id": "1725fdb2-02fc-4387-bc51-52380e6d5cce",
+          "listId": "2b5c32cf-76fd-44c6-898e-31ed08da63a5",
+          "title": "Generate invoices and send them to customers",
+          "description": "We have the Billing module.\n\nWe now need to generate the invoice and send it to each tenant and also store each invoice.\nWe will not store pdfs, we will just store the data we need to generate the invoice\nwe should have an endpoint in which they can see all invoces\nwe will have an entity to hold the invoice\nthe entity will have an enum saying Pending, Due, Paid, Overdue",
+          "labels": [
+            {
+              "id": "851ff7ad-abf0-4a29-9965-a84a8eaadde1",
+              "title": "Complex",
+              "color": "#c377e0"
+            },
+            {
+              "id": "87cf91b2-3f14-483b-9407-79c45a60d96a",
+              "title": "Get-Go",
+              "color": "#eb5a46"
+            }
+          ],
+          "checkboxes": [],
+          "comments": []
+        }
+      ]
+    },
+    {
+      "id": "d597b39a-d79e-42a5-a0eb-e916af73ba79",
+      "title": "To Review",
+      "cards": []
+    },
+    {
+      "id": "3a6f3ff3-61ba-4074-8fa4-4616eef309c8",
+      "title": "Done",
+      "cards": [
+        {
+          "id": "9ca38e1e-ab97-4077-b625-44b9046c14d1",
+          "listId": "3a6f3ff3-61ba-4074-8fa4-4616eef309c8",
+          "title": "Dynamic CORS",
+          "description": "We currently set CORS from appsettings.json and in Startup.cs we do WithOrigins\nUnfortunately as we need to dynamically be able to add origins based on the tenant, we need to change this and make it dynamic.\n\nWe need to make a module called CORS under Product and in there we will have a service which will be responsible for managing the CORS origins for each tenant.\n\npublic interface IAllowedOriginService\n{\nTask<HashSet<string>> GetAllowedOriginsAsync();\n}\n\nthis will check the db Project Keys and get the domains for cors. This should be a singleton and we should be caching the results for 1 hour.\n\nWhen any change to a project key happens (add or remove) we will clear the cache and the next time the GetAllowedOriginsAsync is called it will get the new origins.\n\nwe will need to add\n\npublic class DatabaseCorsPolicyProvider : ICorsPolicyProvider\n{\nprivate readonly IAllowedOriginService \\_originService;\n\n    public DatabaseCorsPolicyProvider(IAllowedOriginService originService)\n    {\n        _originService = originService;\n    }\n\n    public async Task<CorsPolicy> GetPolicyAsync(HttpContext context, string policyName)\n    {\n        var origins = await _originService.GetAllowedOriginsAsync();\n\n        var policy = new CorsPolicyBuilder()\n            .WithOrigins(origins.ToArray())\n            .AllowAnyHeader()\n            .AllowAnyMethod()\n            .AllowCredentials()\n            .Build();\n\n        return policy;\n    }\n\n}\n\nservices.AddSingleton<ICorsPolicyProvider, DatabaseCorsPolicyProvider>();\nservices.AddCors();\n\nImportant: Normalize domains\n\nCustomers will input:\n\nexample.com\nwww.example.com\nhttps://example.com\n\nNormalize before storing:\n\nlowercase\n\nremove protocol\n\nremove trailing slash\n\nAnd compare only hostnames.\n",
+          "labels": [
+            {
+              "id": "87cf91b2-3f14-483b-9407-79c45a60d96a",
+              "title": "Get-Go",
+              "color": "#eb5a46"
+            },
+            {
+              "id": "15b727f4-2078-4524-804c-9b0e0d60c398",
+              "title": "Semi-Complex",
+              "color": "#ff9f1a"
+            }
+          ],
+          "checkboxes": [],
+          "comments": []
+        },
+        {
+          "id": "60c146e1-ac2f-43c5-a730-dc070d943f4f",
+          "listId": "3a6f3ff3-61ba-4074-8fa4-4616eef309c8",
+          "title": "Emphasize EU data store in Landing page",
+          "description": "take a look at https://www.simpleanalytics.com/\nwe need to make it clear that the data are stored in EU and we do not use cookies to track the users or use services that do.\neven when we collect data they are non identifieable and we do not share them with third parties. for more see privacy policy\n",
+          "labels": [
+            {
+              "id": "2633c7da-7d04-4a38-8239-148cb27a04d3",
+              "title": "Easy",
+              "color": "#61bd4f"
+            }
+          ],
+          "checkboxes": [],
+          "comments": []
+        },
+        {
+          "id": "fe69a405-c814-4c39-9681-7bfc55d06ae4",
+          "listId": "3a6f3ff3-61ba-4074-8fa4-4616eef309c8",
+          "title": "Pricing Model",
+          "description": "see code/api/Api/Application/Pricing\n\nwe will have 2 tiers but we need to be able to add extra custom tiers for specific customers\n\n- starter\n  - 29 euros per month\n  - 2 team members (admin + 1 user)\n  - 50k page loads per month\n  - 7 days data retention\n- growth\n  - 80 euros per month\n  - 4 team members (admin + 3 users)\n  - 100k page loads per month\n  - 14 days data retention\n\ndont worry about throttling, we will do it differently.\n\nwe need to see the db with this pricing tiers.\n",
+          "labels": [
+            {
+              "id": "2633c7da-7d04-4a38-8239-148cb27a04d3",
+              "title": "Easy",
+              "color": "#61bd4f"
+            },
+            {
+              "id": "87cf91b2-3f14-483b-9407-79c45a60d96a",
+              "title": "Get-Go",
+              "color": "#eb5a46"
+            }
+          ],
+          "checkboxes": [],
+          "comments": []
+        },
+        {
+          "id": "8c04d4c1-0d26-4e3f-a093-4ec6e7fd82c7",
+          "listId": "3a6f3ff3-61ba-4074-8fa4-4616eef309c8",
+          "title": "Project Key Domain sanitization",
+          "description": "When someone adds a domain to the project key, we need to sanitize it and normalize it before storing it in the db. this is important for CORS and also for security reasons.\n\nexample.com\nwww.example.com\nhttps://example.com\n\nNormalize before storing:\nlowercase\nremove protocol\nremove trailing slash\nAnd compare only hostnames in code/api/Api/Application/ProjectKeys/ProjectKeyMiddleware.cs\n\n",
+          "labels": [
+            {
+              "id": "2633c7da-7d04-4a38-8239-148cb27a04d3",
+              "title": "Easy",
+              "color": "#61bd4f"
+            },
+            {
+              "id": "87cf91b2-3f14-483b-9407-79c45a60d96a",
+              "title": "Get-Go",
+              "color": "#eb5a46"
+            }
+          ],
+          "checkboxes": [],
+          "comments": []
+        },
+        {
+          "id": "c08dfeee-ec22-4052-90d8-306d38aa8c62",
+          "listId": "3a6f3ff3-61ba-4074-8fa4-4616eef309c8",
+          "title": "Tenant Pricing",
+          "description": "code/api/Api/Application/Pricing/Entities/TenantPricingTierEntity.cs\n\nhere we assign the pricing to the tenant. the end date is only if they concluded one pricing tier and then they want to switch to another one. we need to be able to see the history of the pricing tiers for a tenant.\n\nin the tenant pricing we should add 3 flags\n\n- has_trial, which will be true on the first sign up of the user\n- has_trial_expired, which will be true when the trial period of 7 days is over\n- discount_percentage, which will be used to apply a discount to the pricing tier for specific customers\n\nwe dont do billing atm still\n\nchanging the tenant pricing will come into effect immediately from the start of the current day of change. We will bother with billing elsehow\n\n",
+          "labels": [
+            {
+              "id": "87cf91b2-3f14-483b-9407-79c45a60d96a",
+              "title": "Get-Go",
+              "color": "#eb5a46"
+            },
+            {
+              "id": "15b727f4-2078-4524-804c-9b0e0d60c398",
+              "title": "Semi-Complex",
+              "color": "#ff9f1a"
+            }
+          ],
+          "checkboxes": [],
+          "comments": []
+        },
+        {
+          "id": "4e085660-63d9-4e58-9a81-7a3e76bbec50",
+          "listId": "3a6f3ff3-61ba-4074-8fa4-4616eef309c8",
+          "title": "Display free Trial usage",
+          "description": "In http://localhost:4321/dashboard/usage we need to display the free trial info. if the tenant is in free trial we will show a message saying \"You are in a 7 day free trial, you have X days left\" and if the free trial is expired we will show a message saying \"Your free trial has expired, please upgrade to continue using the service\"\n\nwe need to enhance the info from http://localhost:4321/dashboard/usage\nfrom tenant_pricing\n",
+          "labels": [
+            {
+              "id": "2633c7da-7d04-4a38-8239-148cb27a04d3",
+              "title": "Easy",
+              "color": "#61bd4f"
+            }
+          ],
+          "checkboxes": [],
+          "comments": []
+        },
+        {
+          "id": "0c4cbcb7-eb96-4bc5-ad29-a109ab7b9cca",
+          "listId": "3a6f3ff3-61ba-4074-8fa4-4616eef309c8",
+          "title": "Data Cleanup",
+          "description": "we need to be cleaning up the data of tenants based on their pricing model.\n\nwe will make a cronjob using coravel and add it to code/api/Api/Application/Extensions/SchedulerExtensions.cs\nthe cronjob will run every day at midnight and will check for tenants that have expired data retention and will delete the data of those tenants.\n\nUnder product add another domain called MetricCleanup\nin there we will have a service which will be called by the cronjob\nthe idea is\n\nAny info it needs it will use other services and will not directly access the db.\n\n- get all tenants\n- for each tenant get the pricing tier\n- check the data retention of the pricing tier\n- delete the data of the tenant that is older than the data retention",
+          "labels": [
+            {
+              "id": "2633c7da-7d04-4a38-8239-148cb27a04d3",
+              "title": "Easy",
+              "color": "#61bd4f"
+            },
+            {
+              "id": "87cf91b2-3f14-483b-9407-79c45a60d96a",
+              "title": "Get-Go",
+              "color": "#eb5a46"
+            }
+          ],
+          "checkboxes": [],
+          "comments": []
+        }
+      ]
+    }
+  ],
+  "archive": {
+    "lists": [],
+    "cards": []
+  },
+  "settings": {
+    "labels": [
+      {
+        "id": "15b727f4-2078-4524-804c-9b0e0d60c398",
+        "title": "Semi-Complex",
+        "color": "#ff9f1a"
+      },
+      {
+        "id": "f11a1ada-0c6d-4dd0-b8df-6ca9b8d927c0",
+        "title": "50+ Customers",
+        "color": "#ff9f1a"
+      },
+      {
+        "id": "2633c7da-7d04-4a38-8239-148cb27a04d3",
+        "title": "Easy",
+        "color": "#61bd4f"
+      },
+      {
+        "id": "851ff7ad-abf0-4a29-9965-a84a8eaadde1",
+        "title": "Complex",
+        "color": "#c377e0"
+      },
+      {
+        "id": "87cf91b2-3f14-483b-9407-79c45a60d96a",
+        "title": "Get-Go",
+        "color": "#eb5a46"
+      }
+    ]
+  }
+}
