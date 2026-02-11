@@ -3,7 +3,7 @@ const { minify } = require('terser');
 const JavaScriptObfuscator = require('javascript-obfuscator');
 const path = require('path');
 
-const PRODUCTION_URL = 'https://api-witnes.ziou.xyz/api/v1/events';
+const PRODUCTION_URL = 'https://api.witnes.io/api/v1/events';
 const DEV_URL = 'http://localhost:7070/api/v1/events';
 
 const inputPath = 'w.js';
