@@ -184,8 +184,8 @@ public static class StartupServiceExtensions
                 Contact = new OpenApiContact
                 {
                     Name = "Witnes",
-                    Email = "hello@witnes.io",
-                    Url = new Uri("https://witnes.io/#contact"),
+                    Email = "support@witnes.io",
+                    Url = new Uri("https://witnes.io/contact"),
                 },
             });
 
