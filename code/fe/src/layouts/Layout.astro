@@ -39,6 +39,17 @@ const trackingDebug = import.meta.env.PUBLIC_WITNES_DEBUG_MODE === "false";
       };
     </script>
     <script src={trackingUrl} async is:inline></script>
+    <script is:inline>
+      window.$crisp = [];
+      window.CRISP_WEBSITE_ID = "9946e8a6-7f11-456f-8b6e-53e7df8683f4";
+      (function () {
+        d = document;
+        s = d.createElement("script");
+        s.src = "https://client.crisp.chat/l.js";
+        s.async = 1;
+        d.getElementsByTagName("head")[0].appendChild(s);
+      })();
+    </script>
   </head>
   <body>
     <slot />
