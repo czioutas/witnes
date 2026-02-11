@@ -12,13 +12,13 @@ export function NoDataState({ projectKey }: NoDataStateProps) {
     projectKey: '${projectKey}',
   };
 </script>
-<script src="https://cdn-witnes.ziou.xyz/w.min.js" async></script>`
+<script src="https://cdn.witnes.io/w.min.js" async></script>`
     : `<script>
   window.witnesConfig = {
     projectKey: 'YOUR_PROJECT_KEY',
   };
 </script>
-<script src="https://cdn-witnes.ziou.xyz/w.min.js" async></script>`;
+<script src="https://cdn.witnes.io/w.min.js" async></script>`;
 
   const identifySnippet = `// Call this after your login logic
 if (window.Witnes) {
