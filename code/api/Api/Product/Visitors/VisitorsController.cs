@@ -35,7 +35,7 @@ public class VisitorsController : ControllerBase
     /// <remarks>
     /// Sample request:
     ///
-    ///     GET /api/v1/visitors?userIdSearch=user123&amp;startDate=2026-01-01&amp;pageNumber=1&amp;pageSize=20
+    ///     GET /v1/visitors?userIdSearch=user123&amp;startDate=2026-01-01&amp;pageNumber=1&amp;pageSize=20
     ///
     /// Returns visitors ordered by most recently seen (LastSeenAt descending).
     ///
@@ -81,7 +81,7 @@ public class VisitorsController : ControllerBase
     /// <remarks>
     /// Sample request:
     ///
-    ///     GET /api/v1/visitors/user123/page-loads?pageNumber=1&amp;pageSize=20&amp;startDate=2026-01-01
+    ///     GET /v1/visitors/user123/page-loads?pageNumber=1&amp;pageSize=20&amp;startDate=2026-01-01
     ///
     /// Returns page loads ordered by most recent first (Timestamp descending).
     /// </remarks>

@@ -32,7 +32,7 @@ public class PageLoadsController : ControllerBase
     /// <remarks>
     /// Sample request:
     ///
-    ///     GET /api/v1/page-loads/019c3eb8-7a1f-7a29-af77-963722c894b6
+    ///     GET /v1/page-loads/019c3eb8-7a1f-7a29-af77-963722c894b6
     ///
     /// Returns detailed metrics including:
     /// - Core Web Vitals (LCP, CLS, TTFB)

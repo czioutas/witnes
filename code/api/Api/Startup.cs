@@ -184,7 +184,7 @@ public class Startup
 
         // Use ProjectKeyMiddleware ONLY for events routes
         app.UseWhen(
-            context => context.Request.Path.StartsWithSegments("/api/v1/events"),
+            context => context.Request.Path.StartsWithSegments("/v1/events"),
             appBuilder =>
             {
                 appBuilder.UseMiddleware<ProjectKeyMiddleware>();
@@ -192,7 +192,7 @@ public class Startup
 
         // Use MultiTenantServiceMiddleware for all routes EXCEPT events
         app.UseWhen(
-            context => !context.Request.Path.StartsWithSegments("/api/v1/events"),
+            context => !context.Request.Path.StartsWithSegments("/v1/events"),
             appBuilder =>
             {
                 appBuilder.UseMiddleware<MultiTenantServiceMiddleware>();

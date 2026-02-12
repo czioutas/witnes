@@ -4,7 +4,7 @@ const JavaScriptObfuscator = require('javascript-obfuscator');
 const path = require('path');
 
 const PRODUCTION_URL = 'https://api.witnes.io/v1/events';
-const DEV_URL = 'http://localhost:7070/api/v1/events';
+const DEV_URL = 'http://localhost:7070/v1/events';
 
 const inputPath = 'w.js';
 const distDir = 'dist';
