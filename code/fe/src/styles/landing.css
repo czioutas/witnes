@@ -1,6 +1,8 @@
 /* Witnes Landing Page Design System */
 @import "tailwindcss";
 
+@custom-variant dark (&:is(.dark *));
+
 /* shadcn/ui Design Tokens - HSL color space for landing page */
 :root {
   --background: 0 0% 100%;

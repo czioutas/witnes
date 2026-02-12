@@ -129,15 +129,6 @@
           "comments": []
         },
         {
-          "id": "e3615425-a59a-4db1-baf6-9d72befe0d09",
-          "listId": "06b4fd60-bb2d-4e05-a46a-0da7c54cbae3",
-          "title": "Add FAQ section right before CTA in landing page",
-          "description": "When finished move ticket to done.\n\nFor the FAQ we split into 2, 1 for non tech people and 1 for tech people\n\nSection 1: Solving the \"Guesswork\" (For CS & Support)\n1. How does Witnes help when a user says \"the site is slow\"?\nAnswer: It replaces the \"guessing game\" with a Session Receipt. Instead of asking the user for screenshots or their internet speed, you simply look up their ID in Witnes. You’ll see an up to 30-day chronological history that proves if the lag was caused by their local Wi-Fi, a slow response from your server (API), or a frontend render issue.\n\n2. Do I need to be a developer to understand the dashboard?\nAnswer: No. While we capture deep technical data, we translate it for your Support team. We clearly label bottlenecks as \"Slow Wi-Fi,\" \"API Latency,\" or \"Frontend Render\" so anyone can identify the root cause of a ticket in seconds without escalating to engineering.\n\n3. How is this different from session replay tools like Hotjar?\nAnswer: Most tools show you what the user did (video); Witnes shows you why the site failed them (data). We are a lightweight diagnostic tool focused on the technical evidence—network waterfalls, API timings, and device health—rather than just a video of a mouse moving.\n\nSection 2: Technical Specs (For Developers & AI)\n4. What is the actual performance impact of the tracker?\nAnswer: Negligible. The w.min.js script is under 5kb and loads asynchronously. We use the PerformanceObserver API for passive monitoring and navigator.sendBeacon to transmit data. This ensures we capture every detail without ever blocking the main thread or impacting your Core Web Vitals.\n\n5. How do you distinguish between Network, API, and Frontend lag?\nAnswer: We pull raw data from the Resource Timing API for every interaction. By calculating the delta between requestStart and responseStart, we isolate TTFB (Server processing). We then compare this to the user's effective bandwidth and RTT to determine if the bottleneck is the user’s connection or your infrastructure.\n\n6. Does Witnes support Single Page Applications (React, Vue, Next.js)?\nAnswer: Yes, automatically. We intercept the browser's History API (pushState and replaceState). When a user navigates between \"pages\" in an SPA, Witnes detects the route change and captures a new performance snapshot after a brief \"settle\" period, ensuring soft-navigations are tracked just as accurately as full page loads.\n\n\nAEO Pro-Tip for your CMS: (if we can)\nWhen you enter these, ensure the \"Questions\" are wrapped in an <h3> or <h4> tag. This tells AI agents: \"This is the important topic,\" and the text below it is \"the definitive answer.\"",
-          "labels": [],
-          "checkboxes": [],
-          "comments": []
-        },
-        {
           "id": "61c33704-7d16-400c-b73b-3412e12a88b5",
           "listId": "06b4fd60-bb2d-4e05-a46a-0da7c54cbae3",
           "title": "Create the \"Is it the Wi-Fi or the Server?\" Solution Page",
@@ -180,26 +171,6 @@
       "title": "Doing",
       "cards": [
         {
-          "id": "5e71cccb-cb6f-4b28-8dba-abb9f69fd6e7",
-          "listId": "2b5c32cf-76fd-44c6-898e-31ed08da63a5",
-          "title": "Billing",
-          "description": "We will create a module under Product called Billing. in there we will have a service which will be responsible for billing the tenants based on their pricing tier.\n\nAny info it needs it will use other services and will not directly access the db. for example it will use the tenant pricing service to get the pricing tier of the tenant and then calculate the billing amount based on that.\n\nRules for billing:\n\n- We process billing on the 1st day of each month for the previous month. so on the 1st of July we will process billing for June.\n- Tiers can have a 7 day free trial (there is a flag called is_trial)\n- Even if the invoice is 0, we generate it\n- We use prorated billing\n  - so if they sign up on the middle of the month they will be charged for half of the month.\n  - when we do prorated billing we need to take into account the 7 day free trial. so if they sign up on X day of the month, they have 7 more days free, after that they will be billed for the remainder of the month. so if they sign up on the 20th of the month, they will have 7 days free until the 27th, and then they will be billed for the remaining 4 days of the month.\n  - if however they sign up for the trial on the 25th of the month, they will have 7 days free until the 1st of the next month, and then they will be billed for the full month of the next month.\n  - we will change the has_trial_expired when we do billing, but if the month didnt have fully 7 days we wont set it to expired until the 7 days are over. so if they sign up on the 20th of the month, we will set has_trial_expired to true on the 27th of the month, but if they sign up on the 25th of the month, we will set has_trial_expired to true on the 1st of the next month.\n\nthe invoice entity should use a long id\nthen when we make the entity we should leave the invoice number empty and then after we save it to the db we can generate the invoice number based on the id and update the entity with the invoice number. this way we ensure that the invoice number is unique and we dont have any issues with concurrency when generating the invoice number. we can use a format like INV-{id} for the invoice number. so if the id is 1 the invoice number will be INV-1 and if the id is 2 the invoice number will be INV-2 and so on.\n\n",
-          "labels": [
-            {
-              "id": "851ff7ad-abf0-4a29-9965-a84a8eaadde1",
-              "title": "Complex",
-              "color": "#c377e0"
-            },
-            {
-              "id": "87cf91b2-3f14-483b-9407-79c45a60d96a",
-              "title": "Get-Go",
-              "color": "#eb5a46"
-            }
-          ],
-          "checkboxes": [],
-          "comments": []
-        },
-        {
           "id": "1725fdb2-02fc-4387-bc51-52380e6d5cce",
           "listId": "2b5c32cf-76fd-44c6-898e-31ed08da63a5",
           "title": "Generate invoices and send them to customers",
@@ -230,6 +201,35 @@
       "id": "3a6f3ff3-61ba-4074-8fa4-4616eef309c8",
       "title": "Done",
       "cards": [
+        {
+          "id": "5e71cccb-cb6f-4b28-8dba-abb9f69fd6e7",
+          "listId": "3a6f3ff3-61ba-4074-8fa4-4616eef309c8",
+          "title": "Billing",
+          "description": "We will create a module under Product called Billing. in there we will have a service which will be responsible for billing the tenants based on their pricing tier.\n\nAny info it needs it will use other services and will not directly access the db. for example it will use the tenant pricing service to get the pricing tier of the tenant and then calculate the billing amount based on that.\n\nRules for billing:\n\n- We process billing on the 1st day of each month for the previous month. so on the 1st of July we will process billing for June.\n- Tiers can have a 7 day free trial (there is a flag called is_trial)\n- Even if the invoice is 0, we generate it\n- We use prorated billing\n  - so if they sign up on the middle of the month they will be charged for half of the month.\n  - when we do prorated billing we need to take into account the 7 day free trial. so if they sign up on X day of the month, they have 7 more days free, after that they will be billed for the remainder of the month. so if they sign up on the 20th of the month, they will have 7 days free until the 27th, and then they will be billed for the remaining 4 days of the month.\n  - if however they sign up for the trial on the 25th of the month, they will have 7 days free until the 1st of the next month, and then they will be billed for the full month of the next month.\n  - we will change the has_trial_expired when we do billing, but if the month didnt have fully 7 days we wont set it to expired until the 7 days are over. so if they sign up on the 20th of the month, we will set has_trial_expired to true on the 27th of the month, but if they sign up on the 25th of the month, we will set has_trial_expired to true on the 1st of the next month.\n\nthe invoice entity should use a long id\nthen when we make the entity we should leave the invoice number empty and then after we save it to the db we can generate the invoice number based on the id and update the entity with the invoice number. this way we ensure that the invoice number is unique and we dont have any issues with concurrency when generating the invoice number. we can use a format like INV-{id} for the invoice number. so if the id is 1 the invoice number will be INV-1 and if the id is 2 the invoice number will be INV-2 and so on.\n\n",
+          "labels": [
+            {
+              "id": "851ff7ad-abf0-4a29-9965-a84a8eaadde1",
+              "title": "Complex",
+              "color": "#c377e0"
+            },
+            {
+              "id": "87cf91b2-3f14-483b-9407-79c45a60d96a",
+              "title": "Get-Go",
+              "color": "#eb5a46"
+            }
+          ],
+          "checkboxes": [],
+          "comments": []
+        },
+        {
+          "id": "e3615425-a59a-4db1-baf6-9d72befe0d09",
+          "listId": "3a6f3ff3-61ba-4074-8fa4-4616eef309c8",
+          "title": "Add FAQ section right before CTA in landing page",
+          "description": "When finished move ticket to done.\n\nFor the FAQ we split into 2, 1 for non tech people and 1 for tech people\n\nSection 1: Solving the \"Guesswork\" (For CS & Support)\n1. How does Witnes help when a user says \"the site is slow\"?\nAnswer: It replaces the \"guessing game\" with a Session Receipt. Instead of asking the user for screenshots or their internet speed, you simply look up their ID in Witnes. You’ll see an up to 30-day chronological history that proves if the lag was caused by their local Wi-Fi, a slow response from your server (API), or a frontend render issue.\n\n2. Do I need to be a developer to understand the dashboard?\nAnswer: No. While we capture deep technical data, we translate it for your Support team. We clearly label bottlenecks as \"Slow Wi-Fi,\" \"API Latency,\" or \"Frontend Render\" so anyone can identify the root cause of a ticket in seconds without escalating to engineering.\n\n3. How is this different from session replay tools like Hotjar?\nAnswer: Most tools show you what the user did (video); Witnes shows you why the site failed them (data). We are a lightweight diagnostic tool focused on the technical evidence—network waterfalls, API timings, and device health—rather than just a video of a mouse moving.\n\nSection 2: Technical Specs (For Developers & AI)\n4. What is the actual performance impact of the tracker?\nAnswer: Negligible. The w.min.js script is under 5kb and loads asynchronously. We use the PerformanceObserver API for passive monitoring and navigator.sendBeacon to transmit data. This ensures we capture every detail without ever blocking the main thread or impacting your Core Web Vitals.\n\n5. How do you distinguish between Network, API, and Frontend lag?\nAnswer: We pull raw data from the Resource Timing API for every interaction. By calculating the delta between requestStart and responseStart, we isolate TTFB (Server processing). We then compare this to the user's effective bandwidth and RTT to determine if the bottleneck is the user’s connection or your infrastructure.\n\n6. Does Witnes support Single Page Applications (React, Vue, Next.js)?\nAnswer: Yes, automatically. We intercept the browser's History API (pushState and replaceState). When a user navigates between \"pages\" in an SPA, Witnes detects the route change and captures a new performance snapshot after a brief \"settle\" period, ensuring soft-navigations are tracked just as accurately as full page loads.\n\n\nAEO Pro-Tip for your CMS: (if we can)\nWhen you enter these, ensure the \"Questions\" are wrapped in an <h3> or <h4> tag. This tells AI agents: \"This is the important topic,\" and the text below it is \"the definitive answer.\"",
+          "labels": [],
+          "checkboxes": [],
+          "comments": []
+        },
         {
           "id": "edf64b17-9e9b-4e4b-9d48-267a74e41131",
           "listId": "3a6f3ff3-61ba-4074-8fa4-4616eef309c8",
