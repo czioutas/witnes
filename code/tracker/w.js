@@ -3,8 +3,8 @@
  * Focus: Environment + Full Waterfall Latency
  */
 (function (window) {
-    if (window.WitnesInitialized) return;
-    window.WitnesInitialized = true;
+    if (window._wi) return;
+    window._wi = true;
 
     // -----------------------------
     // 1. Setup & Navigation State
@@ -51,9 +51,9 @@
     let metricsAtLoad = { lcp: 0, cls: 0 };
     let metricsAtIdentify = { lcp: 0, cls: 0 };
 
-    const KEYS = { REF: 'wit_ref' };
-    if (!sessionStorage.getItem(KEYS.REF)) {
-        sessionStorage.setItem(KEYS.REF, document.referrer || 'direct');
+    const K_REF = '_wr';
+    if (!sessionStorage.getItem(K_REF)) {
+        sessionStorage.setItem(K_REF, document.referrer || 'direct');
     }
 
     const sessionState = { lcp: 0, cls: 0, longTasks: [] };
@@ -336,7 +336,7 @@
             session: {
                 userId: identifiedUserId,
                 url: window.location.href,
-                ref: sessionStorage.getItem(KEYS.REF)
+                ref: sessionStorage.getItem(K_REF)
             },
             network: getConnectivity(),
             device: getContext(),
