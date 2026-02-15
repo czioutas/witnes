@@ -1,5 +1,6 @@
 ﻿using System;
 using Api.Product.Billing.Entities;
+using Api.Product.Ingestion.Models;
 using Libs.Domain;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
@@ -216,11 +217,11 @@ namespace Api.Migrations
                     HashId = table.Column<string>(type: "text", nullable: false),
                     Url = table.Column<string>(type: "text", nullable: false),
                     EventType = table.Column<string>(type: "text", nullable: false),
-                    Metadata = table.Column<string>(type: "jsonb", nullable: false),
-                    Session = table.Column<string>(type: "jsonb", nullable: false),
-                    Performance = table.Column<string>(type: "jsonb", nullable: false),
-                    Network = table.Column<string>(type: "jsonb", nullable: true),
-                    Device = table.Column<string>(type: "jsonb", nullable: true),
+                    Metadata = table.Column<MetadataModel>(type: "jsonb", nullable: false),
+                    Session = table.Column<SessionModel>(type: "jsonb", nullable: false),
+                    Performance = table.Column<PerformanceModel>(type: "jsonb", nullable: false),
+                    Network = table.Column<NetworkModel>(type: "jsonb", nullable: true),
+                    Device = table.Column<DeviceModel>(type: "jsonb", nullable: true),
                     IngestedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
                     PageRequestedAtByVisitor = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
                     created_at = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
@@ -248,22 +249,35 @@ namespace Api.Migrations
                     GuestId = table.Column<string>(type: "text", nullable: true),
                     UrlPath = table.Column<string>(type: "text", nullable: false),
                     PageRequestedAtByVisitor = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
-                    LcpMs = table.Column<int>(type: "integer", nullable: false),
-                    LcpVerdict = table.Column<string>(type: "text", nullable: false),
-                    ClsScore = table.Column<decimal>(type: "numeric", nullable: false),
-                    ClsVerdict = table.Column<string>(type: "text", nullable: false),
-                    IsConnectionFault = table.Column<bool>(type: "boolean", nullable: false),
                     ConnectionQuality = table.Column<string>(type: "text", nullable: false),
-                    ConnectionReasons = table.Column<int[]>(type: "integer[]", nullable: false),
                     EffectiveType = table.Column<string>(type: "text", nullable: false),
                     Rtt = table.Column<int>(type: "integer", nullable: false),
-                    Downlink = table.Column<decimal>(type: "numeric", nullable: false),
-                    TtfbMs = table.Column<int>(type: "integer", nullable: false),
-                    IsBackendFault = table.Column<bool>(type: "boolean", nullable: false),
-                    IsFrontendFault = table.Column<bool>(type: "boolean", nullable: false),
+                    DownlinkInMbs = table.Column<decimal>(type: "numeric", nullable: false),
                     Incomplete = table.Column<bool>(type: "boolean", nullable: false),
                     DeviceIcon = table.Column<string>(type: "text", nullable: false),
                     BrowserIcon = table.Column<string>(type: "text", nullable: false),
+                    IsBackendIssue = table.Column<bool>(type: "boolean", nullable: false),
+                    BackendConfidence = table.Column<int>(type: "integer", nullable: false),
+                    BackendReasons = table.Column<int[]>(type: "integer[]", nullable: false),
+                    IsNetworkIssue = table.Column<bool>(type: "boolean", nullable: false),
+                    NetworkConfidence = table.Column<int>(type: "integer", nullable: false),
+                    NetworkReasons = table.Column<int[]>(type: "integer[]", nullable: false),
+                    IsPayloadIssue = table.Column<bool>(type: "boolean", nullable: false),
+                    PayloadConfidence = table.Column<int>(type: "integer", nullable: false),
+                    PayloadReasons = table.Column<int[]>(type: "integer[]", nullable: false),
+                    TotalInitialLoadMs = table.Column<int>(type: "integer", nullable: false),
+                    IsFrontendIssue = table.Column<bool>(type: "boolean", nullable: false),
+                    FrontendConfidence = table.Column<int>(type: "integer", nullable: false),
+                    FrontendReasons = table.Column<int[]>(type: "integer[]", nullable: false),
+                    IsBadExperience = table.Column<bool>(type: "boolean", nullable: false),
+                    ExperienceSymptoms = table.Column<int[]>(type: "integer[]", nullable: false),
+                    AbsoluteLcpMs = table.Column<int>(type: "integer", nullable: false),
+                    SettledTimeMs = table.Column<int>(type: "integer", nullable: true),
+                    ClsScore = table.Column<decimal>(type: "numeric", nullable: false),
+                    TotalJankCount = table.Column<int>(type: "integer", nullable: false),
+                    InteractionDeadZoneMs = table.Column<int>(type: "integer", nullable: false),
+                    OverallSentiment = table.Column<int>(type: "integer", nullable: false),
+                    HistoricalComparison = table.Column<int>(type: "integer", nullable: false),
                     created_at = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
                     updated_at = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
                     tenant_id = table.Column<Guid>(type: "uuid", nullable: false)
@@ -289,20 +303,70 @@ namespace Api.Migrations
                     GuestId = table.Column<string>(type: "text", nullable: true),
                     Url = table.Column<string>(type: "text", nullable: false),
                     PageRequestedAtByVisitor = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
-                    WTrackerListenerCalledAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
-                    IngestionEndpointFiredAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
-                    LcpMs = table.Column<decimal>(type: "numeric", nullable: false),
-                    Cls = table.Column<decimal>(type: "numeric", nullable: false),
-                    AvgTtfbMs = table.Column<int>(type: "integer", nullable: false),
+                    PageLoadDurationMs = table.Column<int>(type: "integer", nullable: false),
+                    EmittedAt = table.Column<int>(type: "integer", nullable: false),
+                    FinalizeReason = table.Column<string>(type: "text", nullable: true),
+                    IdentifyDelayMs = table.Column<int>(type: "integer", nullable: false),
                     Rtt = table.Column<int>(type: "integer", nullable: false),
-                    Downlink = table.Column<decimal>(type: "numeric", nullable: false),
+                    DownlinkInMbs = table.Column<decimal>(type: "numeric", nullable: false),
                     EffectiveType = table.Column<string>(type: "text", nullable: false),
                     UserAgent = table.Column<string>(type: "text", nullable: false),
                     DeviceType = table.Column<string>(type: "text", nullable: false),
                     BrowserName = table.Column<string>(type: "text", nullable: false),
                     Incomplete = table.Column<bool>(type: "boolean", nullable: false),
+                    WasBackgroundTab = table.Column<bool>(type: "boolean", nullable: false),
+                    BackgroundDurationMs = table.Column<int>(type: "integer", nullable: false),
                     Waterfall = table.Column<string>(type: "jsonb", nullable: false),
                     JankReports = table.Column<string>(type: "jsonb", nullable: false),
+                    Protocol = table.Column<string>(type: "text", nullable: false),
+                    BaselineNetworkTtfbMs = table.Column<int>(type: "integer", nullable: false),
+                    CdnBaselineTtfbMs = table.Column<int>(type: "integer", nullable: false),
+                    InitialDocTtfbMs = table.Column<int>(type: "integer", nullable: false),
+                    MeanCriticalApiTtfbMs = table.Column<int>(type: "integer", nullable: false),
+                    TotalCriticalStalledMs = table.Column<int>(type: "integer", nullable: false),
+                    ServerEfficiencyRatio = table.Column<double>(type: "double precision", nullable: false),
+                    ConcurrentCriticalRequestCount = table.Column<int>(type: "integer", nullable: false),
+                    MaxConcurrentRequests = table.Column<int>(type: "integer", nullable: false),
+                    LargeApiCount = table.Column<int>(type: "integer", nullable: false),
+                    SmallApiMeanTtfbMs = table.Column<int>(type: "integer", nullable: false),
+                    MeanCriticalApiTransferMs = table.Column<int>(type: "integer", nullable: false),
+                    CriticalApisHaveLargePayloads = table.Column<bool>(type: "boolean", nullable: false),
+                    TotalPayloadBytes = table.Column<long>(type: "bigint", nullable: false),
+                    UncompressedCriticalAssetsCount = table.Column<int>(type: "integer", nullable: false),
+                    IndustryVerdict = table.Column<int>(type: "integer", nullable: false),
+                    CdnBaselineVerdict = table.Column<string>(type: "text", nullable: false),
+                    JsDurationPctOfLoad = table.Column<double>(type: "double precision", nullable: false),
+                    SlowestApiTtfbMs = table.Column<int>(type: "integer", nullable: false),
+                    SlowestApiUrl = table.Column<string>(type: "text", nullable: true),
+                    AbsoluteLcpMs = table.Column<int>(type: "integer", nullable: false),
+                    SettledTimeMs = table.Column<int>(type: "integer", nullable: true),
+                    CumulativeLayoutShift = table.Column<decimal>(type: "numeric", nullable: false),
+                    TotalJankCount = table.Column<int>(type: "integer", nullable: false),
+                    FcpMs = table.Column<int>(type: "integer", nullable: false),
+                    ShellToContentGapMs = table.Column<int>(type: "integer", nullable: false),
+                    InteractiveMs = table.Column<int>(type: "integer", nullable: false),
+                    FrozenUiGapMs = table.Column<int>(type: "integer", nullable: false),
+                    TechnicalInteractiveMs = table.Column<int>(type: "integer", nullable: false),
+                    FunctionalInteractiveMs = table.Column<int>(type: "integer", nullable: false),
+                    InteractionDeadZoneMs = table.Column<int>(type: "integer", nullable: false),
+                    TotalJsBytes = table.Column<long>(type: "bigint", nullable: false),
+                    TotalImgBytes = table.Column<long>(type: "bigint", nullable: false),
+                    TotalCssBytes = table.Column<long>(type: "bigint", nullable: false),
+                    TotalApiBytes = table.Column<long>(type: "bigint", nullable: false),
+                    SameOriginCount = table.Column<int>(type: "integer", nullable: false),
+                    ThirdPartyCount = table.Column<int>(type: "integer", nullable: false),
+                    HasThirdPartyData = table.Column<bool>(type: "boolean", nullable: false),
+                    SameOriginMedianTtfbMs = table.Column<int>(type: "integer", nullable: false),
+                    ThirdPartyMedianTtfbMs = table.Column<int>(type: "integer", nullable: false),
+                    SameOriginMedianThroughputBps = table.Column<double>(type: "double precision", nullable: false),
+                    ThirdPartyMedianThroughputBps = table.Column<double>(type: "double precision", nullable: false),
+                    OverallMedianThroughputBps = table.Column<double>(type: "double precision", nullable: false),
+                    ThirdPartyAlsoSlow = table.Column<bool>(type: "boolean", nullable: false),
+                    OnlySameOriginSlow = table.Column<bool>(type: "boolean", nullable: false),
+                    DownloadThroughputLow = table.Column<bool>(type: "boolean", nullable: false),
+                    HighWaitNormalDownload = table.Column<bool>(type: "boolean", nullable: false),
+                    NavigatorReportsBadConnection = table.Column<bool>(type: "boolean", nullable: false),
+                    NavigatorReportsGoodConnection = table.Column<bool>(type: "boolean", nullable: false),
                     created_at = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
                     updated_at = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
                     tenant_id = table.Column<Guid>(type: "uuid", nullable: false)
@@ -483,6 +547,40 @@ namespace Api.Migrations
                     table.PrimaryKey("PK_user_invitations", x => x.id);
                     table.ForeignKey(
                         name: "FK_user_invitations_tenants_tenant_id",
+                        column: x => x.tenant_id,
+                        principalTable: "tenants",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "user_page_stats",
+                columns: table => new
+                {
+                    id = table.Column<Guid>(type: "uuid", nullable: false),
+                    UserId = table.Column<string>(type: "text", nullable: false),
+                    PagePath = table.Column<string>(type: "text", nullable: false),
+                    WindowType = table.Column<string>(type: "text", nullable: false),
+                    VisitCount = table.Column<int>(type: "integer", nullable: false),
+                    AvgLoadTimeMs = table.Column<double>(type: "double precision", nullable: false),
+                    AvgDocTtfbMs = table.Column<double>(type: "double precision", nullable: false),
+                    AvgApiTtfbWorstMs = table.Column<double>(type: "double precision", nullable: false),
+                    AvgTransferSizeBytes = table.Column<double>(type: "double precision", nullable: false),
+                    AvgCdnLoadTimeMs = table.Column<double>(type: "double precision", nullable: false),
+                    SumLoadTimeMs = table.Column<double>(type: "double precision", nullable: false),
+                    SumDocTtfbMs = table.Column<double>(type: "double precision", nullable: false),
+                    SumApiTtfbWorstMs = table.Column<double>(type: "double precision", nullable: false),
+                    SumTransferSizeBytes = table.Column<double>(type: "double precision", nullable: false),
+                    SumCdnLoadTimeMs = table.Column<double>(type: "double precision", nullable: false),
+                    created_at = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    updated_at = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
+                    tenant_id = table.Column<Guid>(type: "uuid", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_user_page_stats", x => x.id);
+                    table.ForeignKey(
+                        name: "FK_user_page_stats_tenants_tenant_id",
                         column: x => x.tenant_id,
                         principalTable: "tenants",
                         principalColumn: "id",
@@ -795,6 +893,12 @@ namespace Api.Migrations
                 name: "IX_user_invitations_tenant_id",
                 table: "user_invitations",
                 column: "tenant_id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_user_page_stats_tenant_id_UserId_PagePath_WindowType",
+                table: "user_page_stats",
+                columns: new[] { "tenant_id", "UserId", "PagePath", "WindowType" },
+                unique: true);
         }
 
         /// <inheritdoc />
@@ -847,6 +951,9 @@ namespace Api.Migrations
 
             migrationBuilder.DropTable(
                 name: "user_invitations");
+
+            migrationBuilder.DropTable(
+                name: "user_page_stats");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");

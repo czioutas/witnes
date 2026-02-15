@@ -55,9 +55,9 @@ public class PageLoadsService : IPageLoadsService
             UserId = silverMetric.UserId ?? silverMetric.GuestId ?? "Unknown",
             Url = silverMetric.Url,
             Timestamp = silverMetric.PageRequestedAtByVisitor,
-            LcpMs = silverMetric.LcpMs,
-            Cls = silverMetric.Cls,
-            AvgTtfbMs = silverMetric.AvgTtfbMs,
+            LcpMs = silverMetric.AbsoluteLcpMs,
+            Cls = silverMetric.CumulativeLayoutShift,
+            AvgTtfbMs = silverMetric.InitialDocTtfbMs,
             Waterfall = silverMetric.Waterfall.Select(r => new ResourceTimingModel
             {
                 Id = r.Id,
@@ -67,10 +67,13 @@ public class PageLoadsService : IPageLoadsService
                 StalledMs = r.StalledMs,
                 TtfbMs = r.TtfbMs,
                 TotalMs = r.TotalMs,
-                SizeFormatted = r.SizeFormatted,
-                IsCompressed = r.IsCompressed
+                IsCompressed = r.IsCompressed,
+                SizeFormatted = FormatBytes(r.SizeBytes)
             }).ToList(),
             JankReports = silverMetric.JankReports
+                .Where(j => j.S.HasValue && j.D.HasValue)
+                .Select(j => $"Long task at {j.S}ms (duration: {j.D}ms)")
+                .ToList()
         };
 
         _logger.LogInformation(
@@ -82,4 +85,11 @@ public class PageLoadsService : IPageLoadsService
 
         return detail;
     }
+
+    private static string FormatBytes(long bytes) => bytes switch
+    {
+        >= 1_048_576 => $"{bytes / 1_048_576.0:F1} MB",
+        >= 1_024 => $"{bytes / 1_024.0:F1} KB",
+        _ => $"{bytes} B"
+    };
 }

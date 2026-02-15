@@ -49,12 +49,9 @@ export type GetV1RequestResetPasswordParams = {
 };
 
 export interface WebVitals {
-  /** @nullable */
-  cls?: number | null;
-  /** @nullable */
-  fcp?: string | null;
-  /** @nullable */
-  lcp?: string | null;
+  cls?: number;
+  fcp?: number;
+  lcp?: number;
 }
 
 /**
@@ -80,25 +77,17 @@ export interface WaterfallResource {
   name?: string | null;
   /** @nullable */
   protocol?: string | null;
+  same_origin?: boolean;
   /** @nullable */
   start?: number | null;
+  timing_restricted?: boolean;
 }
 
-/**
- * @nullable
- */
-export type VitalsModelWebVitals = WebVitals | null;
-
-/**
- * @nullable
- */
-export type VitalsModelPageLoad = { [key: string]: string } | null;
-
 export interface VitalsModel {
-  /** @nullable */
-  page_load?: VitalsModelPageLoad;
-  /** @nullable */
-  web_vitals?: VitalsModelWebVitals;
+  metrics_at_identify?: MetricsAtIdentify;
+  metrics_at_load?: MetricsAtLoad;
+  page_load?: PageLoad;
+  web_vitals?: WebVitals;
 }
 
 /**
@@ -163,6 +152,18 @@ export interface ValidationProblemDetails {
   /** @nullable */
   type?: string | null;
   [key: string]: unknown;
+}
+
+export interface UserPageStatsResponse {
+  avg_api_ttfb_worst_ms?: number;
+  avg_cdn_load_time_ms?: number;
+  avg_doc_ttfb_ms?: number;
+  avg_load_time_ms?: number;
+  avg_transfer_size_bytes?: number;
+  page_path?: string;
+  user_id?: string;
+  visit_count?: number;
+  window_type?: string;
 }
 
 export interface UserInvitationModel {
@@ -538,42 +539,29 @@ export interface ProblemDetails {
 /**
  * @nullable
  */
-export type PerformanceModelVitals = VitalsModel | null;
+export type PerformanceModelCdnBaseline = CdnBaselineModel | null;
 
 export interface PerformanceModel {
   /** @nullable */
-  jank?: JankMetric[] | null;
+  cdn_baseline?: PerformanceModelCdnBaseline;
+  initial_load?: InitialLoadModel;
   /** @nullable */
-  vitals?: PerformanceModelVitals;
+  jank?: JankMetric[] | null;
+  vitals?: VitalsModel;
   /** @nullable */
   waterfall?: WaterfallResource[] | null;
 }
 
-/**
- * Summary model for a single page load event
- */
-export interface PageLoadSummaryModel {
-  browser_icon?: string;
-  cls_score?: number;
-  cls_verdict?: string;
-  connection_quality?: string;
-  connection_reasons?: ConnectionReason[];
-  device_icon?: string;
-  downlink?: number;
-  effective_type?: string;
-  id?: string;
-  incomplete?: boolean;
-  is_backend_fault?: boolean;
-  is_connection_fault?: boolean;
-  is_frontend_fault?: boolean;
-  lcp_ms?: number;
-  lcp_verdict?: string;
-  rtt?: number;
-  silver_id?: string;
-  timestamp?: string;
-  ttfb_ms?: number;
-  url_path?: string;
-}
+export type PayloadReason = (typeof PayloadReason)[keyof typeof PayloadReason];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const PayloadReason = {
+  UncompressedAssets: "UncompressedAssets",
+  ExcessiveSize: "ExcessiveSize",
+  ScriptBloat: "ScriptBloat",
+  LargeApiResponses: "LargeApiResponses",
+  ConcurrencyBottleneck: "ConcurrencyBottleneck",
+} as const;
 
 export interface PageLoadSummaryModelPagedResult {
   data?: PageLoadSummaryModel[];
@@ -607,6 +595,11 @@ export interface PageLoadDetailModel {
   user_id?: string;
   /** Network waterfall - list of resources loaded */
   waterfall?: ResourceTimingModel[];
+}
+
+export interface PageLoad {
+  complete?: number;
+  interactive?: number;
 }
 
 /**
@@ -650,44 +643,94 @@ export interface PackageInfoModel {
   trial_days_remaining?: number;
 }
 
-export interface NetworkModel {
+export type OverallSentiment =
+  (typeof OverallSentiment)[keyof typeof OverallSentiment];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const OverallSentiment = {
+  bad: "bad",
+  neutral: "neutral",
+  good: "good",
+} as const;
+
+export type NetworkReason = (typeof NetworkReason)[keyof typeof NetworkReason];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const NetworkReason = {
+  high_latency: "high_latency",
+  low_bandwidth: "low_bandwidth",
+  network_congestion: "network_congestion",
+  unstable_cellular: "unstable_cellular",
+  elevated_cdn_baseline: "elevated_cdn_baseline",
+} as const;
+
+/**
+ * Summary model for a single page load event
+ */
+export interface PageLoadSummaryModel {
+  absolute_lcp_ms?: number;
+  backend_confidence?: number;
+  backend_reasons?: BackendReason[];
+  browser_icon?: string;
+  cls_score?: number;
+  connection_quality?: string;
+  device_icon?: string;
+  experience_symptoms?: ExperienceSymptom[];
+  frontend_confidence?: number;
+  frontend_reasons?: FrontendReason[];
+  historical_comparison?: HistoricalComparison;
+  id?: string;
+  incomplete?: boolean;
+  interaction_dead_zone_ms?: number;
+  is_backend_issue?: boolean;
+  is_bad_experience?: boolean;
+  is_frontend_issue?: boolean;
+  is_network_issue?: boolean;
+  is_payload_issue?: boolean;
+  network_confidence?: number;
+  network_reasons?: NetworkReason[];
+  overall_sentiment?: OverallSentiment;
+  page_requested_at_by_visitor?: string;
+  payload_confidence?: number;
+  payload_reasons?: PayloadReason[];
   /** @nullable */
-  downlink?: string | null;
+  settled_time_ms?: number | null;
+  silver_id?: string;
+  total_initial_load_ms?: number;
+  total_jank_count?: number;
+  url_path?: string;
+  user_id?: string;
+  user_left_early?: boolean;
+}
+
+export interface NetworkModel {
+  downlink_in_mbs?: number;
   /** @nullable */
   effective_type?: string | null;
   /** @nullable */
   rtt?: string | null;
 }
 
-/**
- * Response model for metric data
- */
-export interface MetricResponse {
-  browser_icon?: string;
-  cls_score?: number;
-  cls_verdict?: string;
-  connection_quality?: string;
-  created_at?: string;
-  device_icon?: string;
-  id?: string;
-  incomplete?: boolean;
-  is_backend_fault?: boolean;
-  is_connection_fault?: boolean;
-  is_frontend_fault?: boolean;
-  lcp_ms?: number;
-  lcp_verdict?: string;
-  silver_id?: string;
-  timestamp?: string;
-  ttfb_ms?: number;
-  url_path?: string;
-  user_id?: string;
+export interface MetricsAtLoad {
+  cls?: number;
+  lcp?: number;
+}
+
+export interface MetricsAtIdentify {
+  cls?: number;
+  lcp?: number;
 }
 
 export interface MetadataModel {
-  call_witnes_at?: string;
+  duration_ms?: number;
+  emitted_at?: string;
   event?: string;
+  /** @nullable */
+  finalize_reason?: string | null;
+  identify_delay_ms?: number;
   incomplete?: boolean;
-  listener_called_at_by_emit_event?: string;
+  load_event_fired_at?: number;
+  navigation_id?: string;
   page_requested_at_by_visitor?: string;
   pk?: string;
 }
@@ -700,6 +743,7 @@ export interface LoginModel {
 }
 
 export interface LatencyMetrics {
+  download_ms?: number;
   stalled?: number;
   total?: number;
   ttfb?: number;
@@ -707,7 +751,9 @@ export interface LatencyMetrics {
 
 export interface JankMetric {
   /** @nullable */
-  d?: string | null;
+  d?: number | null;
+  /** @nullable */
+  s?: number | null;
 }
 
 export type InvoiceStatus = (typeof InvoiceStatus)[keyof typeof InvoiceStatus];
@@ -764,6 +810,25 @@ export interface InvoiceModel {
 /**
  * @nullable
  */
+export type InitialLoadModelLatency = LatencyMetrics | null;
+
+/**
+ * @nullable
+ */
+export type InitialLoadModelData = DataMetrics | null;
+
+export interface InitialLoadModel {
+  /** @nullable */
+  data?: InitialLoadModelData;
+  /** @nullable */
+  latency?: InitialLoadModelLatency;
+  /** @nullable */
+  protocol?: string | null;
+}
+
+/**
+ * @nullable
+ */
 export type IngestMetricRequestModelNetwork = NetworkModel | null;
 
 /**
@@ -781,11 +846,47 @@ export interface IngestMetricRequestModel {
   session?: SessionModel;
 }
 
+export type HistoricalComparison =
+  (typeof HistoricalComparison)[keyof typeof HistoricalComparison];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const HistoricalComparison = {
+  worse: "worse",
+  similar: "similar",
+  better: "better",
+  insufficient_data: "insufficient_data",
+} as const;
+
+export type FrontendReason =
+  (typeof FrontendReason)[keyof typeof FrontendReason];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const FrontendReason = {
+  heavy_app_bundle: "heavy_app_bundle",
+  hydration_lockup: "hydration_lockup",
+  zombie_ui: "zombie_ui",
+  implementation_layout_shift: "implementation_layout_shift",
+  unoptimized_boot_sequence: "unoptimized_boot_sequence",
+} as const;
+
 export type FeatureKey = (typeof FeatureKey)[keyof typeof FeatureKey];
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const FeatureKey = {
   dropzone: "dropzone",
+} as const;
+
+export type ExperienceSymptom =
+  (typeof ExperienceSymptom)[keyof typeof ExperienceSymptom];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const ExperienceSymptom = {
+  slow_visual_load: "slow_visual_load",
+  unstable_layout: "unstable_layout",
+  stuttering_ui: "stuttering_ui",
+  delayed_functional_ready: "delayed_functional_ready",
+  inifnite_waterfall: "inifnite_waterfall",
+  rage_quit: "rage_quit",
 } as const;
 
 export interface EnabledFeaturesResponse {
@@ -817,9 +918,10 @@ export interface DeviceModel {
 
 export interface DataMetrics {
   /** @nullable */
-  is_compressed?: boolean | null;
+  download_bytes_per_sec?: number | null;
   /** @nullable */
-  transfer?: string | null;
+  is_compressed?: boolean | null;
+  transfer_in_bytes?: number;
 }
 
 export interface CreateUserInvitationModel {
@@ -842,18 +944,6 @@ export interface CreateProjectKeyRequest {
   name: string;
 }
 
-export type ConnectionReason =
-  (typeof ConnectionReason)[keyof typeof ConnectionReason];
-
-// eslint-disable-next-line @typescript-eslint/no-redeclare
-export const ConnectionReason = {
-  high_latency: "high_latency",
-  low_bandwidth: "low_bandwidth",
-  network_congestion: "network_congestion",
-  unstable_cellular: "unstable_cellular",
-  local_bottleneck: "local_bottleneck",
-} as const;
-
 export interface CheckFeatureResponse {
   feature_key: FeatureKey;
   is_enabled: boolean;
@@ -864,6 +954,22 @@ export interface ChangeTenantPricingRequest {
   /** @nullable */
   start_date?: string | null;
 }
+
+export interface CdnBaselineModel {
+  total_ms?: number;
+  transfer_bytes?: number;
+  ttfb_ms?: number;
+}
+
+export type BackendReason = (typeof BackendReason)[keyof typeof BackendReason];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const BackendReason = {
+  slow_initial_document: "slow_initial_document",
+  slow_critical_api: "slow_critical_api",
+  server_processing_gap: "server_processing_gap",
+  heavy_response_payload: "heavy_response_payload",
+} as const;
 
 /**
  * A wrapper class for an Application Level exception, which includes helpful details.
@@ -1122,29 +1228,9 @@ The response is lightweight and does not perform any complex operations or datab
   };
 
   /**
-   * @summary Gets all metrics for the current tenant
-   */
-  const getV1Metrics = () => {
-    return customInstance<MetricResponse[]>({
-      url: `/v1/metrics`,
-      method: "GET",
-    });
-  };
-
-  /**
-   * @summary Gets a specific metric by ID
-   */
-  const getV1MetricsId = (id: string) => {
-    return customInstance<MetricResponse>({
-      url: `/v1/metrics/${id}`,
-      method: "GET",
-    });
-  };
-
-  /**
  * Sample request:
             
-    GET /api/v1/page-loads/019c3eb8-7a1f-7a29-af77-963722c894b6
+    GET /v1/page-loads/019c3eb8-7a1f-7a29-af77-963722c894b6
             
 Returns detailed metrics including:
 - Core Web Vitals (LCP, CLS, TTFB)
@@ -1354,7 +1440,7 @@ Returns detailed metrics including:
   /**
  * Sample request:
             
-    GET /api/v1/visitors?userIdSearch=user123&startDate=2026-01-01&pageNumber=1&pageSize=20
+    GET /v1/visitors?userIdSearch=user123&startDate=2026-01-01&pageNumber=1&pageSize=20
             
 Returns visitors ordered by most recently seen (LastSeenAt descending).
             
@@ -1374,7 +1460,7 @@ Supports filtering by user ID search, date range, and pagination.
   /**
  * Sample request:
             
-    GET /api/v1/visitors/user123/page-loads?pageNumber=1&pageSize=20&startDate=2026-01-01
+    GET /v1/visitors/user123/page-loads?pageNumber=1&pageSize=20&startDate=2026-01-01
             
 Returns page loads ordered by most recent first (Timestamp descending).
  * @summary Gets a paginated list of page loads for a specific visitor (end-user).
@@ -1388,6 +1474,17 @@ Supports filtering by date range and pagination.
       url: `/v1/visitors/${userId}/page-loads`,
       method: "GET",
       params,
+    });
+  };
+
+  /**
+ * @summary Gets historical performance stats for a specific visitor (end-user).
+Returns rolling window aggregates (last_10, last_50, last_200) and time-based windows.
+ */
+  const getV1VisitorsUserIdStats = (userId: string) => {
+    return customInstance<UserPageStatsResponse[]>({
+      url: `/v1/visitors/${userId}/stats`,
+      method: "GET",
     });
   };
 
@@ -1407,8 +1504,6 @@ Supports filtering by date range and pagination.
     postV1Events,
     getV1Invoice,
     getV1InvoiceInvoiceId,
-    getV1Metrics,
-    getV1MetricsId,
     getV1PageLoadsId,
     postV1PricingTenantPricing,
     putV1PricingTenantPricing,
@@ -1432,6 +1527,7 @@ Supports filtering by date range and pagination.
     userInvitationDelete,
     getV1Visitors,
     getV1VisitorsUserIdPageLoads,
+    getV1VisitorsUserIdStats,
   };
 };
 export type PostV1AccountRegisterResult = NonNullable<
@@ -1506,12 +1602,6 @@ export type GetV1InvoiceInvoiceIdResult = NonNullable<
   Awaited<
     ReturnType<ReturnType<typeof getWitnesServerAPI>["getV1InvoiceInvoiceId"]>
   >
->;
-export type GetV1MetricsResult = NonNullable<
-  Awaited<ReturnType<ReturnType<typeof getWitnesServerAPI>["getV1Metrics"]>>
->;
-export type GetV1MetricsIdResult = NonNullable<
-  Awaited<ReturnType<ReturnType<typeof getWitnesServerAPI>["getV1MetricsId"]>>
 >;
 export type GetV1PageLoadsIdResult = NonNullable<
   Awaited<ReturnType<ReturnType<typeof getWitnesServerAPI>["getV1PageLoadsId"]>>
@@ -1619,6 +1709,13 @@ export type GetV1VisitorsUserIdPageLoadsResult = NonNullable<
   Awaited<
     ReturnType<
       ReturnType<typeof getWitnesServerAPI>["getV1VisitorsUserIdPageLoads"]
+    >
+  >
+>;
+export type GetV1VisitorsUserIdStatsResult = NonNullable<
+  Awaited<
+    ReturnType<
+      ReturnType<typeof getWitnesServerAPI>["getV1VisitorsUserIdStats"]
     >
   >
 >;

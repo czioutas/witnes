@@ -11,6 +11,7 @@ using Api.Application.Users;
 using Api.Data.Seeders;
 using Api.Product.DailySalt;
 using Api.Product.Billing.Entities;
+using Api.Product.MetricsProcessing.Aggregates;
 using Api.Product.MetricsProcessing.Bronze;
 using Api.Product.MetricsProcessing.Gold;
 using Api.Product.MetricsProcessing.Silver;
@@ -18,6 +19,7 @@ using Libs.Domain;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Api.Product.Ingestion.Models;
 
 namespace Api.Data;
 
@@ -76,6 +78,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUserEntity, App
     public virtual DbSet<MetricBronzeEntity> MetricsBronze => Set<MetricBronzeEntity>();
     public virtual DbSet<MetricSilverEntity> MetricsSilver => Set<MetricSilverEntity>();
     public virtual DbSet<MetricGoldEntity> MetricsGold => Set<MetricGoldEntity>();
+    public virtual DbSet<UserPageStatsEntity> UserPageStats => Set<UserPageStatsEntity>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -109,8 +112,8 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUserEntity, App
                 .HasColumnType("jsonb")
                 .HasConversion(
                     v => JsonSerializer.Serialize(v, (JsonSerializerOptions)null!),
-                    v => JsonSerializer.Deserialize<List<string>>(v, (JsonSerializerOptions)null!)
-                        ?? new List<string>()
+                    v => JsonSerializer.Deserialize<List<JankMetric>>(v, (JsonSerializerOptions)null!)
+                        ?? new List<JankMetric>()
                 );
 
             // 2. Ensure the tenant_id FK and other constraints
@@ -169,6 +172,11 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUserEntity, App
         });
 
         builder.Entity<MetricGoldEntity>(entity =>
+        {
+            entity.HasQueryFilter(e => e.TenantId == CurrentTenantId);
+        });
+
+        builder.Entity<UserPageStatsEntity>(entity =>
         {
             entity.HasQueryFilter(e => e.TenantId == CurrentTenantId);
         });

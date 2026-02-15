@@ -1,8 +1,8 @@
 using Api.Data;
 using Api.Product.Ingestion.Models;
+using Api.Product.MetricsProcessing.Bronze;
+using Libs.Domain;
 using Microsoft.EntityFrameworkCore;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 
 namespace Api.Product.MetricsProcessing.Silver;
 
@@ -30,12 +30,6 @@ public class SilverService : ISilverService
     private readonly ApplicationDbContext _context;
     private readonly ILogger<SilverService> _logger;
 
-    private static readonly JsonSerializerOptions JsonOptions = new()
-    {
-        PropertyNameCaseInsensitive = true,
-        NumberHandling = JsonNumberHandling.AllowReadingFromString
-    };
-
     public SilverService(ApplicationDbContext context, ILogger<SilverService> logger)
     {
         _context = context;
@@ -47,21 +41,27 @@ public class SilverService : ISilverService
         _logger.LogDebug("Starting Silver transformation for BronzeId: {BronzeId}", bronzeId);
 
         var bronze = await _context.MetricsBronze
-            .FirstOrDefaultAsync(x => x.Id == bronzeId && x.TenantId == tenantId);
+            .FirstOrDefaultAsync(x => x.Id == bronzeId && x.TenantId == tenantId) ?? throw new InvalidOperationException($"Bronze record {bronzeId} not found.");
 
-        if (bronze == null)
-            throw new InvalidOperationException($"Bronze record {bronzeId} not found.");
+        // ---------------------------------------------------------
+        // 1. Data Extraction & Contextual Setup
+        // ---------------------------------------------------------
+        var metadata = bronze.Metadata;
+        var performance = bronze.Performance;
+        var network = bronze.Network;
+        var device = bronze.Device;
 
-        // 1. Deserialize the blocks from the Bronze entity
-        var metadata = JsonSerializer.Deserialize<MetadataModel>(bronze.Metadata, JsonOptions);
-        var performance = JsonSerializer.Deserialize<PerformanceModel>(bronze.Performance, JsonOptions);
-        var network = bronze.Network != null ? JsonSerializer.Deserialize<NetworkModel>(bronze.Network, JsonOptions) : null;
-        var device = bronze.Device != null ? JsonSerializer.Deserialize<DeviceModel>(bronze.Device, JsonOptions) : null;
+        var waterfall = performance.Waterfall ?? [];
+        var initialLoad = performance.InitialLoad;
+        var jankList = performance.Jank ?? new List<JankMetric>();
 
-        if (performance == null)
-            throw new InvalidOperationException("Failed to deserialize Bronze Performance payload.");
+        // Compute Network Baselines
+        var baselineNetworkTtfb = CalculateNetworkBaseline(waterfall);
+        var initialDocTtfb = initialLoad?.Latency?.Ttfb ?? 0;
 
-        // 2. Construct the Silver Entity
+        // ---------------------------------------------------------
+        // 2. Map Silver Entity (The Flat Record)
+        // ---------------------------------------------------------
         var silverEntity = new MetricSilverEntity
         {
             Id = Guid.NewGuid(),
@@ -71,23 +71,26 @@ public class SilverService : ISilverService
             GuestId = bronze.UserId == null ? bronze.HashId : null,
             Url = bronze.Url,
             PageRequestedAtByVisitor = metadata!.PageRequestedAtByVisitor,
-            WTrackerListenerCalledAt = metadata.ListenerCalledAtByEmitEvent,
-            IngestionEndpointFiredAt = metadata.CallWitnesAt,
+            PageLoadDurationMs = metadata?.PageLoadDurationMs ?? 0,
             Incomplete = metadata?.Incomplete ?? false,
+            FinalizeReason = metadata?.FinalizeReason,
+            IdentifyDelayMs = metadata?.IdentifyDelayMs ?? 0,
+            WasBackgroundTab = metadata?.WasBackgroundTab ?? false,
+            BackgroundDurationMs = metadata?.TabVisibleAtMs ?? 0,
 
-            // --- Network Extraction ---
+            // Network Context
             EffectiveType = network?.EffectiveType ?? "unknown",
             Rtt = ParseIntMetric(network?.Rtt, "ms"),
-            Downlink = ParseDecimalMetric(network?.Downlink, "Mb/s"),
+            DownlinkInMbs = network?.DownlinkInMbs ?? 0,
+            Protocol = initialLoad?.Protocol ?? "h2",
 
-            // --- Device Extraction ---
+            // Device Context
             UserAgent = device?.UserAgent ?? "Unknown",
-            // Note: These helpers would use a simple regex or library to get "Chrome"/"Desktop"
             BrowserName = UserAgentParser.GetBrowser(device?.UserAgent),
             DeviceType = UserAgentParser.GetDeviceType(device?.UserAgent),
 
-            // --- Performance & Waterfall ---
-            Waterfall = performance.Waterfall?.Select(r => new ProcessedResource
+            // Waterfall Processing
+            Waterfall = [.. waterfall.Select(r => new ProcessedResource
             {
                 Label = $"{(r.Initiator ?? "OTHER").ToUpper()} | {r.Name ?? "Unknown"}",
                 FullUrl = r.FullUrl ?? "N/A",
@@ -95,25 +98,302 @@ public class SilverService : ISilverService
                 StalledMs = r.Latency?.Stalled ?? 0,
                 TtfbMs = r.Latency?.Ttfb ?? 0,
                 TotalMs = r.Latency?.Total ?? 0,
-                SizeFormatted = r.Data?.Transfer ?? "0B",
-                IsCompressed = r.Data?.IsCompressed ?? false
-            }).ToList() ?? new List<ProcessedResource>(),
+                SizeBytes = r.Data?.TransferInBytes ?? 0,
+                IsCompressed = r.Data?.IsCompressed ?? false,
+                SameOrigin = r.SameOrigin,
+                TimingRestricted = r.TimingRestricted,
+                DownloadMs = r.Latency?.DownloadMs ?? 0,
+                DownloadBytesPerSec = r.Data?.DownloadBytesPerSec,
+                TransferInBytes = r.Data?.TransferInBytes ?? 0
+            })],
 
-            JankReports = performance.Jank?.Select(j => j.D ?? "Unknown Jank").ToList() ?? new List<string>(),
+            // Jank Storage
+            JankReports = jankList,
 
-            LcpMs = ParseDecimalMetric(performance.Vitals?.WebVitals?.Lcp, "ms"),
-            Cls = performance.Vitals?.WebVitals?.Cls ?? 0,
+            // Infrastructure & Efficiency Baseline
+            BaselineNetworkTtfbMs = baselineNetworkTtfb,
+            CdnBaselineTtfbMs = performance.CdnBaseline?.TtfbMs ?? 0,
+            InitialDocTtfbMs = initialDocTtfb,
+            ServerEfficiencyRatio = baselineNetworkTtfb > 0 ? (double)initialDocTtfb / baselineNetworkTtfb : 1.0,
+            TotalCriticalStalledMs = CalculateTotalCriticalStalled(waterfall),
+            MaxConcurrentRequests = CalculateMaxConcurrency(waterfall),
+            // ---------------------------------------------------------
+            // 3. Frontend Symptoms (The "What Happened?")
+            // ---------------------------------------------------------
+            AbsoluteLcpMs = performance.Vitals.WebVitals.Lcp,
+            FcpMs = performance.Vitals.WebVitals.Fcp,
+            CumulativeLayoutShift = performance.Vitals.WebVitals.Cls,
+            TotalJankCount = jankList.Count,
 
-            AvgTtfbMs = (performance.Waterfall != null && performance.Waterfall.Any())
-                ? (int)performance.Waterfall.Average(w => w.Latency?.Ttfb ?? 0)
-                : 0
+            // Settled Time: Null if we didn't finish cleanly
+            SettledTimeMs = metadata?.FinalizeReason == "idle"
+                ? metadata.PageLoadDurationMs
+                : null,
+
+            // ---------------------------------------------------------
+            // 4. Interactive Duo & Functional Logic
+            // ---------------------------------------------------------
+            TechnicalInteractiveMs = performance.Vitals.PageLoad.Interactive
         };
+
+        // Find the last long task that effectively extended the "Hydration/Init" phase
+        // We look for tasks starting near TechnicalInteractive and up to 3s after.
+        var hydrationJank = silverEntity.JankReports
+            .Where(j => j.S >= silverEntity.TechnicalInteractiveMs - 500 &&
+                        j.S <= silverEntity.TechnicalInteractiveMs + 3000)
+            .OrderByDescending(j => (j.S ?? 0) + (j.D ?? 0))
+            .FirstOrDefault();
+
+        silverEntity.FunctionalInteractiveMs = hydrationJank != null
+            ? (hydrationJank.S ?? 0) + (hydrationJank.D ?? 0)
+            : silverEntity.TechnicalInteractiveMs;
+
+        // ---------------------------------------------------------
+        // 5. Fault Evidence (The Calculated Gaps)
+        // ---------------------------------------------------------
+        // Why was it slow?
+        silverEntity.ShellToContentGapMs = Math.Max(0, silverEntity.AbsoluteLcpMs - silverEntity.FcpMs);
+        silverEntity.InteractionDeadZoneMs = silverEntity.FunctionalInteractiveMs - silverEntity.TechnicalInteractiveMs;
+
+        // Legacy mapping for InteractiveMs (using Technical as the baseline)
+        silverEntity.InteractiveMs = silverEntity.TechnicalInteractiveMs;
+        silverEntity.FrozenUiGapMs = Math.Max(0, silverEntity.TechnicalInteractiveMs - silverEntity.AbsoluteLcpMs);
+
+        var resources = silverEntity.Waterfall;
+
+        silverEntity.TotalPayloadBytes = resources.Sum(r => r.SizeBytes);
+
+        // Bucket the bytes by looking at the Label (which we set to Initiator) or Extension
+        silverEntity.TotalJsBytes = resources
+            .Where(r => r.Label.Contains("SCRIPT") || r.FullUrl.Contains(".js"))
+            .Sum(r => r.SizeBytes);
+
+        silverEntity.TotalImgBytes = resources
+            .Where(r => r.Label.Contains("IMG") || r.Label.Contains("IMAGE") || IsImageExtension(r.FullUrl))
+            .Sum(r => r.SizeBytes);
+
+        silverEntity.TotalApiBytes = resources
+            .Where(r => r.Label.Contains("FETCH") || r.Label.Contains("XMLHTTPREQUEST"))
+            .Sum(r => r.SizeBytes);
+
+        // Implementation Fault: Find individual APIs that are way too large for a single request
+        silverEntity.LargeApiCount = resources
+            .Count(r => (r.Label.Contains("FETCH") || r.Label.Contains("XMLHTTPREQUEST")) && r.SizeBytes > 200 * 1024);
+
+        // CSS bytes
+        silverEntity.TotalCssBytes = resources
+            .Where(r => r.Label.Contains("LINK") || r.FullUrl.EndsWith(".css"))
+            .Sum(r => r.SizeBytes);
+
+        // Compression Fault: Text-based assets that aren't compressed
+        silverEntity.UncompressedCriticalAssetsCount = resources
+            .Count(r => !r.IsCompressed && (r.Label.Contains("SCRIPT") || r.Label.Contains("LINK") || r.Label.Contains("FETCH")));
+
+        // ---------------------------------------------------------
+        // 6. Critical API Signals
+        // ---------------------------------------------------------
+        // For timing-restricted (cross-origin) entries, TtfbMs=0 is meaningless.
+        // Use TotalMs (duration) as the effective response time — it's still accurate.
+        static int EffectiveApiTime(ProcessedResource r) =>
+            r.TimingRestricted ? r.TotalMs : r.TtfbMs;
+
+        silverEntity.MeanCriticalApiTtfbMs = CalculateMeanCriticalApiTtfb(waterfall);
+
+        var criticalApis = resources
+            .Where(r => r.Label.Contains("FETCH") || r.Label.Contains("XMLHTTPREQUEST"))
+            .OrderBy(r => r.StalledMs + EffectiveApiTime(r)) // order by start-ish time
+            .Take(5)
+            .ToList();
+
+        if (criticalApis.Count != 0)
+        {
+            // Mean transfer time (download phase) for critical APIs
+            silverEntity.MeanCriticalApiTransferMs = (int)criticalApis
+                .Where(r => !r.TimingRestricted)
+                .DefaultIfEmpty()
+                .Average(r => r != null ? Math.Max(0, r.TotalMs - r.TtfbMs - r.StalledMs) : 0);
+
+            // Do any critical APIs have large payloads (>100KB)?
+            silverEntity.CriticalApisHaveLargePayloads = criticalApis
+                .Any(r => r.SizeBytes > 100 * 1024);
+
+            // Mean TTFB for small-payload APIs (pure server logic speed)
+            var smallApis = criticalApis.Where(r => r.SizeBytes <= 100 * 1024).ToList();
+            silverEntity.SmallApiMeanTtfbMs = smallApis.Any()
+                ? (int)smallApis.Average(r => EffectiveApiTime(r))
+                : 0;
+
+            // How many critical APIs started within 50ms of each other?
+            silverEntity.ConcurrentCriticalRequestCount = CountConcurrentStarts(criticalApis, 50);
+        }
+
+        // Helper for image detection
+        bool IsImageExtension(string url) =>
+            url.EndsWith(".png") || url.EndsWith(".jpg") || url.EndsWith(".jpeg") || url.EndsWith(".webp") || url.EndsWith(".svg");
+
+        silverEntity = BuildNetworkFingerprint(bronze, silverEntity);
+
+        // ---------------------------------------------------------
+        // 7. Page Sentiment Signal (Industry Verdict)
+        // ---------------------------------------------------------
+        silverEntity.IndustryVerdict = silverEntity.AbsoluteLcpMs switch
+        {
+            < 2500 => IndustryVerdict.Fast,
+            < 4000 => IndustryVerdict.Normal,
+            < 6000 => IndustryVerdict.Slow,
+            _ => IndustryVerdict.Critical
+        };
+
+        // ---------------------------------------------------------
+        // 8. CDN Baseline Verdict
+        // ---------------------------------------------------------
+        silverEntity.CdnBaselineVerdict = silverEntity.CdnBaselineTtfbMs switch
+        {
+            0 => "unknown",   // No CDN data available
+            <= 50 => "normal",
+            <= 150 => "elevated",
+            _ => "high"
+        };
+
+        // ---------------------------------------------------------
+        // 9. Frontend: JS execution as % of total load
+        // ---------------------------------------------------------
+        var totalJankDurationMs = silverEntity.JankReports.Sum(j => j.D ?? 0);
+        var loadDuration = silverEntity.PageLoadDurationMs > 0 ? silverEntity.PageLoadDurationMs : silverEntity.AbsoluteLcpMs;
+        silverEntity.JsDurationPctOfLoad = loadDuration > 0
+            ? Math.Round((double)totalJankDurationMs / loadDuration * 100, 1)
+            : 0;
+
+        // ---------------------------------------------------------
+        // 10. Backend: Slowest individual API call (by total duration — always accurate)
+        // ---------------------------------------------------------
+        var allApis = resources
+            .Where(r => r.Label.Contains("FETCH") || r.Label.Contains("XMLHTTPREQUEST"))
+            .ToList();
+        if (allApis.Count != 0)
+        {
+            var slowest = allApis.OrderByDescending(r => r.TotalMs).First();
+            silverEntity.SlowestApiTtfbMs = slowest.TotalMs;
+            silverEntity.SlowestApiUrl = slowest.FullUrl;
+        }
 
         await _context.MetricsSilver.AddAsync(silverEntity);
         await _context.SaveChangesAsync();
 
         _logger.LogInformation("Silver record saved successfully: {SilverId}", silverEntity.Id);
+
         return silverEntity;
+    }
+
+    // =========================================================================
+    // Network Fingerprint: The foundation for differential diagnosis
+    // =========================================================================
+    //
+    // The fingerprint answers: "What does this user's pipe look like?"
+    // by comparing same-origin vs third-party resource behavior.
+    //
+    // Key insight:
+    //   - Slow network  → BOTH same-origin and third-party are slow
+    //   - Slow server   → Only same-origin is slow, third-party is fine
+    //   - Slow download → download throughput (bytes/sec) is low everywhere
+    //   - Slow backend  → high TTFB (wait) but normal download throughput
+    // =========================================================================
+
+    private static MetricSilverEntity BuildNetworkFingerprint(MetricBronzeEntity bronze, MetricSilverEntity silver)
+    {
+        var waterfall = silver.Waterfall ?? new List<ProcessedResource>();
+
+        // Partition resources — exclude timing-restricted entries from TTFB analysis
+        // (cross-origin without Timing-Allow-Origin have TtfbMs=0 which is meaningless)
+        var sameOrigin = waterfall.Where(w => w.SameOrigin).ToList();
+        var thirdParty = waterfall.Where(w => !w.SameOrigin && !w.TimingRestricted).ToList();
+
+        // Calculate median TTFB for each group (more robust than mean against outliers)
+        var sameOriginMedianTtfb = MedianOrDefault(sameOrigin.Select(w => w.TtfbMs).ToList());
+        var thirdPartyMedianTtfb = MedianOrDefault(thirdParty.Select(w => w.TtfbMs).ToList());
+
+        // Calculate median download throughput (bytes/sec) for each group
+        // Only consider resources with meaningful download (>10ms, >0 bytes)
+        var sameOriginThroughputs = sameOrigin
+            .Where(w => w.DownloadMs > 10 && w.TransferInBytes > 0)
+            .Select(w => (int)(w.TransferInBytes / (w.DownloadMs / 1000)))
+            .ToList();
+
+        var thirdPartyThroughputs = thirdParty
+            .Where(w => w.DownloadMs > 10 && w.TransferInBytes > 0)
+            .Select(w => (int)(w.TransferInBytes / (w.DownloadMs / 1000)))
+            .ToList();
+
+        var sameOriginMedianThroughput = MedianOrDefault(sameOriginThroughputs);
+        var thirdPartyMedianThroughput = MedianOrDefault(thirdPartyThroughputs);
+
+        // All throughputs combined — the "pipe speed" for this session
+        var allThroughputs = sameOriginThroughputs.Concat(thirdPartyThroughputs).ToList();
+        var overallMedianThroughput = MedianOrDefault(allThroughputs);
+
+        // Does the browser's own assessment (navigator.connection) agree?
+        bool navigatorReportsBadConnection =
+            silver.EffectiveType is "2g" or "3g" or "slow-2g"
+            || silver.Rtt > 400
+            || (silver.DownlinkInMbs > 0 && silver.DownlinkInMbs < 2.0m);
+
+        bool navigatorReportsGoodConnection =
+            silver.EffectiveType == "4g"
+            && silver.Rtt < 100
+            && silver.DownlinkInMbs > 10.0m;
+
+        // --- The Differential Diagnosis ---
+
+        bool hasThirdPartyData = thirdParty.Count >= 2;
+        bool thirdPartyAlsoSlow = hasThirdPartyData && thirdPartyMedianTtfb > 200;
+        bool onlySameOriginSlow = hasThirdPartyData && sameOriginMedianTtfb > 300 && thirdPartyMedianTtfb < 150;
+
+        // Download throughput check: is the pipe itself slow?
+        // Below ~500KB/s is a genuinely constrained connection
+        bool downloadThroughputLow = overallMedianThroughput > 0 && overallMedianThroughput < 500_000;
+
+        // "High TTFB but normal download" = server think-time, not network
+        bool highWaitNormalDownload = sameOriginMedianTtfb > 300
+            && sameOriginMedianThroughput > 500_000
+            && !downloadThroughputLow;
+
+        silver.SameOriginCount = sameOrigin.Count;
+        silver.ThirdPartyCount = waterfall.Count(w => !w.SameOrigin); // All third-party, including restricted
+        silver.HasThirdPartyData = hasThirdPartyData;
+
+        silver.SameOriginMedianTtfbMs = (int)sameOriginMedianTtfb;
+        silver.ThirdPartyMedianTtfbMs = (int)thirdPartyMedianTtfb;
+
+        silver.SameOriginMedianThroughputBps = sameOriginMedianThroughput;
+        silver.ThirdPartyMedianThroughputBps = thirdPartyMedianThroughput;
+        silver.OverallMedianThroughputBps = overallMedianThroughput;
+
+        silver.ThirdPartyAlsoSlow = thirdPartyAlsoSlow;
+        silver.OnlySameOriginSlow = onlySameOriginSlow;
+        silver.DownloadThroughputLow = downloadThroughputLow;
+        silver.HighWaitNormalDownload = highWaitNormalDownload;
+
+        silver.NavigatorReportsBadConnection = navigatorReportsBadConnection;
+        silver.NavigatorReportsGoodConnection = navigatorReportsGoodConnection;
+
+        // CDN baseline corroboration: if the tracker script itself was slow,
+        // that's strong evidence the network is the bottleneck (it's a tiny file from a CDN)
+        if (silver.CdnBaselineTtfbMs > 150)
+        {
+            silver.ThirdPartyAlsoSlow = true; // CDN is third-party, confirms network issue
+        }
+
+        return silver;
+    }
+
+    private static double MedianOrDefault(List<int> values)
+    {
+        if (values == null || values.Count == 0) return 0;
+        var sorted = values.OrderBy(v => v).ToList();
+        int mid = sorted.Count / 2;
+        return (double)sorted.Count % 2 == 0
+            ? (sorted[mid - 1] + sorted[mid]) / 2.0
+            : sorted[mid];
     }
 
     /// <inheritdoc/>
@@ -157,11 +437,93 @@ public class SilverService : ISilverService
         return int.TryParse(clean, out var result) ? result : 0;
     }
 
-    private static decimal ParseDecimalMetric(string? value, string unit)
+    // -----------------------------
+    // Calculation Helpers
+    // -----------------------------
+
+    /// <summary>
+    /// Finds the Mean TTFB of the fastest 3-5 non-cached static assets.
+    /// This represents the "Speed of Light" for the user's current connection.
+    /// </summary>
+    private int CalculateNetworkBaseline(List<WaterfallResource> waterfall)
     {
-        if (string.IsNullOrEmpty(value)) return 0;
-        var clean = value.Replace(unit, "").Trim();
-        return decimal.TryParse(clean, out var result) ? result : 0;
+        var staticAssets = waterfall
+            .Where(r => (r.Initiator == "script" || r.Initiator == "link" || r.Initiator == "css" || r.Initiator == "img")
+                        && (r.Latency?.Ttfb > 0) // Exclude zeroed cross-origin / fully cached
+                        && r.Data?.TransferInBytes > 0) // Ignore cached items
+            .OrderBy(r => r.Latency?.Ttfb)
+            .Take(5)
+            .ToList();
+
+        if (!staticAssets.Any()) return 0;
+        return (int)staticAssets.Average(r => r.Latency?.Ttfb ?? 0);
+    }
+
+    /// <summary>
+    /// Mean total duration of the first 5 XHR/Fetch requests.
+    /// Uses Total (duration) which is always accurate, even cross-origin.
+    /// </summary>
+    private int CalculateMeanCriticalApiTtfb(List<WaterfallResource> waterfall)
+    {
+        var criticalApis = waterfall
+            .Where(r => r.Initiator == "xmlhttprequest" || r.Initiator == "fetch")
+            .OrderBy(r => r.Start)
+            .Take(5)
+            .ToList();
+
+        if (!criticalApis.Any()) return 0;
+        return (int)criticalApis.Average(r => r.Latency?.Total ?? 0);
+    }
+
+    /// <summary>
+    /// Detects how many requests were overlapping in the "In-Flight" state.
+    /// </summary>
+    private int CalculateMaxConcurrency(List<WaterfallResource> waterfall)
+    {
+        if (!waterfall.Any()) return 0;
+
+        // Sort all start and end events to find the peak overlap
+        var events = waterfall.Select(r => new { Time = r.Start, Type = 1 }) // 1 = Start
+            .Concat(waterfall.Select(r => new { Time = r.Start + (r.Latency?.Total ?? 0), Type = -1 })) // -1 = End
+            .OrderBy(e => e.Time)
+            .ThenBy(e => e.Type);
+
+        int max = 0, current = 0;
+        foreach (var e in events)
+        {
+            current += e.Type;
+            if (current > max) max = current;
+        }
+        return max;
+    }
+
+    /// <summary>
+    /// Counts how many resources started within a given window (ms) of each other.
+    /// </summary>
+    private static int CountConcurrentStarts(List<ProcessedResource> resources, int windowMs)
+    {
+        if (resources.Count < 2) return 0;
+        var starts = resources.Select(r => r.StalledMs + r.TtfbMs).OrderBy(s => s).ToList();
+        int concurrent = 0;
+        for (int i = 1; i < starts.Count; i++)
+        {
+            if (starts[i] - starts[i - 1] <= windowMs)
+                concurrent++;
+        }
+        return concurrent;
+    }
+
+    /// <summary>
+    /// Sums the stalled time for the critical Rank 1-5 APIs.
+    /// High stalled time usually points to browser queuing (HTTP/1.1) or Network Saturation.
+    /// </summary>
+    private static int CalculateTotalCriticalStalled(List<WaterfallResource> waterfall)
+    {
+        return waterfall
+            .Where(r => r.Initiator == "xmlhttprequest" || r.Initiator == "fetch")
+            .OrderBy(r => r.Start)
+            .Take(5)
+            .Sum(r => Math.Max(0, r.Latency?.Stalled ?? 0));
     }
 }
 

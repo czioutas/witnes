@@ -125,4 +125,16 @@ public class VisitorsController : ControllerBase
 
         return Ok(result);
     }
+
+    /// <summary>
+    /// Gets historical performance stats for a specific visitor (end-user).
+    /// Returns rolling window aggregates (last_10, last_50, last_200) and time-based windows.
+    /// </summary>
+    [HttpGet("{userId}/stats")]
+    [ProducesResponseType(typeof(List<UserPageStatsResponse>), StatusCodes.Status200OK)]
+    public async Task<ActionResult<List<UserPageStatsResponse>>> GetUserStats(string userId)
+    {
+        var stats = await _visitorsService.GetUserStatsAsync(userId);
+        return Ok(stats);
+    }
 }

@@ -1,3 +1,4 @@
+using Api.Product.MetricsProcessing.Gold;
 using Libs.Domain;
 
 namespace Api.Product.Visitors.Models;
@@ -7,39 +8,53 @@ namespace Api.Product.Visitors.Models;
 /// </summary>
 public class PageLoadSummaryModel
 {
+    // --- Identifiers ---
     public Guid Id { get; set; }
-    public DateTimeOffset Timestamp { get; set; }
+    public Guid SilverId { get; set; }
+    public string UserId { get; set; } = null!;
     public string UrlPath { get; set; } = null!;
 
-    // LCP
-    public int LcpMs { get; set; }
-    public string LcpVerdict { get; set; } = null!;
-
-    // CLS
-    public decimal ClsScore { get; set; }
-    public string ClsVerdict { get; set; } = null!;
-
-    // Connection
-    public bool IsConnectionFault { get; set; }
-    public string ConnectionQuality { get; set; } = null!;
-    public ConnectionReason[] ConnectionReasons { get; set; } = [];
-    public string EffectiveType { get; set; } = null!;
-    public int Rtt { get; set; }
-    public decimal Downlink { get; set; }
-
-    // Backend
-    public int TtfbMs { get; set; }
-    public bool IsBackendFault { get; set; }
-
-    // Frontend
-    public bool IsFrontendFault { get; set; }
-
-    // Environment
+    // --- Environment (UI Icons) ---
     public string DeviceIcon { get; set; } = null!;
     public string BrowserIcon { get; set; } = null!;
 
-    // Data Completeness
-    public bool Incomplete { get; set; }
+    // --- Time & Duration (The "When" and "How Long") ---
+    public DateTimeOffset PageRequestedAtByVisitor { get; set; }
+    public int TotalInitialLoadMs { get; set; } // The primary "Wait" duration
+    public int? SettledTimeMs { get; set; }      // Total duration until idle (for SPAs)
 
-    public Guid SilverId { get; set; }
+    // --- Status Flags ---
+    public bool Incomplete { get; set; }
+    public bool IsBadExperience { get; set; }
+    public bool UserLeftEarly { get; set; }
+
+    // --- The 4 Pillar "Fault" Toggles ---
+    public bool IsBackendIssue { get; set; }
+    public bool IsNetworkIssue { get; set; }
+    public bool IsPayloadIssue { get; set; }
+    public bool IsFrontendIssue { get; set; }
+
+    // --- The 5 Pillar Confidence Scores (0-100) ---
+    public int BackendConfidence { get; set; }
+    public int NetworkConfidence { get; set; }
+    public int PayloadConfidence { get; set; }
+    public int FrontendConfidence { get; set; }
+
+    // --- The Raw Reasons (Enums) ---
+    public BackendReason[] BackendReasons { get; set; } = [];
+    public NetworkReason[] NetworkReasons { get; set; } = [];
+    public PayloadReason[] PayloadReasons { get; set; } = [];
+    public FrontendReason[] FrontendReasons { get; set; } = [];
+    public ExperienceSymptom[] ExperienceSymptoms { get; set; } = [];
+
+    // --- Performance Markers ---
+    public string ConnectionQuality { get; set; } = "Good";
+    public int AbsoluteLcpMs { get; set; }
+    public decimal ClsScore { get; set; }
+    public int TotalJankCount { get; set; }
+    public int InteractionDeadZoneMs { get; set; }
+
+    // --- Overall Verdict ---
+    public OverallSentiment OverallSentiment { get; set; }
+    public HistoricalComparison HistoricalComparison { get; set; }
 }

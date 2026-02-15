@@ -61,6 +61,7 @@ public class UserController : ControllerBase
     [ProducesResponseType(typeof(ApplicationProblemDetailsModel), StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult<List<SlimApplicationUserModel>>> GetAll()
     {
+        // await Task.Delay(5000); // 3 seconds
         var users = await _service.GetAllAsync(HttpContext.GetTenantId());
         return Ok(users);
     }

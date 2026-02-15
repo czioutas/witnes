@@ -7,15 +7,15 @@ import {
   type VisitorSummaryModel,
 } from "../../generated/api";
 import { UserInfoHeader } from "../visitors/UserInfoHeader";
-import { UserPageLoadsTable } from "../visitors/UserPageLoadsTable";
+import { VisitorPageLoadsTable } from "../visitors/VisitorPageLoadsTable";
 import { Button } from "../ui/button";
 import { ArrowLeft } from "lucide-react";
 
-interface UserDetailPageProps {
+interface VisitorDetailedPageProps {
   userId: string;
 }
 
-export default function UserDetailPage({ userId }: UserDetailPageProps) {
+export default function VisitorDetailedPage({ userId }: VisitorDetailedPageProps) {
   const { handleApiCall } = useApiToast();
   const [userSummary, setUserSummary] = useState<VisitorSummaryModel | null>(
     null,
@@ -72,7 +72,7 @@ export default function UserDetailPage({ userId }: UserDetailPageProps) {
 
           <div>
             <h2 className="text-xl font-semibold mb-4">Page Loads</h2>
-            <UserPageLoadsTable userId={userId} />
+            <VisitorPageLoadsTable userId={userId} />
           </div>
         </>
       )}

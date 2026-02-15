@@ -17,7 +17,7 @@ import { UsersPage } from "./pages/UsersPage";
 import { UsagePage } from "./pages/UsagePage";
 import { BillingPage } from "./pages/BillingPage";
 import { VisitorsPage } from "./pages/VisitorsPage";
-import UserDetailPage from "./pages/UserDetailPage";
+import VisitorDetailedPage from "./pages/VisitorDetailedPage";
 import PageLoadDetailPage from "./pages/PageLoadDetailPage";
 import { Toaster } from "sonner";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
@@ -33,7 +33,7 @@ const pageComponents = {
   insights: ComingSoonPage,
   users: UsersPage,
   visitors: VisitorsPage,
-  "visitor-detail": UserDetailPage,
+  "visitor-detail": VisitorDetailedPage,
   "page-load-detail": PageLoadDetailPage,
   usage: UsagePage,
   billing: BillingPage,
@@ -127,7 +127,7 @@ function AuthenticatedDashboard({
       case "visitors":
         return <VisitorsPage />;
       case "visitor-detail":
-        return <UserDetailPage userId={rest.userId!} />;
+        return <VisitorDetailedPage userId={rest.userId!} />;
       case "page-load-detail":
         return <PageLoadDetailPage pageLoadId={rest.pageLoadId!} />;
       case "usage":

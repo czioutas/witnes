@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations.Schema;
 using Api.Application.Tenancy.Entities;
+using Api.Product.Ingestion.Models;
 
 namespace Api.Product.MetricsProcessing.Bronze;
 
@@ -15,20 +16,21 @@ public class MetricBronzeEntity : TenantAwareEntity
 
     // --- THE "BLACK BOX" (The "Dynamic" Schema) ---
     // This allows the waterfall or vitals to change without a migration.
+    // Npgsql auto-serializes these POCOs to/from jsonb via EnableDynamicJson().
     [Column(TypeName = "jsonb")]
-    public string Metadata { get; set; } = null!;
+    public MetadataModel Metadata { get; set; } = null!;
 
     [Column(TypeName = "jsonb")]
-    public string Session { get; set; } = null!;
+    public SessionModel Session { get; set; } = null!;
 
     [Column(TypeName = "jsonb")]
-    public string Performance { get; set; } = null!;
+    public PerformanceModel Performance { get; set; } = null!;
 
     [Column(TypeName = "jsonb")]
-    public string? Network { get; set; }
+    public NetworkModel? Network { get; set; }
 
     [Column(TypeName = "jsonb")]
-    public string? Device { get; set; }
+    public DeviceModel? Device { get; set; }
 
     // --- AUDIT ---
     public DateTimeOffset IngestedAt { get; set; }

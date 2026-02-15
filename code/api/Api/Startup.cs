@@ -35,6 +35,7 @@ using Api.Product.DailySalt;
 using Api.Product.Visitors;
 using Api.Product.PageLoads;
 using Usersr.API.Users.Services;
+using Api.Product.MetricsProcessing.Aggregates;
 using Api.Product.MetricsProcessing.Gold;
 using Api.Product.MetricsProcessing.Silver;
 using Api.Product.MetricsProcessing.Bronze;
@@ -252,6 +253,7 @@ public class Startup
         services.AddTransient<IBronzeService, BronzeService>();
         services.AddTransient<ISilverService, SilverService>();
         services.AddTransient<IGoldService, GoldService>();
+        services.AddTransient<IAggregateService, AggregateService>();
         services.AddTransient<IMetricsService, MetricsService>();
 
         // Metric cleanup

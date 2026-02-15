@@ -105,8 +105,6 @@ public static class StartupServiceExtensions
 
     public static void SetupDatabase(this IServiceCollection services, IConfiguration configuration)
     {
-        // NpgsqlConnection.GlobalTypeMapper.EnableDynamicJson();
-
         var primaryConnectionString = configuration.GetConnectionString("Primary");
         var replicaConnectionString = configuration.GetConnectionString("Replica");
 
@@ -135,12 +133,28 @@ public static class StartupServiceExtensions
             CommandTimeout = 30          // Command timeout in seconds
         };
 
-        var optimizedPrimaryConnectionString = primaryConnectionBuilder.ToString();
-        var optimizedReplicaConnectionString = replicaConnectionBuilder.ToString();
+        // Build NpgsqlDataSource with EnableDynamicJson() so Npgsql auto-serializes
+        // POCO types on jsonb columns (e.g. MetricBronzeEntity's typed JSONB properties).
+        // Enum mappings must be registered on the data source builder (not just EF Core options).
+        var primaryDataSource = new Npgsql.NpgsqlDataSourceBuilder(primaryConnectionBuilder.ToString())
+            .EnableDynamicJson()
+            .MapEnum<FeatureKey>("feature_key")
+            .MapEnum<LimitKey>("limit_key")
+            .MapEnum<LimitPeriod>("limit_period")
+            .MapEnum<InvoiceStatus>("invoice_status")
+            .Build();
+
+        var replicaDataSource = new Npgsql.NpgsqlDataSourceBuilder(replicaConnectionBuilder.ToString())
+            .EnableDynamicJson()
+            .MapEnum<FeatureKey>("feature_key")
+            .MapEnum<LimitKey>("limit_key")
+            .MapEnum<LimitPeriod>("limit_period")
+            .MapEnum<InvoiceStatus>("invoice_status")
+            .Build();
 
         // Register WRITE (primary) context
         services.AddDbContext<ApplicationDbContext>(options =>
-            options.UseNpgsql(optimizedPrimaryConnectionString, o =>
+            options.UseNpgsql(primaryDataSource, o =>
             {
                 o.MapEnum<FeatureKey>("feature_key");
                 o.MapEnum<LimitKey>("limit_key");
@@ -151,7 +165,7 @@ public static class StartupServiceExtensions
 
         // Register READ (replica) context
         services.AddDbContext<ApplicationDbContextRead>(options =>
-            options.UseNpgsql(optimizedReplicaConnectionString, o =>
+            options.UseNpgsql(replicaDataSource, o =>
             {
                 o.MapEnum<FeatureKey>("feature_key");
                 o.MapEnum<LimitKey>("limit_key");

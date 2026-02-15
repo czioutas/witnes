@@ -29,12 +29,15 @@ fi
 popd > /dev/null
 echo "✅ API build completed"
 
-# Generate OpenAPI spec
+# Generate OpenAPI spec (run from API dir so appsettings.json is found)
 echo "📄 Generating OpenAPI specification..."
-if ! dotnet swagger tofile --output code/openapi.json code/api/Api/bin/Debug/net10.0/api.dll v1; then
+pushd code/api/Api > /dev/null
+if ! dotnet swagger tofile --output ../../../code/openapi.json bin/Debug/net10.0/api.dll v1; then
     echo "❌ OpenAPI specification generation failed"
+    popd > /dev/null
     exit 1
 fi
+popd > /dev/null
 echo "✅ OpenAPI spec generated: code/openapi.json"
 
 # Move spec to frontend directory

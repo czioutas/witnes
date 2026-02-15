@@ -2,6 +2,7 @@
 using System;
 using Api.Data;
 using Api.Product.Billing.Entities;
+using Api.Product.Ingestion.Models;
 using Libs.Domain;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
@@ -14,7 +15,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Api.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260210222613_Init1")]
+    [Migration("20260215151927_Init1")]
     partial class Init1
     {
         /// <inheritdoc />
@@ -901,6 +902,78 @@ namespace Api.Migrations
                     b.ToTable("daily_salt");
                 });
 
+            modelBuilder.Entity("Api.Product.MetricsProcessing.Aggregates.UserPageStatsEntity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<double>("AvgApiTtfbWorstMs")
+                        .HasColumnType("double precision");
+
+                    b.Property<double>("AvgCdnLoadTimeMs")
+                        .HasColumnType("double precision");
+
+                    b.Property<double>("AvgDocTtfbMs")
+                        .HasColumnType("double precision");
+
+                    b.Property<double>("AvgLoadTimeMs")
+                        .HasColumnType("double precision");
+
+                    b.Property<double>("AvgTransferSizeBytes")
+                        .HasColumnType("double precision");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<string>("PagePath")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<double>("SumApiTtfbWorstMs")
+                        .HasColumnType("double precision");
+
+                    b.Property<double>("SumCdnLoadTimeMs")
+                        .HasColumnType("double precision");
+
+                    b.Property<double>("SumDocTtfbMs")
+                        .HasColumnType("double precision");
+
+                    b.Property<double>("SumLoadTimeMs")
+                        .HasColumnType("double precision");
+
+                    b.Property<double>("SumTransferSizeBytes")
+                        .HasColumnType("double precision");
+
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("tenant_id");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("VisitCount")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("WindowType")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TenantId", "UserId", "PagePath", "WindowType")
+                        .IsUnique();
+
+                    b.ToTable("user_page_stats");
+                });
+
             modelBuilder.Entity("Api.Product.MetricsProcessing.Bronze.MetricBronzeEntity", b =>
                 {
                     b.Property<Guid>("Id")
@@ -912,7 +985,7 @@ namespace Api.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at");
 
-                    b.Property<string>("Device")
+                    b.Property<DeviceModel>("Device")
                         .HasColumnType("jsonb");
 
                     b.Property<string>("EventType")
@@ -926,21 +999,21 @@ namespace Api.Migrations
                     b.Property<DateTimeOffset>("IngestedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("Metadata")
+                    b.Property<MetadataModel>("Metadata")
                         .IsRequired()
                         .HasColumnType("jsonb");
 
-                    b.Property<string>("Network")
+                    b.Property<NetworkModel>("Network")
                         .HasColumnType("jsonb");
 
                     b.Property<DateTimeOffset>("PageRequestedAtByVisitor")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("Performance")
+                    b.Property<PerformanceModel>("Performance")
                         .IsRequired()
                         .HasColumnType("jsonb");
 
-                    b.Property<string>("Session")
+                    b.Property<SessionModel>("Session")
                         .IsRequired()
                         .HasColumnType("jsonb");
 
@@ -973,6 +1046,16 @@ namespace Api.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("id");
 
+                    b.Property<int>("AbsoluteLcpMs")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("BackendConfidence")
+                        .HasColumnType("integer");
+
+                    b.PrimitiveCollection<int[]>("BackendReasons")
+                        .IsRequired()
+                        .HasColumnType("integer[]");
+
                     b.Property<string>("BrowserIcon")
                         .IsRequired()
                         .HasColumnType("text");
@@ -980,17 +1063,9 @@ namespace Api.Migrations
                     b.Property<decimal>("ClsScore")
                         .HasColumnType("numeric");
 
-                    b.Property<string>("ClsVerdict")
-                        .IsRequired()
-                        .HasColumnType("text");
-
                     b.Property<string>("ConnectionQuality")
                         .IsRequired()
                         .HasColumnType("text");
-
-                    b.PrimitiveCollection<int[]>("ConnectionReasons")
-                        .IsRequired()
-                        .HasColumnType("integer[]");
 
                     b.Property<DateTimeOffset>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
@@ -1000,39 +1075,75 @@ namespace Api.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<decimal>("Downlink")
+                    b.Property<decimal>("DownlinkInMbs")
                         .HasColumnType("numeric");
 
                     b.Property<string>("EffectiveType")
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.PrimitiveCollection<int[]>("ExperienceSymptoms")
+                        .IsRequired()
+                        .HasColumnType("integer[]");
+
+                    b.Property<int>("FrontendConfidence")
+                        .HasColumnType("integer");
+
+                    b.PrimitiveCollection<int[]>("FrontendReasons")
+                        .IsRequired()
+                        .HasColumnType("integer[]");
+
                     b.Property<string>("GuestId")
                         .HasColumnType("text");
+
+                    b.Property<int>("HistoricalComparison")
+                        .HasColumnType("integer");
 
                     b.Property<bool>("Incomplete")
                         .HasColumnType("boolean");
 
-                    b.Property<bool>("IsBackendFault")
-                        .HasColumnType("boolean");
-
-                    b.Property<bool>("IsConnectionFault")
-                        .HasColumnType("boolean");
-
-                    b.Property<bool>("IsFrontendFault")
-                        .HasColumnType("boolean");
-
-                    b.Property<int>("LcpMs")
+                    b.Property<int>("InteractionDeadZoneMs")
                         .HasColumnType("integer");
 
-                    b.Property<string>("LcpVerdict")
+                    b.Property<bool>("IsBackendIssue")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsBadExperience")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsFrontendIssue")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsNetworkIssue")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsPayloadIssue")
+                        .HasColumnType("boolean");
+
+                    b.Property<int>("NetworkConfidence")
+                        .HasColumnType("integer");
+
+                    b.PrimitiveCollection<int[]>("NetworkReasons")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("integer[]");
+
+                    b.Property<int>("OverallSentiment")
+                        .HasColumnType("integer");
 
                     b.Property<DateTimeOffset>("PageRequestedAtByVisitor")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<int>("PayloadConfidence")
+                        .HasColumnType("integer");
+
+                    b.PrimitiveCollection<int[]>("PayloadReasons")
+                        .IsRequired()
+                        .HasColumnType("integer[]");
+
                     b.Property<int>("Rtt")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("SettledTimeMs")
                         .HasColumnType("integer");
 
                     b.Property<Guid>("SilverId")
@@ -1042,7 +1153,10 @@ namespace Api.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("tenant_id");
 
-                    b.Property<int>("TtfbMs")
+                    b.Property<int>("TotalInitialLoadMs")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("TotalJankCount")
                         .HasColumnType("integer");
 
                     b.Property<DateTimeOffset?>("UpdatedAt")
@@ -1072,7 +1186,13 @@ namespace Api.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("id");
 
-                    b.Property<int>("AvgTtfbMs")
+                    b.Property<int>("AbsoluteLcpMs")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("BackgroundDurationMs")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("BaselineNetworkTtfbMs")
                         .HasColumnType("integer");
 
                     b.Property<Guid>("BronzeId")
@@ -1082,49 +1202,195 @@ namespace Api.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<decimal>("Cls")
-                        .HasColumnType("numeric");
+                    b.Property<int>("CdnBaselineTtfbMs")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("CdnBaselineVerdict")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("ConcurrentCriticalRequestCount")
+                        .HasColumnType("integer");
 
                     b.Property<DateTimeOffset>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at");
 
+                    b.Property<bool>("CriticalApisHaveLargePayloads")
+                        .HasColumnType("boolean");
+
+                    b.Property<decimal>("CumulativeLayoutShift")
+                        .HasColumnType("numeric");
+
                     b.Property<string>("DeviceType")
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<decimal>("Downlink")
+                    b.Property<decimal>("DownlinkInMbs")
                         .HasColumnType("numeric");
+
+                    b.Property<bool>("DownloadThroughputLow")
+                        .HasColumnType("boolean");
 
                     b.Property<string>("EffectiveType")
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<int>("EmittedAt")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("FcpMs")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("FinalizeReason")
+                        .HasColumnType("text");
+
+                    b.Property<int>("FrozenUiGapMs")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("FunctionalInteractiveMs")
+                        .HasColumnType("integer");
+
                     b.Property<string>("GuestId")
                         .HasColumnType("text");
+
+                    b.Property<bool>("HasThirdPartyData")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("HighWaitNormalDownload")
+                        .HasColumnType("boolean");
+
+                    b.Property<int>("IdentifyDelayMs")
+                        .HasColumnType("integer");
 
                     b.Property<bool>("Incomplete")
                         .HasColumnType("boolean");
 
-                    b.Property<DateTimeOffset>("IngestionEndpointFiredAt")
-                        .HasColumnType("timestamp with time zone");
+                    b.Property<int>("IndustryVerdict")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("InitialDocTtfbMs")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("InteractionDeadZoneMs")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("InteractiveMs")
+                        .HasColumnType("integer");
 
                     b.Property<string>("JankReports")
                         .IsRequired()
                         .HasColumnType("jsonb");
 
-                    b.Property<decimal>("LcpMs")
-                        .HasColumnType("numeric");
+                    b.Property<double>("JsDurationPctOfLoad")
+                        .HasColumnType("double precision");
+
+                    b.Property<int>("LargeApiCount")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("MaxConcurrentRequests")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("MeanCriticalApiTransferMs")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("MeanCriticalApiTtfbMs")
+                        .HasColumnType("integer");
+
+                    b.Property<bool>("NavigatorReportsBadConnection")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("NavigatorReportsGoodConnection")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("OnlySameOriginSlow")
+                        .HasColumnType("boolean");
+
+                    b.Property<double>("OverallMedianThroughputBps")
+                        .HasColumnType("double precision");
+
+                    b.Property<int>("PageLoadDurationMs")
+                        .HasColumnType("integer");
 
                     b.Property<DateTimeOffset>("PageRequestedAtByVisitor")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<string>("Protocol")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<int>("Rtt")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("SameOriginCount")
+                        .HasColumnType("integer");
+
+                    b.Property<double>("SameOriginMedianThroughputBps")
+                        .HasColumnType("double precision");
+
+                    b.Property<int>("SameOriginMedianTtfbMs")
+                        .HasColumnType("integer");
+
+                    b.Property<double>("ServerEfficiencyRatio")
+                        .HasColumnType("double precision");
+
+                    b.Property<int?>("SettledTimeMs")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("ShellToContentGapMs")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("SlowestApiTtfbMs")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("SlowestApiUrl")
+                        .HasColumnType("text");
+
+                    b.Property<int>("SmallApiMeanTtfbMs")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("TechnicalInteractiveMs")
                         .HasColumnType("integer");
 
                     b.Property<Guid>("TenantId")
                         .HasColumnType("uuid")
                         .HasColumnName("tenant_id");
+
+                    b.Property<bool>("ThirdPartyAlsoSlow")
+                        .HasColumnType("boolean");
+
+                    b.Property<int>("ThirdPartyCount")
+                        .HasColumnType("integer");
+
+                    b.Property<double>("ThirdPartyMedianThroughputBps")
+                        .HasColumnType("double precision");
+
+                    b.Property<int>("ThirdPartyMedianTtfbMs")
+                        .HasColumnType("integer");
+
+                    b.Property<long>("TotalApiBytes")
+                        .HasColumnType("bigint");
+
+                    b.Property<int>("TotalCriticalStalledMs")
+                        .HasColumnType("integer");
+
+                    b.Property<long>("TotalCssBytes")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("TotalImgBytes")
+                        .HasColumnType("bigint");
+
+                    b.Property<int>("TotalJankCount")
+                        .HasColumnType("integer");
+
+                    b.Property<long>("TotalJsBytes")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("TotalPayloadBytes")
+                        .HasColumnType("bigint");
+
+                    b.Property<int>("UncompressedCriticalAssetsCount")
+                        .HasColumnType("integer");
 
                     b.Property<DateTimeOffset?>("UpdatedAt")
                         .HasColumnType("timestamp with time zone")
@@ -1141,8 +1407,8 @@ namespace Api.Migrations
                     b.Property<string>("UserId")
                         .HasColumnType("text");
 
-                    b.Property<DateTimeOffset>("WTrackerListenerCalledAt")
-                        .HasColumnType("timestamp with time zone");
+                    b.Property<bool>("WasBackgroundTab")
+                        .HasColumnType("boolean");
 
                     b.Property<string>("Waterfall")
                         .IsRequired()
@@ -1394,6 +1660,17 @@ namespace Api.Migrations
                         .IsRequired();
 
                     b.Navigation("Invoice");
+
+                    b.Navigation("Tenant");
+                });
+
+            modelBuilder.Entity("Api.Product.MetricsProcessing.Aggregates.UserPageStatsEntity", b =>
+                {
+                    b.HasOne("Api.Application.Tenancy.Entities.TenantEntity", "Tenant")
+                        .WithMany()
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Tenant");
                 });

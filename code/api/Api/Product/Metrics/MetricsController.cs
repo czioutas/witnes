@@ -1,5 +1,3 @@
-using Api.Application.Filters;
-using Api.Product.Metrics.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -22,43 +20,6 @@ public class MetricsController : ControllerBase
     {
         _metricsService = metricsService ?? throw new ArgumentNullException(nameof(metricsService));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-    }
-
-    /// <summary>
-    /// Gets all metrics for the current tenant
-    /// </summary>
-    /// <returns>List of metrics</returns>
-    [HttpGet]
-    [ProducesResponseType(typeof(List<MetricResponse>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<List<MetricResponse>>> GetAll()
-    {
-        _logger.LogInformation("Getting all metrics");
-
-        var metrics = await _metricsService.GetAllMetricsAsync();
-
-        return Ok(metrics);
-    }
-
-    /// <summary>
-    /// Gets a specific metric by ID
-    /// </summary>
-    /// <param name="id">Metric ID</param>
-    /// <returns>Metric details</returns>
-    [HttpGet("{id}")]
-    [ProducesResponseType(typeof(MetricResponse), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<MetricResponse>> GetById(Guid id)
-    {
-        _logger.LogInformation("Getting metric by Id={Id}", id);
-
-        var metric = await _metricsService.GetMetricByIdAsync(id);
-
-        if (metric == null)
-        {
-            return NotFound();
-        }
-
-        return Ok(metric);
     }
 
     [HttpPost("recalculate-stage/{stage}/tenant/{tenantId}")]

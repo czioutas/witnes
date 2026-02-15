@@ -28,7 +28,7 @@ public class PageLoadDetailModel
     /// <summary>
     /// Largest Contentful Paint in milliseconds
     /// </summary>
-    public decimal LcpMs { get; set; }
+    public int LcpMs { get; set; }
 
     /// <summary>
     /// Cumulative Layout Shift score

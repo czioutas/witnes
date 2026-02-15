@@ -2,6 +2,7 @@ using Api.Data;
 using Api.Product.Visitors.Models;
 using Libs.Pagination;
 using Microsoft.EntityFrameworkCore;
+using AutoMapper;
 
 namespace Api.Product.Visitors;
 
@@ -10,19 +11,9 @@ namespace Api.Product.Visitors;
 /// </summary>
 public interface IVisitorsService
 {
-    /// <summary>
-    /// Gets a paginated list of visitors with their activity summary
-    /// </summary>
-    /// <param name="request">Filter and pagination parameters</param>
-    /// <returns>Paginated result containing visitor summaries</returns>
     Task<PagedResult<VisitorSummaryModel>> GetVisitorsAsync(GetVisitorsRequest request);
-
-    /// <summary>
-    /// Gets a paginated list of page loads for a specific user
-    /// </summary>
-    /// <param name="request">User ID and filter parameters</param>
-    /// <returns>Paginated result containing page load summaries</returns>
     Task<PagedResult<PageLoadSummaryModel>> GetUserPageLoadsAsync(GetUserPageLoadsRequest request);
+    Task<List<UserPageStatsResponse>> GetUserStatsAsync(string userOrGuestId);
 }
 
 /// <summary>
@@ -32,11 +23,15 @@ public class VisitorsService : IVisitorsService
 {
     private readonly ApplicationDbContextRead _contextRead;
     private readonly ILogger<VisitorsService> _logger;
+    private readonly IMapper _mapper;
+
 
     public VisitorsService(
+                IMapper mapper,
         ApplicationDbContextRead contextRead,
         ILogger<VisitorsService> logger)
     {
+        _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         _contextRead = contextRead ?? throw new ArgumentNullException(nameof(contextRead));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
@@ -90,8 +85,8 @@ public class VisitorsService : IVisitorsService
                 GuestId = g.Key.GuestId,
                 TotalPageLoads = g.Count(),
                 LastSeenAt = g.Max(m => m.PageRequestedAtByVisitor),
-                Browsers = new List<string>(),
-                OperatingSystems = new List<string>()
+                Browsers = g.Select(m => m.BrowserIcon).Distinct().ToList(),
+                OperatingSystems = g.Select(m => m.DeviceIcon).Distinct().ToList()
             });
 
         // Get total count before pagination
@@ -166,30 +161,9 @@ public class VisitorsService : IVisitorsService
             .OrderByDescending(m => m.PageRequestedAtByVisitor)
             .Skip(request.Skip)
             .Take(request.Take)
-            .Select(m => new PageLoadSummaryModel
-            {
-                Id = m.Id,
-                Timestamp = m.PageRequestedAtByVisitor,
-                UrlPath = m.UrlPath,
-                LcpMs = m.LcpMs,
-                LcpVerdict = m.LcpVerdict,
-                ClsScore = m.ClsScore,
-                ClsVerdict = m.ClsVerdict,
-                IsConnectionFault = m.IsConnectionFault,
-                ConnectionQuality = m.ConnectionQuality,
-                ConnectionReasons = m.ConnectionReasons,
-                EffectiveType = m.EffectiveType,
-                Rtt = m.Rtt,
-                Downlink = m.Downlink,
-                TtfbMs = m.TtfbMs,
-                IsBackendFault = m.IsBackendFault,
-                IsFrontendFault = m.IsFrontendFault,
-                DeviceIcon = m.DeviceIcon,
-                BrowserIcon = m.BrowserIcon,
-                Incomplete = m.Incomplete,
-                SilverId = m.SilverId
-            })
             .ToListAsync();
+
+        var pageLoadsModel = _mapper.Map<List<PageLoadSummaryModel>>(pageLoads);
 
         _logger.LogInformation(
             "Retrieved {Count} page loads out of {TotalCount} total for {IdType} {Id} (Page {PageNumber})",
@@ -200,9 +174,31 @@ public class VisitorsService : IVisitorsService
             request.PageNumber);
 
         return new PagedResult<PageLoadSummaryModel>(
-            pageLoads,
+            pageLoadsModel,
             totalCount,
             request.PageNumber,
             request.PageSize);
+    }
+
+    public async Task<List<UserPageStatsResponse>> GetUserStatsAsync(string userOrGuestId)
+    {
+        var stats = await _contextRead.UserPageStats
+            .AsNoTracking()
+            .Where(s => s.UserId == userOrGuestId)
+            .Select(s => new UserPageStatsResponse
+            {
+                UserId = s.UserId,
+                PagePath = s.PagePath,
+                WindowType = s.WindowType,
+                VisitCount = s.VisitCount,
+                AvgLoadTimeMs = s.AvgLoadTimeMs,
+                AvgDocTtfbMs = s.AvgDocTtfbMs,
+                AvgApiTtfbWorstMs = s.AvgApiTtfbWorstMs,
+                AvgTransferSizeBytes = s.AvgTransferSizeBytes,
+                AvgCdnLoadTimeMs = s.AvgCdnLoadTimeMs
+            })
+            .ToListAsync();
+
+        return stats;
     }
 }
