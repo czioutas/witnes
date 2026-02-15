@@ -4,8 +4,15 @@ import {
   AccordionTrigger,
   AccordionContent,
 } from "../ui/accordion";
+import type { ReactNode } from "react";
 
-const supportFaqs = [
+type FaqItem = {
+  id: string;
+  question: string;
+  answer: ReactNode;
+};
+
+const supportFaqs: FaqItem[] = [
   {
     id: "support-1",
     question:
@@ -27,12 +34,23 @@ const supportFaqs = [
   },
 ];
 
-const techFaqs = [
+const techFaqs: FaqItem[] = [
   {
     id: "tech-1",
     question: "What is the actual performance impact of the tracker?",
-    answer:
-      "Negligible. The w.min.js script is under 5kb and loads asynchronously. We use the PerformanceObserver API for passive monitoring and navigator.sendBeacon to transmit data. This ensures we capture every detail without ever blocking the main thread or impacting your Core Web Vitals.",
+    answer: (
+      <>
+        Negligible. The <code>w.min.js</code> script is under 5kb and loads
+        asynchronously. We use the <code>PerformanceObserver</code> API for
+        passive monitoring and <code>navigator.sendBeacon</code> to transmit
+        data. This ensures we capture every detail without ever blocking the
+        main thread or impacting your Core Web Vitals. See{" "}
+        <a href="/trust" className="underline underline-offset-4">
+          Security & Trust
+        </a>{" "}
+        for the technical privacy and transport model.
+      </>
+    ),
   },
   {
     id: "tech-2",

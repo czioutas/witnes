@@ -1,8 +1,10 @@
 using System.Text.Json;
 using Api.Application.Pricing.Entities;
+using Api.Application.Pricing.Models;
 using Api.Application.Services;
 using Api.Application.Tenancy.Services;
 using Api.Data;
+using AutoMapper;
 using Libs.Result;
 using Microsoft.EntityFrameworkCore;
 using StackExchange.Redis;
@@ -13,13 +15,13 @@ public interface ITenantPricingService
 {
     Task<Result<TenantPricingTierEntity>> SetTenantPricingAsync(Guid pricingTierId, DateOnly? startDate = null, bool isTrial = false);
     Task<Result<TenantPricingTierEntity>> ChangeTenantPricingAsync(Guid newPricingTierId, DateOnly? startDate = null);
-    Task<TenantPricingTierEntity> GetCurrentTenantPricingAsync();
-    Task<TenantPricingTierEntity?> GetTenantPricingAtDateAsync(DateOnly date);
-    Task<List<TenantPricingTierEntity>> GetTenantPricingHistoryAsync();
+    Task<Result<TenantPricingTierEntity>> GetCurrentTenantPricingAsync();
+    Task<Result<TenantPricingTierEntity>> GetTenantPricingAtDateAsync(DateOnly date);
+    Task<Result<List<TenantPricingTierEntity>>> GetTenantPricingHistoryAsync();
     Task<Result<bool>> EndTenantPricingAsync(DateOnly? endDate = null);
     Task<PricingTierEntity?> GetStarterTierAsync();
-    Task<List<TenantPricingTierEntity>> GetTenantPricingForPeriodAsync(DateOnly periodStart, DateOnly periodEnd);
-    Task SetTrialExpiredAsync(Guid tenantPricingId);
+    Task<Result<List<TenantPricingTierEntity>>> GetTenantPricingForPeriodAsync(DateOnly periodStart, DateOnly periodEnd);
+    Task<Result<bool>> SetTrialExpiredAsync(Guid tenantPricingId);
 }
 
 public class TenantPricingService : ITenantPricingService
@@ -28,13 +30,15 @@ public class TenantPricingService : ITenantPricingService
     private readonly ApplicationDbContext _context;
     private readonly ILogger<TenantPricingService> _logger;
     private readonly IDatabase _redis;
+    private readonly IMapper _mapper;
 
-    public TenantPricingService(IRequestTenant requestTenant, ApplicationDbContext context, ILogger<TenantPricingService> logger, IConnectionMultiplexer redisConnection)
+    public TenantPricingService(IRequestTenant requestTenant, ApplicationDbContext context, ILogger<TenantPricingService> logger, IConnectionMultiplexer redisConnection, IMapper mapper)
     {
         _requestTenant = requestTenant ?? throw new ArgumentNullException(nameof(requestTenant));
         _context = context ?? throw new ArgumentNullException(nameof(context));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _redis = redisConnection.GetDatabase() ?? throw new ArgumentNullException(nameof(redisConnection));
+        _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
     }
 
     public static string GetTenantPricingCacheKey(Guid tenantId)
@@ -45,18 +49,7 @@ public class TenantPricingService : ITenantPricingService
     private async Task CacheTenantPricingAsync(Guid tenantId, TenantPricingTierEntity tenantPricing)
     {
         var cacheKey = GetTenantPricingCacheKey(tenantId);
-        var cacheValue = new
-        {
-            TenantId = tenantPricing.TenantId,
-            PricingTierId = tenantPricing.PricingTierId,
-            StartDate = tenantPricing.StartDate,
-            EndDate = tenantPricing.EndDate,
-            IsActive = tenantPricing.IsActive,
-            MonthlyPageLoads = tenantPricing.PricingTier?.MonthlyPageLoads ?? 0,
-            HasTrial = tenantPricing.HasTrial,
-            HasTrialExpired = tenantPricing.HasTrialExpired,
-            DiscountPercentage = tenantPricing.DiscountPercentage
-        };
+        var cacheValue = _mapper.Map<TenantPricingCacheModel>(tenantPricing);
 
         await _redis.StringSetAsync(cacheKey, JsonSerializer.Serialize(cacheValue), TimeSpan.FromHours(24));
     }
@@ -127,9 +120,15 @@ public class TenantPricingService : ITenantPricingService
             }
 
             // End current pricing tier
-            var currentPricing = await GetCurrentTenantPricingAsync();
-            if (currentPricing != null)
+            var currentPricingResult = await GetCurrentTenantPricingAsync();
+            if (currentPricingResult.IsFailure && currentPricingResult.ErrorModel is not ResourceNotFoundErrorModel)
             {
+                return currentPricingResult.ToErrorResult<TenantPricingTierEntity>();
+            }
+
+            if (!currentPricingResult.IsFailure)
+            {
+                var currentPricing = currentPricingResult.GetValue;
                 currentPricing.EndDate = effectiveStartDate.AddDays(-1);
                 currentPricing.IsActive = false;
                 _context.TenantPricingTiers.Update(currentPricing);
@@ -161,36 +160,52 @@ public class TenantPricingService : ITenantPricingService
         }
     }
 
-    public async Task<TenantPricingTierEntity> GetCurrentTenantPricingAsync()
+    public async Task<Result<TenantPricingTierEntity>> GetCurrentTenantPricingAsync()
     {
         var today = DateOnly.FromDateTime(DateTime.UtcNow);
 
-        return await _context.TenantPricingTiers
+        var pricing = await _context.TenantPricingTiers
             .Include(tp => tp.PricingTier)
             .Where(tp =>
                         tp.StartDate <= today &&
                         (tp.EndDate == null || tp.EndDate >= today) &&
                         tp.IsActive)
             .FirstOrDefaultAsync();
+
+        if (pricing == null)
+        {
+            return Result<TenantPricingTierEntity>.NotFound("TenantPricing", _requestTenant.TenantId.ToString());
+        }
+
+        return Result<TenantPricingTierEntity>.Ok(pricing);
     }
 
-    public async Task<TenantPricingTierEntity?> GetTenantPricingAtDateAsync(DateOnly date)
+    public async Task<Result<TenantPricingTierEntity>> GetTenantPricingAtDateAsync(DateOnly date)
     {
-        return await _context.TenantPricingTiers
+        var pricing = await _context.TenantPricingTiers
             .Include(tp => tp.PricingTier)
             .Where(tp =>
                         tp.StartDate <= date &&
                         (tp.EndDate == null || tp.EndDate >= date) &&
                         tp.IsActive)
             .FirstOrDefaultAsync();
+
+        if (pricing == null)
+        {
+            return Result<TenantPricingTierEntity>.NotFound("TenantPricingAtDate", date.ToString("yyyy-MM-dd"));
+        }
+
+        return Result<TenantPricingTierEntity>.Ok(pricing);
     }
 
-    public async Task<List<TenantPricingTierEntity>> GetTenantPricingHistoryAsync()
+    public async Task<Result<List<TenantPricingTierEntity>>> GetTenantPricingHistoryAsync()
     {
-        return await _context.TenantPricingTiers
+        var history = await _context.TenantPricingTiers
             .Include(tp => tp.PricingTier)
             .OrderBy(tp => tp.StartDate)
             .ToListAsync();
+
+        return Result<List<TenantPricingTierEntity>>.Ok(history);
     }
 
     public async Task<Result<bool>> EndTenantPricingAsync(DateOnly? endDate = null)
@@ -199,11 +214,12 @@ public class TenantPricingService : ITenantPricingService
         {
             var effectiveEndDate = endDate ?? DateOnly.FromDateTime(DateTime.UtcNow);
 
-            var currentPricing = await GetCurrentTenantPricingAsync();
-            if (currentPricing == null)
+            var currentPricingResult = await GetCurrentTenantPricingAsync();
+            if (currentPricingResult.IsFailure)
             {
-                return Result<bool>.NotFound("TenantPricing", _requestTenant.TenantId.ToString());
+                return currentPricingResult.ToErrorResult<bool>();
             }
+            var currentPricing = currentPricingResult.GetValue;
 
             currentPricing.EndDate = effectiveEndDate;
             currentPricing.IsActive = false;
@@ -231,24 +247,31 @@ public class TenantPricingService : ITenantPricingService
             .FirstOrDefaultAsync();
     }
 
-    public async Task<List<TenantPricingTierEntity>> GetTenantPricingForPeriodAsync(DateOnly periodStart, DateOnly periodEnd)
+    public async Task<Result<List<TenantPricingTierEntity>>> GetTenantPricingForPeriodAsync(DateOnly periodStart, DateOnly periodEnd)
     {
-        return await _context.TenantPricingTiers
+        var pricing = await _context.TenantPricingTiers
             .Include(tp => tp.PricingTier)
             .Where(tp =>
                         tp.StartDate <= periodEnd &&
                         (tp.EndDate == null || tp.EndDate >= periodStart))
             .OrderBy(tp => tp.StartDate)
             .ToListAsync();
+
+        return Result<List<TenantPricingTierEntity>>.Ok(pricing);
     }
 
-    public async Task SetTrialExpiredAsync(Guid tenantPricingId)
+    public async Task<Result<bool>> SetTrialExpiredAsync(Guid tenantPricingId)
     {
-        var pricing = await _context.TenantPricingTiers
-            .FirstOrDefaultAsync(tp => tp.Id == tenantPricingId);
-
-        if (pricing != null)
+        try
         {
+            var pricing = await _context.TenantPricingTiers
+                .FirstOrDefaultAsync(tp => tp.Id == tenantPricingId);
+
+            if (pricing == null)
+            {
+                return Result<bool>.NotFound("TenantPricing", tenantPricingId.ToString());
+            }
+
             pricing.HasTrialExpired = true;
             _context.TenantPricingTiers.Update(pricing);
             await _context.SaveChangesAsync();
@@ -258,6 +281,13 @@ public class TenantPricingService : ITenantPricingService
                 .Reference(tp => tp.PricingTier)
                 .LoadAsync();
             await CacheTenantPricingAsync(pricing.TenantId, pricing);
+
+            return Result<bool>.Ok(true);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error setting trial expired for tenant pricing {TenantPricingId}", tenantPricingId);
+            return Result<bool>.Failure(new InternalErrorModel(ex));
         }
     }
 }

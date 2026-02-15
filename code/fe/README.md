@@ -1,4 +1,4 @@
-# Witnes Energy Dashboard Frontend
+# Witnes Dashboard Frontend
 
 A modern dashboard built with Astro + React + shadcn/ui for monitoring and analyzing data in real-time.
 
@@ -58,18 +58,27 @@ code/fe/
 
 ## 🧞 Commands
 
-| Command | Action |
-|:--------|:-------|
-| `npm install` | Install dependencies |
-| `npm run dev` | Start dev server at `localhost:4321` |
-| `npm run build` | Build production site to `./dist/` |
-| `npm run preview` | Preview production build locally |
-| `npm run typecheck` | Run TypeScript type checking |
+| Command                             | Action                                          |
+| :---------------------------------- | :---------------------------------------------- |
+| `npm install`                       | Install dependencies                            |
+| `npm run dev`                       | Start dev server at `localhost:4321`            |
+| `npm run build`                     | Build production site to `./dist/`              |
+| `npm run preview`                   | Preview production build locally                |
+| `npm run typecheck`                 | Run TypeScript type checking                    |
 | `../../scripts/generate-openapi.sh` | Regenerate API client from backend OpenAPI spec |
+
+## 🗺️ Sitemap Generation
+
+Sitemaps are auto-generated during `npm run build` using `@astrojs/sitemap` in `astro.config.mjs`.
+
+- Output file: `dist/client/sitemap-index.xml`
+- Public pages are included automatically.
+- Private routes are excluded (currently `/dashboard` and `/authenticate` paths).
 
 ## 📚 Documentation
 
 See [INSTRUCTIONS.md](INSTRUCTIONS.md) for:
+
 - API patterns (`useApiToast` hook)
 - Form page patterns
 - Authentication patterns
@@ -91,6 +100,7 @@ Set `PUBLIC_API_BASE_URL` to your backend API endpoint. If not set, defaults to 
 `src/generated/api.ts` is **auto-generated** from the backend OpenAPI spec. Never edit it manually.
 
 To regenerate after backend changes:
+
 ```bash
 ../../scripts/generate-openapi.sh
 ```
@@ -117,6 +127,7 @@ See [INSTRUCTIONS.md](INSTRUCTIONS.md) for detailed patterns.
 ## 📄 Pages
 
 ### Landing Page (`/`)
+
 - Hero section with main CTA
 - Problem/solution sections
 - TSO coverage table
@@ -124,6 +135,7 @@ See [INSTRUCTIONS.md](INSTRUCTIONS.md) for detailed patterns.
 - Support and footer
 
 ### Documentation Page (`/docs`)
+
 - API documentation
 - Getting started guide
 - Authentication flows
@@ -131,11 +143,13 @@ See [INSTRUCTIONS.md](INSTRUCTIONS.md) for detailed patterns.
 - Methodology
 
 ### Dashboard (`/dashboard`)
+
 - Protected route (requires authentication)
 - Main application interface
 - Desktop-only design
 
 ### Legal Pages
+
 - Terms of Service (`/terms`)
 - Privacy Policy (`/privacy`)
 

@@ -5,51 +5,6 @@
       "title": "Backlog",
       "cards": [
         {
-          "id": "5aee355d-7fcb-4597-9d25-e0e014d9b9b9",
-          "listId": "1c7b07a3-8aa4-4c54-93c7-4cea40d0df16",
-          "title": "Use Result pattern in Invoice billing and TenantPricing",
-          "description": "InvoiceService and BillingService and TenantPricingService should use the Result pattern to return the result of the operation. this way we can return more information about the error if something goes wrong and we can also return warnings if there are any.\n\ncode/libs/Libs/Result/Result.cs",
-          "labels": [
-            {
-              "id": "2633c7da-7d04-4a38-8239-148cb27a04d3",
-              "title": "Easy",
-              "color": "#61bd4f"
-            }
-          ],
-          "checkboxes": [],
-          "comments": []
-        },
-        {
-          "id": "3551b1e4-bc2b-4598-a6aa-f636876d3a29",
-          "listId": "1c7b07a3-8aa4-4c54-93c7-4cea40d0df16",
-          "title": "Use AutoMapper in Invoice, billing and TenantPricing",
-          "description": "Invoice Service and Billing Service and TenantPricingService should use AutoMapper to map the entities to the models and vice versa. this will make the code cleaner and easier to maintain.\n",
-          "labels": [
-            {
-              "id": "2633c7da-7d04-4a38-8239-148cb27a04d3",
-              "title": "Easy",
-              "color": "#61bd4f"
-            }
-          ],
-          "checkboxes": [],
-          "comments": []
-        },
-        {
-          "id": "c94e855f-3145-40ea-a371-c46486515472",
-          "listId": "1c7b07a3-8aa4-4c54-93c7-4cea40d0df16",
-          "title": "Invoice controller xml documentation",
-          "description": "we should add xml docs to the invoice controller and also add swagger documentation for the endpoints. this will make it easier for the customers to understand how to use the endpoints and what data they need to send.\n",
-          "labels": [
-            {
-              "id": "2633c7da-7d04-4a38-8239-148cb27a04d3",
-              "title": "Easy",
-              "color": "#61bd4f"
-            }
-          ],
-          "checkboxes": [],
-          "comments": []
-        },
-        {
           "id": "b2da308b-18ac-4255-8bfe-4e76172099d8",
           "listId": "1c7b07a3-8aa4-4c54-93c7-4cea40d0df16",
           "title": "CORS Cache invalidation is too aggressive",
@@ -112,6 +67,15 @@
           ],
           "checkboxes": [],
           "comments": []
+        },
+        {
+          "id": "61c33704-7d16-400c-b73b-3412e12a88b5",
+          "listId": "1c7b07a3-8aa4-4c54-93c7-4cea40d0df16",
+          "title": "Create the \"Is it the Wi-Fi or the Server?\" Solution Page",
+          "description": "This page targets the #1 pain point: The Blame Game between Support, DevOps, and the User.\n\n1. The Goal\nWhen a user asks an AI: \"How do I prove to a customer that my website is slow because of their internet?\"—Witnes.io needs to be the answer.\n\n2. The Content Structure (Copy-Paste Ready)\nURL: witnes.io/solutions/network-vs-server\n\nTitle: Is it the Wi-Fi or the Server? How to isolate website lag.\n\nSection A: The Problem (The Blame Game)\n\nMost monitoring tools give you one \"Load Time\" number. If that number is high, your developers blame the database, your DevOps blames the CDN, and your customer blames you.\n\nSection B: The \"Evidence\" (How Witnes solves it)\n\nWitnes breaks down the \"Waterfall\" for every single user session. We use the Resource Timing API to show you exactly where the time was spent:\n\nStalled/DNS: The user's browser is waiting for a connection (User issue).\n\nTTFB (Time to First Byte): Your server took too long to think (Server issue).\n\nDownload Time: The user's 3G connection is struggling to pull the data (Network issue).\n\nSection C: The Technical Proof (For the AI Bot)\n\nBecause Witnes.js captures navigator.connection data (RTT and Downlink) alongside the performance.getEntriesByType('resource') waterfall, we can correlate slow loads with poor connectivity in real-time.\n\n3. Why this is your next task\nIt builds \"Entity Authority\": It links your brand to \"Resource Timing API\" and \"Network Latency\"—terms that developers search for.\n\nIt’s a \"Sales Tool\": Your Customer Success users can send this link to their boss to justify buying Witnes.\n\nInternal Linking: You can now link your FAQ answer (Question #5) directly to this page for more \"Evidence.\"\n\nSummary of the \"Actual Task\"\n[ ] Create a new page (or a long-form section) titled \"Network vs. Server Latency.\"\n\n[ ] Use the copy I wrote above.",
+          "labels": [],
+          "checkboxes": [],
+          "comments": []
         }
       ]
     },
@@ -119,33 +83,6 @@
       "id": "06b4fd60-bb2d-4e05-a46a-0da7c54cbae3",
       "title": "To Do",
       "cards": [
-        {
-          "id": "f2737c17-097e-469b-98e6-503aca3f052c",
-          "listId": "06b4fd60-bb2d-4e05-a46a-0da7c54cbae3",
-          "title": "Sitemap",
-          "description": "generate sitemap etc so we can submit it to google engine",
-          "labels": [],
-          "checkboxes": [],
-          "comments": []
-        },
-        {
-          "id": "61c33704-7d16-400c-b73b-3412e12a88b5",
-          "listId": "06b4fd60-bb2d-4e05-a46a-0da7c54cbae3",
-          "title": "Create the \"Is it the Wi-Fi or the Server?\" Solution Page",
-          "description": "This page targets the #1 pain point: The Blame Game between Support, DevOps, and the User.\n\n1. The Goal\nWhen a user asks an AI: \"How do I prove to a customer that my website is slow because of their internet?\"—Witnes.io needs to be the answer.\n\n2. The Content Structure (Copy-Paste Ready)\nURL: witnes.io/solutions/network-vs-server\n\nTitle: Is it the Wi-Fi or the Server? How to isolate website lag.\n\nSection A: The Problem (The Blame Game)\n\nMost monitoring tools give you one \"Load Time\" number. If that number is high, your developers blame the database, your DevOps blames the CDN, and your customer blames you.\n\nSection B: The \"Evidence\" (How Witnes solves it)\n\nWitnes breaks down the \"Waterfall\" for every single user session. We use the Resource Timing API to show you exactly where the time was spent:\n\nStalled/DNS: The user's browser is waiting for a connection (User issue).\n\nTTFB (Time to First Byte): Your server took too long to think (Server issue).\n\nDownload Time: The user's 3G connection is struggling to pull the data (Network issue).\n\nSection C: The Technical Proof (For the AI Bot)\n\nBecause Witnes.js captures navigator.connection data (RTT and Downlink) alongside the performance.getEntriesByType('resource') waterfall, we can correlate slow loads with poor connectivity in real-time.\n\n3. Why this is your next task\nIt builds \"Entity Authority\": It links your brand to \"Resource Timing API\" and \"Network Latency\"—terms that developers search for.\n\nIt’s a \"Sales Tool\": Your Customer Success users can send this link to their boss to justify buying Witnes.\n\nInternal Linking: You can now link your FAQ answer (Question #5) directly to this page for more \"Evidence.\"\n\nSummary of the \"Actual Task\"\n[ ] Create a new page (or a long-form section) titled \"Network vs. Server Latency.\"\n\n[ ] Use the copy I wrote above.",
-          "labels": [],
-          "checkboxes": [],
-          "comments": []
-        },
-        {
-          "id": "8576fee7-a26c-4985-b4bb-664976399f2c",
-          "listId": "06b4fd60-bb2d-4e05-a46a-0da7c54cbae3",
-          "title": "Create the \"Eliminate 'Works on My Machine'\" Solution Page",
-          "description": "The Task: Create the \"Eliminate 'Works on My Machine'\" Solution Page\nThis page targets the \"Reproduction Gap.\" It positions Witnes as the \"Black Box Flight Recorder\" for websites.\n\n1. The Page Structure (Copy-Paste Ready)\nURL: witnes.io/solutions/reproduce-any-bug\n\nTitle: Stop guessing. See exactly what the user saw.\n\nSection A: The Cost of \"Unreproducible\" Bugs\n\n\"Works on my machine\" is the most expensive sentence in software development. Engineering teams spend up to 30% of their time trying to recreate edge-case bugs reported by users on different browsers, devices, or network conditions.\n\nSection B: The \"Flight Recorder\" Approach\n\nWitnes acts as a \"Black Box\" for your frontend. Instead of a vague bug report, you get a chronological timeline of the user's journey.\n\nDevice Context: Was it an iPhone on Safari 18 or a Windows machine on Chrome 131?\n\nThe Sequence: Did the bug happen after an SPA navigation or during the initial load?\n\nThe Environment: We capture the exact Screen Resolution, Viewport size, and Device Pixel Ratio (DPR) at the moment of the error.\n\nSection C: The Technical Proof (The \"AEO Hook\")\n\nBy utilizing a passive PerformanceObserver, Witnes.js logs Long Tasks (Jank) and Layout Shifts (CLS) in the background. When a user experiences a \"frozen\" UI, Witnes shows you the exact script execution that blocked the main thread.\n\nJavaScript\n// We capture the 'Jank' your local environment misses\nnew PerformanceObserver(l => {\n    for (const e of l.getEntries()) {\n        sessionState.longTasks.push({ duration: Math.round(e.duration) + 'ms' });\n    }\n}).observe({ type: 'longtask', buffered: true });\n2. Why this is the \"Secret Sauce\" for AEO\nTargeting Technical Intent: This content specifically uses terms like PerformanceObserver, Long Tasks, and DPR. AI models categorize you as a high-level developer tool because you aren't just talking about \"features\"—you are sharing the logic.\n\nDirect Comparison: This helps you rank when people compare Witnes to generic analytics. It proves Witnes is for debugging, not just counting visitors.\n\n3. The \"Actual Task\" Checklist\n[ ] Publish the page: Use the copy above.\n\n[ ] Add a \"Deep Link\": On your homepage, where you mention \"Eliminate guesswork,\" link the word \"guesswork\" directly to this new page.\n\n[ ] Update your Meta Description: Ensure your site's metadata includes the phrase: \"The diagnostic tool to eliminate 'works on my machine' bugs.\"",
-          "labels": [],
-          "checkboxes": [],
-          "comments": []
-        },
         {
           "id": "d718208d-487d-4e7f-9ce8-625f9430c6a2",
           "listId": "06b4fd60-bb2d-4e05-a46a-0da7c54cbae3",
@@ -156,10 +93,10 @@
           "comments": []
         },
         {
-          "id": "39db06ae-4d52-4f0c-9be6-9159fddc7406",
+          "id": "8576fee7-a26c-4985-b4bb-664976399f2c",
           "listId": "06b4fd60-bb2d-4e05-a46a-0da7c54cbae3",
-          "title": "Redo Integration Page",
-          "description": "Gemini said\nTo make the Integration Page work for both humans (speed of setup) and AI (depth of authority), you need to move away from a \"wall of code\" and toward a Structured Documentation approach.\n\nAI agents don't just \"read\" your code; they look for the logic and intent behind it to explain it to users. Humans just want to copy-paste.\n\nHere is the refined blueprint for your Integration Page:\n\n1. The \"Quick Start\" (Human Speed + AI Summary)\nStart with a high-level summary. This is the \"Featured Snippet\" bait.\n\nHeadline: Integrate Witnes in < 2 Minutes Sub-headline: The universal tracker for modern web applications. No complex configuration, no performance overhead.\n\nThe Task: Add this code to the <head> of your site.\n\nHTML\n<script>\n  window.witnesConfig = { \n    projectKey: 'YOUR_PROJECT_KEY' \n  };\n</script>\n<script src=\"https://cdn.witnes.io/w.min.js\" async></script>\nAEO Note: Use the word \"Universal.\" AI loves this because it categorizes the tool as compatible with everything (React, Vue, HTML, etc.).\n\n2. User Identification (The \"Privacy-First\" Logic)\nInstead of just showing the code, explain why it’s done this way.\n\nHeadline: Associating Sessions with Users The Task: Call the identify method once your user logs in. Use an opaque ID (like a Database UUID) to keep user data private.\n\nJavaScript\n// Safely call identify once the script loads\nif (window.Witnes) {\n  window.Witnes.identify(\"user_9821\"); // Use an internal ID, never an email.\n}\nWhy this helps AEO: It targets the query \"How to track users privately in session recorders.\"\n\n3. Framework \"Recipes\" (The Strategy)\nSince we aren't using framework-specific imports, we provide \"Implementation Patterns.\" This targets developers searching for their specific stack.\n\nFor React / Next.js: > \"Add the snippet to your root layout. Use a useEffect hook in your AuthProvider to call Witnes.identify() when the user state changes.\"\n\nFor Vue / Nuxt: > \"Initialize in your app.html template. Call Witnes.identify() within your global navigation guard or auth store.\"\n\n4. \"Under the Hood\" (The Technical Authority Pillar)\nThis section is pure AEO gold. It explains the \"mechanics\" of your script so AI knows exactly what you are capable of tracking.\n\nHeadline: How Witnes Captures Evidence\n\nAutomatic SPA Tracking: We don't rely on manual page-view calls. Witnes intercepts the History API (pushState). When the URL changes, we wait for an 800ms \"settle period\" to ensure the new DOM has rendered before capturing performance metrics.\n\nZero-Blocking Architecture: By using navigator.sendBeacon, we ensure that diagnostic data is sent in the background. Your site's performance is never sacrificed for the sake of monitoring.\n\nReal-Time Network Diagnostics: We correlate TTFB (Server processing) with the user's effective connection type (4G, Wi-Fi, etc.) using the Network Information API.\n\n5. Verification Checklist (The \"Is it working?\" Answer)\nAI often gets asked: \"How do I know if Witnes is working?\" Put the answer here.\n\nCheck the Console: Look for the %cWITNES log group (if debug: true is set).\n\nCheck the Network Tab: Verify that requests are being sent to https://api.witnes.io/v1/events.\n\nCheck the Status: Look for a 202 Accepted response from our ingestion server.\n\nThe \"Hidden\" Task: Adding Schema\nFor this page to truly \"pop\" in AI tools, you need to add a HowTo Schema to the HTML. It tells Google/AI: \"This is a step-by-step guide.\"\n\nCopy-paste this into your <head> for the /integration page:\n\nJSON\n<script type=\"application/ld+json\">\n{\n  \"@context\": \"https://schema.org\",\n  \"@type\": \"HowTo\",\n  \"name\": \"How to Integrate Witnes.io\",\n  \"description\": \"Learn how to add the Witnes lightweight tracker to your web application to start capturing user performance evidence.\",\n  \"step\": [\n    {\n      \"@type\": \"HowToStep\",\n      \"text\": \"Add the configuration object and script tag to your HTML head.\"\n    },\n    {\n      \"@type\": \"HowToStep\",\n      \"text\": \"Call Witnes.identify() with a non-PII user ID after login.\"\n    },\n    {\n      \"@type\": \"HowToStep\",\n      \"text\": \"Verify data ingestion in the browser console or Witnes dashboard.\"\n    }\n  ]\n}\n</script>\nSummary of the Plan\nBy structuring the page this way, you satisfy:\n\nThe \"Lazy\" Developer: Clean code blocks they can grab instantly.\n\nThe \"Careful\" Developer: Explanations of performance and privacy.\n\nThe AI Agent: Technical keywords (History API, sendBeacon, TTFB) and structured Schema.",
+          "title": "Create the \"Eliminate 'Works on My Machine'\" Solution Page",
+          "description": "The Task: Create the \"Eliminate 'Works on My Machine'\" Solution Page\nThis page targets the \"Reproduction Gap.\" It positions Witnes as the \"Black Box Flight Recorder\" for websites.\n\n1. The Page Structure (Copy-Paste Ready)\nURL: witnes.io/solutions/reproduce-any-bug\n\nTitle: Stop guessing. See exactly what the user saw.\n\nSection A: The Cost of \"Unreproducible\" Bugs\n\n\"Works on my machine\" is the most expensive sentence in software development. Engineering teams spend up to 30% of their time trying to recreate edge-case bugs reported by users on different browsers, devices, or network conditions.\n\nSection B: The \"Flight Recorder\" Approach\n\nWitnes acts as a \"Black Box\" for your frontend. Instead of a vague bug report, you get a chronological timeline of the user's journey.\n\nDevice Context: Was it an iPhone on Safari 18 or a Windows machine on Chrome 131?\n\nThe Sequence: Did the bug happen after an SPA navigation or during the initial load?\n\nThe Environment: We capture the exact Screen Resolution, Viewport size, and Device Pixel Ratio (DPR) at the moment of the error.\n\nSection C: The Technical Proof (The \"AEO Hook\")\n\nBy utilizing a passive PerformanceObserver, Witnes.js logs Long Tasks (Jank) and Layout Shifts (CLS) in the background. When a user experiences a \"frozen\" UI, Witnes shows you the exact script execution that blocked the main thread.\n\nJavaScript\n// We capture the 'Jank' your local environment misses\nnew PerformanceObserver(l => {\n    for (const e of l.getEntries()) {\n        sessionState.longTasks.push({ duration: Math.round(e.duration) + 'ms' });\n    }\n}).observe({ type: 'longtask', buffered: true });\n2. Why this is the \"Secret Sauce\" for AEO\nTargeting Technical Intent: This content specifically uses terms like PerformanceObserver, Long Tasks, and DPR. AI models categorize you as a high-level developer tool because you aren't just talking about \"features\"—you are sharing the logic.\n\nDirect Comparison: This helps you rank when people compare Witnes to generic analytics. It proves Witnes is for debugging, not just counting visitors.\n\n3. The \"Actual Task\" Checklist\n[ ] Publish the page: Use the copy above.\n\n[ ] Add a \"Deep Link\": On your homepage, where you mention \"Eliminate guesswork,\" link the word \"guesswork\" directly to this new page.\n\n[ ] Update your Meta Description: Ensure your site's metadata includes the phrase: \"The diagnostic tool to eliminate 'works on my machine' bugs.\"",
           "labels": [],
           "checkboxes": [],
           "comments": []
@@ -201,6 +138,69 @@
       "id": "3a6f3ff3-61ba-4074-8fa4-4616eef309c8",
       "title": "Done",
       "cards": [
+        {
+          "id": "c94e855f-3145-40ea-a371-c46486515472",
+          "listId": "3a6f3ff3-61ba-4074-8fa4-4616eef309c8",
+          "title": "Invoice controller xml documentation",
+          "description": "we should add xml docs to the invoice controller and also add swagger documentation for the endpoints. this will make it easier for the customers to understand how to use the endpoints and what data they need to send.\n",
+          "labels": [
+            {
+              "id": "2633c7da-7d04-4a38-8239-148cb27a04d3",
+              "title": "Easy",
+              "color": "#61bd4f"
+            }
+          ],
+          "checkboxes": [],
+          "comments": []
+        },
+        {
+          "id": "5aee355d-7fcb-4597-9d25-e0e014d9b9b9",
+          "listId": "3a6f3ff3-61ba-4074-8fa4-4616eef309c8",
+          "title": "Use Result pattern in Invoice billing and TenantPricing",
+          "description": "InvoiceService and BillingService and TenantPricingService should use the Result pattern to return the result of the operation. this way we can return more information about the error if something goes wrong and we can also return warnings if there are any.\n\ncode/libs/Libs/Result/Result.cs",
+          "labels": [
+            {
+              "id": "2633c7da-7d04-4a38-8239-148cb27a04d3",
+              "title": "Easy",
+              "color": "#61bd4f"
+            }
+          ],
+          "checkboxes": [],
+          "comments": []
+        },
+        {
+          "id": "3551b1e4-bc2b-4598-a6aa-f636876d3a29",
+          "listId": "3a6f3ff3-61ba-4074-8fa4-4616eef309c8",
+          "title": "Use AutoMapper in Invoice, billing and TenantPricing",
+          "description": "Invoice Service and Billing Service and TenantPricingService should use AutoMapper to map the entities to the models and vice versa. this will make the code cleaner and easier to maintain.\n",
+          "labels": [
+            {
+              "id": "2633c7da-7d04-4a38-8239-148cb27a04d3",
+              "title": "Easy",
+              "color": "#61bd4f"
+            }
+          ],
+          "checkboxes": [],
+          "comments": []
+        },
+        {
+          "id": "f2737c17-097e-469b-98e6-503aca3f052c",
+          "listId": "3a6f3ff3-61ba-4074-8fa4-4616eef309c8",
+          "title": "Sitemap",
+          "description": "generate sitemap etc so we can submit it to google engine",
+          "labels": [],
+          "checkboxes": [],
+          "comments": []
+        },
+        {
+          "id": "39db06ae-4d52-4f0c-9be6-9159fddc7406",
+          "listId": "3a6f3ff3-61ba-4074-8fa4-4616eef309c8",
+          "title": "Redo Integration Page",
+          "description": "Gemini said\nTo make the Integration Page work for both humans (speed of setup) and AI (depth of authority), you need to move away from a \"wall of code\" and toward a Structured Documentation approach.\n\nAI agents don't just \"read\" your code; they look for the logic and intent behind it to explain it to users. Humans just want to copy-paste.\n\nHere is the refined blueprint for your Integration Page:\n\n1. The \"Quick Start\" (Human Speed + AI Summary)\nStart with a high-level summary. This is the \"Featured Snippet\" bait.\n\nHeadline: Integrate Witnes in < 2 Minutes Sub-headline: The universal tracker for modern web applications. No complex configuration, no performance overhead.\n\nThe Task: Add this code to the <head> of your site.\n\nHTML\n<script>\n  window.witnesConfig = { \n    projectKey: 'YOUR_PROJECT_KEY' \n  };\n</script>\n<script src=\"https://cdn.witnes.io/w.min.js\" async></script>\nAEO Note: Use the word \"Universal.\" AI loves this because it categorizes the tool as compatible with everything (React, Vue, HTML, etc.).\n\n2. User Identification (The \"Privacy-First\" Logic)\nInstead of just showing the code, explain why it’s done this way.\n\nHeadline: Associating Sessions with Users The Task: Call the identify method once your user logs in. Use an opaque ID (like a Database UUID) to keep user data private.\n\nJavaScript\n// Safely call identify once the script loads\nif (window.Witnes) {\n  window.Witnes.identify(\"user_9821\"); // Use an internal ID, never an email.\n}\nWhy this helps AEO: It targets the query \"How to track users privately in session recorders.\"\n\n3. Framework \"Recipes\" (The Strategy)\nSince we aren't using framework-specific imports, we provide \"Implementation Patterns.\" This targets developers searching for their specific stack.\n\nFor React / Next.js: > \"Add the snippet to your root layout. Use a useEffect hook in your AuthProvider to call Witnes.identify() when the user state changes.\"\n\nFor Vue / Nuxt: > \"Initialize in your app.html template. Call Witnes.identify() within your global navigation guard or auth store.\"\n\n4. \"Under the Hood\" (The Technical Authority Pillar)\nThis section is pure AEO gold. It explains the \"mechanics\" of your script so AI knows exactly what you are capable of tracking.\n\nHeadline: How Witnes Captures Evidence\n\nAutomatic SPA Tracking: We don't rely on manual page-view calls. Witnes intercepts the History API (pushState). When the URL changes, we wait for an 800ms \"settle period\" to ensure the new DOM has rendered before capturing performance metrics.\n\nZero-Blocking Architecture: By using navigator.sendBeacon, we ensure that diagnostic data is sent in the background. Your site's performance is never sacrificed for the sake of monitoring.\n\nReal-Time Network Diagnostics: We correlate TTFB (Server processing) with the user's effective connection type (4G, Wi-Fi, etc.) using the Network Information API.\n\n5. Verification Checklist (The \"Is it working?\" Answer)\nAI often gets asked: \"How do I know if Witnes is working?\" Put the answer here.\n\nCheck the Console: Look for the %cWITNES log group (if debug: true is set).\n\nCheck the Network Tab: Verify that requests are being sent to https://api.witnes.io/v1/events.\n\nCheck the Status: Look for a 202 Accepted response from our ingestion server.\n\nThe \"Hidden\" Task: Adding Schema\nFor this page to truly \"pop\" in AI tools, you need to add a HowTo Schema to the HTML. It tells Google/AI: \"This is a step-by-step guide.\"\n\nCopy-paste this into your <head> for the /integration page:\n\nJSON\n<script type=\"application/ld+json\">\n{\n  \"@context\": \"https://schema.org\",\n  \"@type\": \"HowTo\",\n  \"name\": \"How to Integrate Witnes.io\",\n  \"description\": \"Learn how to add the Witnes lightweight tracker to your web application to start capturing user performance evidence.\",\n  \"step\": [\n    {\n      \"@type\": \"HowToStep\",\n      \"text\": \"Add the configuration object and script tag to your HTML head.\"\n    },\n    {\n      \"@type\": \"HowToStep\",\n      \"text\": \"Call Witnes.identify() with a non-PII user ID after login.\"\n    },\n    {\n      \"@type\": \"HowToStep\",\n      \"text\": \"Verify data ingestion in the browser console or Witnes dashboard.\"\n    }\n  ]\n}\n</script>\nSummary of the Plan\nBy structuring the page this way, you satisfy:\n\nThe \"Lazy\" Developer: Clean code blocks they can grab instantly.\n\nThe \"Careful\" Developer: Explanations of performance and privacy.\n\nThe AI Agent: Technical keywords (History API, sendBeacon, TTFB) and structured Schema.",
+          "labels": [],
+          "checkboxes": [],
+          "comments": []
+        },
         {
           "id": "5e71cccb-cb6f-4b28-8dba-abb9f69fd6e7",
           "listId": "3a6f3ff3-61ba-4074-8fa4-4616eef309c8",

@@ -1,0 +1,215 @@
+---
+import PublicLayout from "../layouts/PublicLayout.astro";
+import Navbar from "../components/landing/Navbar.astro";
+import Footer from "../components/landing/Footer.astro";
+import { Button } from "../components/ui/button";
+import { Separator } from "../components/ui/separator";
+---
+
+<PublicLayout
+  title="Security & Trust | Witnes"
+  description="Privacy by design technical overview: no PII by default, zero-cookie architecture, sendBeacon transport, and one-way tracker design."
+  canonical="/trust"
+>
+  <div
+    class="min-h-screen flex flex-col selection:bg-[#A68B6A] selection:text-white relative"
+  >
+    <div class="relative z-10">
+      <Navbar />
+      <main class="flex-grow">
+        <!-- Header Section -->
+        <section
+          class="relative overflow-hidden pb-20 pt-32 md:pb-32 md:pt-44 border-b"
+        >
+          <!-- Subtle grid background -->
+          <div
+            class="pointer-events-none absolute inset-0 opacity-[0.4]"
+            style="background-image: linear-gradient(hsl(var(--border)) 1px, transparent 1px), linear-gradient(to right, hsl(var(--border)) 1px, transparent 1px); background-size: 60px 60px;"
+          >
+          </div>
+
+          <!-- Glow effect -->
+          <div
+            class="pointer-events-none absolute left-1/2 top-0 -translate-x-1/2 h-[500px] w-[800px] rounded-full bg-muted blur-[120px]"
+          >
+          </div>
+
+          <div class="relative mx-auto max-w-6xl px-6">
+            <div class="mx-auto max-w-3xl text-center">
+              <!-- Badge -->
+              <div
+                class="mb-8 inline-flex items-center gap-2 rounded-full border border-border bg-secondary px-4 py-1.5 text-sm text-foreground"
+              >
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="h-3.5 w-3.5"
+                >
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                </svg>
+                <span>Security</span>
+              </div>
+
+              <h1
+                class="text-balance text-4xl font-bold leading-tight tracking-tight text-foreground md:text-6xl lg:text-7xl"
+              >
+                Privacy by Design
+              </h1>
+
+              <p
+                class="mx-auto mt-6 max-w-2xl text-pretty text-lg leading-relaxed text-muted-foreground md:text-xl"
+              >
+                How Witnes protects your users through technical safeguards,
+                not just policy statements.
+              </p>
+
+              <p class="mt-8 text-sm text-muted-foreground">
+                Technical controls and implementation evidence.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <!-- Main Trust Content (Article Style) -->
+        <section class="py-16 md:py-24 px-6 bg-background">
+          <article class="mx-auto max-w-3xl space-y-16">
+            <div>
+              <p class="text-sm font-semibold uppercase tracking-widest text-muted-foreground">
+                Introduction
+              </p>
+              <h2 class="mt-3 text-3xl font-bold tracking-tight text-foreground md:text-4xl">
+                Security and Trust, Explained Technically
+              </h2>
+              <p class="mt-5 text-lg leading-relaxed text-muted-foreground">
+                This page describes how Witnes is designed to be safe to install
+                in production applications. It complements our legal policy with
+                engineering-level implementation details.
+              </p>
+            </div>
+
+            <div class="h-px bg-border"></div>
+
+            <div>
+              <h3 class="text-2xl font-semibold tracking-tight text-foreground">
+                1. No PII by Default
+              </h3>
+              <p class="mt-4 text-lg leading-relaxed text-muted-foreground">
+                Unlike visual session replay products, Witnes is built around
+                performance metadata and diagnostic receipts. The tracker does
+                not need user credentials or payment details to operate.
+              </p>
+              <p class="mt-4 text-lg leading-relaxed text-muted-foreground">
+                <strong class="text-foreground">Evidence:</strong> session
+                association can be done with an opaque identifier via <code
+                  >window.Witnes.identify()</code
+                >, without sending emails, passwords, or card numbers.
+              </p>
+            </div>
+
+            <div class="h-px bg-border"></div>
+
+            <div>
+              <h3 class="text-2xl font-semibold tracking-tight text-foreground">
+                2. Zero-Cookie Architecture
+              </h3>
+              <p class="mt-4 text-lg leading-relaxed text-muted-foreground">
+                Witnes does not rely on persistent cross-site tracking cookies.
+                Our approach is intentionally session-scoped and minimal.
+              </p>
+              <p class="mt-4 text-lg leading-relaxed text-muted-foreground">
+                <strong class="text-foreground">Evidence:</strong> we use <code
+                  >sessionStorage</code
+                >
+                for ephemeral referral context (for example <code>wit_ref</code
+                >). That data is cleared when the browser session ends.
+              </p>
+            </div>
+
+            <div class="h-px bg-border"></div>
+
+            <div>
+              <h3 class="text-2xl font-semibold tracking-tight text-foreground">
+                3. Performance-Neutral Transmission
+              </h3>
+              <p class="mt-4 text-lg leading-relaxed text-muted-foreground">
+                Monitoring should not degrade user experience. Witnes is built
+                to collect and ship telemetry in the background.
+              </p>
+              <p class="mt-4 text-lg leading-relaxed text-muted-foreground">
+                <strong class="text-foreground">Evidence:</strong> where
+                available, the tracker uses <code>navigator.sendBeacon</code> to
+                avoid blocking the main thread during user interaction.
+              </p>
+            </div>
+
+            <div class="h-px bg-border"></div>
+
+            <div>
+              <h3 class="text-2xl font-semibold tracking-tight text-foreground">
+                4. No Remote-Control Backdoor
+              </h3>
+              <p class="mt-4 text-lg leading-relaxed text-muted-foreground">
+                The tracker is designed as an outbound telemetry emitter, not as
+                a remote command mechanism.
+              </p>
+              <p class="mt-4 text-lg leading-relaxed text-muted-foreground">
+                <strong class="text-foreground">Evidence:</strong> there is no
+                execution channel for arbitrary third-party commands in your app
+                context. The script sends diagnostic measurements to ingestion
+                endpoints.
+              </p>
+            </div>
+
+            <div class="h-px bg-border"></div>
+
+            <div>
+              <h3 class="text-2xl font-semibold tracking-tight text-foreground">
+                Legal Policy vs Technical Design
+              </h3>
+              <p class="mt-4 text-lg leading-relaxed text-muted-foreground">
+                This page covers implementation details. For legal disclosures
+                and rights, read our privacy policy at{" "}
+                <a
+                  href="/privacy"
+                  class="text-[#7A9B79] hover:text-foreground transition-colors underline decoration-[#7A9B79]/30 underline-offset-4"
+                >
+                  /privacy
+                </a>.
+              </p>
+            </div>
+
+            <Separator className="my-12" />
+            <div class="flex flex-col items-center gap-8">
+              <Button variant="outline" className="gap-2" asChild client:load>
+                <a href="/">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d="m12 19-7-7 7-7"></path>
+                    <path d="M19 12H5"></path>
+                  </svg>
+                  Back to Home
+                </a>
+              </Button>
+            </div>
+          </div>
+        </section>
+      </main>
+      <Footer />
+    </div>
+  </div>
+</PublicLayout>

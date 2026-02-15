@@ -70,11 +70,17 @@ public class MetricCleanupService : IMetricCleanupService
 
     private async Task<int> CleanupTenantAsync(Guid tenantId)
     {
-        var pricing = await _tenantPricingService.GetCurrentTenantPricingAsync();
-
-        if (pricing?.PricingTier == null)
+        var pricingResult = await _tenantPricingService.GetCurrentTenantPricingAsync();
+        if (pricingResult.IsFailure)
         {
             _logger.LogWarning("[MetricCleanup] Tenant {TenantId} has no active pricing tier, skipping", tenantId);
+            return 0;
+        }
+
+        var pricing = pricingResult.GetValue;
+        if (pricing.PricingTier == null)
+        {
+            _logger.LogWarning("[MetricCleanup] Tenant {TenantId} has invalid pricing tier configuration, skipping", tenantId);
             return 0;
         }
 

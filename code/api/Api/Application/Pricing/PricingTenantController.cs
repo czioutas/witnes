@@ -1,4 +1,5 @@
 using Api.Application.Authentication;
+using Api.Application.Extensions;
 using Api.Application.Pricing.Models;
 using Api.Application.Pricing.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -48,7 +49,8 @@ public class PricingTenantController : ControllerBase
 
         if (result.IsFailure)
         {
-            return BadRequest(result.ErrorModel);
+            var problem = result.ErrorModel.ToApplicationProblemDetails(HttpContext);
+            return StatusCode(problem.Status ?? StatusCodes.Status400BadRequest, problem);
         }
 
         return Ok(result.GetValue);
@@ -72,7 +74,8 @@ public class PricingTenantController : ControllerBase
 
         if (result.IsFailure)
         {
-            return BadRequest(result.ErrorModel);
+            var problem = result.ErrorModel.ToApplicationProblemDetails(HttpContext);
+            return StatusCode(problem.Status ?? StatusCodes.Status400BadRequest, problem);
         }
 
         return Ok(result.GetValue);
@@ -88,14 +91,14 @@ public class PricingTenantController : ControllerBase
     [HttpGet("pricing/current")]
     public async Task<IActionResult> GetCurrentTenantPricing()
     {
-        var pricing = await _tenantPricingService.GetCurrentTenantPricingAsync();
-
-        if (pricing == null)
+        var result = await _tenantPricingService.GetCurrentTenantPricingAsync();
+        if (result.IsFailure)
         {
-            return NotFound("No active pricing found for tenant");
+            var problem = result.ErrorModel.ToApplicationProblemDetails(HttpContext);
+            return StatusCode(problem.Status ?? StatusCodes.Status400BadRequest, problem);
         }
 
-        return Ok(pricing);
+        return Ok(result.GetValue);
     }
 
     /// <summary>
@@ -107,8 +110,14 @@ public class PricingTenantController : ControllerBase
     [HttpGet("pricing/history")]
     public async Task<IActionResult> GetTenantPricingHistory()
     {
-        var history = await _tenantPricingService.GetTenantPricingHistoryAsync();
-        return Ok(history);
+        var result = await _tenantPricingService.GetTenantPricingHistoryAsync();
+        if (result.IsFailure)
+        {
+            var problem = result.ErrorModel.ToApplicationProblemDetails(HttpContext);
+            return StatusCode(problem.Status ?? StatusCodes.Status400BadRequest, problem);
+        }
+
+        return Ok(result.GetValue);
     }
 
     /// <summary>
@@ -122,13 +131,13 @@ public class PricingTenantController : ControllerBase
     [HttpGet("pricing/date/{date}")]
     public async Task<IActionResult> GetTenantPricingAtDate(DateOnly date)
     {
-        var pricing = await _tenantPricingService.GetTenantPricingAtDateAsync(date);
-
-        if (pricing == null)
+        var result = await _tenantPricingService.GetTenantPricingAtDateAsync(date);
+        if (result.IsFailure)
         {
-            return NotFound($"No pricing found for tenant on {date}");
+            var problem = result.ErrorModel.ToApplicationProblemDetails(HttpContext);
+            return StatusCode(problem.Status ?? StatusCodes.Status400BadRequest, problem);
         }
 
-        return Ok(pricing);
+        return Ok(result.GetValue);
     }
 }

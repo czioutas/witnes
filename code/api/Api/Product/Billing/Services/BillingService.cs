@@ -2,7 +2,10 @@ using Api.Application;
 using Api.Application.Communication.Services;
 using Api.Application.Pricing.Services;
 using Api.Application.Tenancy.Services;
+using Api.Product.Billing.Models;
 using Api.Settings.Settings;
+using AutoMapper;
+using Libs.Result;
 using Microsoft.Extensions.Options;
 using Usersr.API.Users.Services;
 
@@ -10,8 +13,10 @@ namespace Api.Product.Billing.Services;
 
 public interface IBillingService
 {
-    Task RunMonthlyBillingAsync(int year, int month);
+    Task<Result<BillingRunSummary>> RunMonthlyBillingAsync(int year, int month);
 }
+
+public record BillingRunSummary(int TenantsProcessed, int InvoicesCreated, int Skipped, int Failed);
 
 public class BillingService : IBillingService
 {
@@ -23,6 +28,7 @@ public class BillingService : IBillingService
     private readonly ICommunicationService _communicationService;
     private readonly ILinkResolver _linkResolver;
     private readonly SmtpSettings _smtpSettings;
+    private readonly IMapper _mapper;
     private readonly ILogger<BillingService> _logger;
 
     public BillingService(
@@ -34,6 +40,7 @@ public class BillingService : IBillingService
         ICommunicationService communicationService,
         ILinkResolver linkResolver,
         IOptions<SmtpSettings> smtpSettings,
+        IMapper mapper,
         ILogger<BillingService> logger)
     {
         _requestTenant = requestTenant;
@@ -44,64 +51,101 @@ public class BillingService : IBillingService
         _communicationService = communicationService;
         _linkResolver = linkResolver;
         _smtpSettings = smtpSettings.Value;
+        _mapper = mapper;
         _logger = logger;
     }
 
-    public async Task RunMonthlyBillingAsync(int year, int month)
+    public async Task<Result<BillingRunSummary>> RunMonthlyBillingAsync(int year, int month)
     {
-        _logger.LogInformation("[Billing] Starting monthly billing for {Year}-{Month:D2}", year, month);
-
-        var tenantIds = await _tenantService.GetAllTenantIdsAsync();
-        _logger.LogInformation("[Billing] Found {Count} tenants to process", tenantIds.Count);
-
-        var invoicesCreated = 0;
-
-        foreach (var tenantId in tenantIds)
+        try
         {
-            try
+            _logger.LogInformation("[Billing] Starting monthly billing for {Year}-{Month:D2}", year, month);
+
+            var tenantIds = await _tenantService.GetAllTenantIdsAsync();
+            _logger.LogInformation("[Billing] Found {Count} tenants to process", tenantIds.Count);
+
+            var invoicesCreated = 0;
+            var skipped = 0;
+            var failed = 0;
+
+            foreach (var tenantId in tenantIds)
             {
                 _requestTenant.SetTenantId(tenantId);
-                var created = await ProcessTenantBillingAsync(year, month);
-                if (created) invoicesCreated++;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "[Billing] Error processing billing for tenant {TenantId}", tenantId);
-            }
-        }
+                var processResult = await ProcessTenantBillingAsync(year, month);
+                if (processResult.IsFailure)
+                {
+                    failed++;
+                    _logger.LogError("[Billing] Tenant {TenantId} failed: {Error}",
+                        tenantId, processResult.ErrorModel.Message);
+                    continue;
+                }
 
-        _logger.LogInformation("[Billing] Billing complete. Invoices created: {Count}", invoicesCreated);
+                if (processResult.GetValue)
+                {
+                    invoicesCreated++;
+                }
+                else
+                {
+                    skipped++;
+                }
+            }
+
+            _logger.LogInformation(
+                "[Billing] Billing complete. Processed={Processed}, Created={Created}, Skipped={Skipped}, Failed={Failed}",
+                tenantIds.Count, invoicesCreated, skipped, failed);
+
+            return Result<BillingRunSummary>.Ok(new BillingRunSummary(tenantIds.Count, invoicesCreated, skipped, failed));
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "[Billing] Monthly billing run failed");
+            return Result<BillingRunSummary>.Failure(new InternalErrorModel(ex));
+        }
     }
 
-    private async Task<bool> ProcessTenantBillingAsync(int year, int month)
+    private async Task<Result<bool>> ProcessTenantBillingAsync(int year, int month)
     {
-        // Idempotency check
-        if (await _invoiceService.InvoiceExistsForPeriodAsync(year, month))
+        try
         {
-            _logger.LogDebug("[Billing] Invoice already exists for tenant {TenantId} period {Year}-{Month:D2}, skipping",
-                _requestTenant.TenantId, year, month);
-            return false;
-        }
+            // Idempotency check
+            var invoiceExistsResult = await _invoiceService.InvoiceExistsForPeriodAsync(year, month);
+            if (invoiceExistsResult.IsFailure)
+            {
+                return invoiceExistsResult.ToErrorResult<bool>();
+            }
+
+            if (invoiceExistsResult.GetValue)
+            {
+                _logger.LogDebug("[Billing] Invoice already exists for tenant {TenantId} period {Year}-{Month:D2}, skipping",
+                    _requestTenant.TenantId, year, month);
+                return Result<bool>.Ok(false);
+            }
 
         var monthStart = new DateOnly(year, month, 1);
         var monthEnd = monthStart.AddMonths(1).AddDays(-1);
 
         // Get all pricing records that overlap with the billing month
-        var pricingRecords = await _tenantPricingService.GetTenantPricingForPeriodAsync(monthStart, monthEnd);
+            var pricingRecordsResult = await _tenantPricingService.GetTenantPricingForPeriodAsync(monthStart, monthEnd);
+            if (pricingRecordsResult.IsFailure)
+            {
+                return pricingRecordsResult.ToErrorResult<bool>();
+            }
 
-        if (pricingRecords.Count == 0)
-        {
-            _logger.LogWarning("[Billing] Tenant {TenantId} has no pricing for period {Year}-{Month:D2}, skipping",
-                _requestTenant.TenantId, year, month);
-            return false;
-        }
+            var pricingRecords = pricingRecordsResult.GetValue;
 
-        var daysInMonth = monthEnd.DayNumber - monthStart.DayNumber + 1;
-        var lineItems = new List<BillingLineItem>();
-        var trialExpiredPricingIds = new List<Guid>();
+            if (pricingRecords.Count == 0)
+            {
+                _logger.LogWarning("[Billing] Tenant {TenantId} has no pricing for period {Year}-{Month:D2}, skipping",
+                    _requestTenant.TenantId, year, month);
+                return Result<bool>.Ok(false);
+            }
 
-        foreach (var pricing in pricingRecords)
-        {
+            var daysInMonth = monthEnd.DayNumber - monthStart.DayNumber + 1;
+            var lineItems = new List<BillingLineItem>();
+            var trialExpiredPricingIds = new List<Guid>();
+
+            foreach (var pricing in pricingRecords)
+            {
             var tier = pricing.PricingTier;
             if (tier == null) continue;
 
@@ -163,30 +207,30 @@ public class BillingService : IBillingService
                 TotalDaysInMonth: daysInMonth,
                 Amount: amount
             ));
-        }
+            }
 
         // Calculate totals
-        var subtotal = lineItems.Sum(li => li.Amount);
-        var discountPercentage = pricingRecords.Last().DiscountPercentage;
-        var discountAmount = Math.Round(subtotal * (discountPercentage / 100m), 2);
-        var totalAmount = subtotal - discountAmount;
+            var subtotal = lineItems.Sum(li => li.Amount);
+            var discountPercentage = pricingRecords.Last().DiscountPercentage;
+            var discountAmount = Math.Round(subtotal * (discountPercentage / 100m), 2);
+            var totalAmount = subtotal - discountAmount;
 
         // Get tenant details for snapshot
-        var tenantResult = await _tenantService.GetAsync(_requestTenant.TenantId);
-        if (tenantResult.IsFailure)
-        {
-            _logger.LogWarning("[Billing] Could not get tenant details for {TenantId}, skipping", _requestTenant.TenantId);
-            return false;
-        }
+            var tenantResult = await _tenantService.GetAsync(_requestTenant.TenantId);
+            if (tenantResult.IsFailure)
+            {
+                _logger.LogWarning("[Billing] Could not get tenant details for {TenantId}, skipping", _requestTenant.TenantId);
+                return tenantResult.ToErrorResult<bool>();
+            }
 
-        var tenant = tenantResult.GetValue;
+            var tenant = _mapper.Map<BillingTenantSnapshotModel>(tenantResult.GetValue);
 
-        var calculation = new BillingCalculationResult(
+            var calculation = new BillingCalculationResult(
             SubtotalAmount: subtotal,
             DiscountPercentage: discountPercentage,
             DiscountAmount: discountAmount,
             TotalAmount: totalAmount,
-            TenantName: tenant.Identifier,
+            TenantName: tenant.TenantName,
             VatNumber: tenant.VatNumber,
             CompanyRegistrationNumber: tenant.CompanyRegistrationNumber,
             StreetLine1: tenant.StreetLine1,
@@ -199,18 +243,32 @@ public class BillingService : IBillingService
         );
 
         // Create invoice
-        var invoice = await _invoiceService.CreateInvoiceAsync(year, month, calculation);
+            var invoiceResult = await _invoiceService.CreateInvoiceAsync(year, month, calculation);
+            if (invoiceResult.IsFailure)
+            {
+                return invoiceResult.ToErrorResult<bool>();
+            }
 
         // Update trial expired flags
-        foreach (var pricingId in trialExpiredPricingIds)
-        {
-            await _tenantPricingService.SetTrialExpiredAsync(pricingId);
+            foreach (var pricingId in trialExpiredPricingIds)
+            {
+                var trialResult = await _tenantPricingService.SetTrialExpiredAsync(pricingId);
+                if (trialResult.IsFailure)
+                {
+                    return trialResult.ToErrorResult<bool>();
+                }
+            }
+
+            // Send email notification
+            await SendInvoiceNotificationAsync(invoiceResult.GetValue.InvoiceNumber, totalAmount, monthStart, monthEnd);
+
+            return Result<bool>.Ok(true);
         }
-
-        // Send email notification
-        await SendInvoiceNotificationAsync(invoice.InvoiceNumber, totalAmount, monthStart, monthEnd);
-
-        return true;
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "[Billing] Error processing billing for tenant {TenantId}", _requestTenant.TenantId);
+            return Result<bool>.Failure(new InternalErrorModel(ex));
+        }
     }
 
     private async Task SendInvoiceNotificationAsync(string invoiceNumber, decimal totalAmount, DateOnly periodStart, DateOnly periodEnd)

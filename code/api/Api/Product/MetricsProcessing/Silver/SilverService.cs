@@ -99,7 +99,7 @@ public class SilverService : ISilverService
                 TtfbMs = r.Latency?.Ttfb ?? 0,
                 TotalMs = r.Latency?.Total ?? 0,
                 SizeBytes = r.Data?.TransferInBytes ?? 0,
-                IsCompressed = r.Data?.IsCompressed ?? false,
+                IsCompressed = r.Data?.IsCompressed ?? true, // unknown = assume compressed (avoid false positives for cross-origin)
                 SameOrigin = r.SameOrigin,
                 TimingRestricted = r.TimingRestricted,
                 DownloadMs = r.Latency?.DownloadMs ?? 0,
@@ -185,9 +185,9 @@ public class SilverService : ISilverService
             .Where(r => r.Label.Contains("LINK") || r.FullUrl.EndsWith(".css"))
             .Sum(r => r.SizeBytes);
 
-        // Compression Fault: Text-based assets that aren't compressed
+        // Compression Fault: Text-based assets that aren't compressed (only flag if >10KB — tiny assets don't matter)
         silverEntity.UncompressedCriticalAssetsCount = resources
-            .Count(r => !r.IsCompressed && (r.Label.Contains("SCRIPT") || r.Label.Contains("LINK") || r.Label.Contains("FETCH")));
+            .Count(r => !r.IsCompressed && r.SizeBytes > 10 * 1024 && (r.Label.Contains("SCRIPT") || r.Label.Contains("LINK") || r.Label.Contains("FETCH")));
 
         // ---------------------------------------------------------
         // 6. Critical API Signals

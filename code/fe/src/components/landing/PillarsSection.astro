@@ -21,8 +21,8 @@ const pillars = [
     iconColor: "text-red-600 bg-red-50",
     tag: "Server-side",
     description:
-      "Every XHR, fetch, and WebSocket call is tracked with TTFB, total duration, and status code. Identify that one endpoint that takes 8 seconds before the user even finishes describing the problem.",
-    metrics: ["Time to First Byte", "Total response time", "HTTP status codes"],
+      "Every XHR and fetch call is tracked with TTFB and total duration. Identify that one endpoint that takes 8 seconds before the user even finishes describing the problem.",
+    metrics: ["Time to First Byte", "Total response time", "Server processing gap"],
   },
   {
     iconName: "Monitor",
@@ -31,8 +31,8 @@ const pillars = [
     iconColor: "text-blue-600 bg-blue-50",
     tag: "Client-side",
     description:
-      "We capture Largest Contentful Paint, First Input Delay, and Cumulative Layout Shift for every page load and SPA transition. If the UI is janky, you'll know why.",
-    metrics: ["LCP / FID / CLS", "SPA transition time", "JS long tasks"],
+      "We capture Largest Contentful Paint and Cumulative Layout Shift for every page load and SPA transition. If the UI is janky, you'll know why.",
+    metrics: ["LCP / CLS", "SPA transition time", "JS long tasks"],
   },
 ];
 

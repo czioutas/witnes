@@ -175,20 +175,26 @@ function PillarIcon({
   label,
   okLabel,
   reasons,
+  sentiment,
 }: {
   icon: React.ElementType;
   isIssue?: boolean;
   label: string;
   okLabel: string;
   reasons?: string[];
+  sentiment?: OverallSentiment;
 }) {
   const hasReasons = reasons && reasons.length > 0;
+  const issueColor =
+    sentiment === OverallSentiment.good
+      ? "text-yellow-500"
+      : "text-red-500";
   return (
     <Tooltip>
       <TooltipTrigger asChild>
         <div className="w-8 shrink-0 flex justify-center">
           <IconComponent
-            className={`h-4 w-4 ${isIssue ? "text-red-500" : "text-muted-foreground/40"}`}
+            className={`h-4 w-4 ${isIssue ? issueColor : "text-muted-foreground/40"}`}
           />
         </div>
       </TooltipTrigger>
@@ -474,6 +480,7 @@ export function VisitorPageLoadsTable({ userId }: VisitorPageLoadsTableProps) {
                           label="Backend Issue"
                           okLabel="Backend OK"
                           reasons={pl.backend_reasons}
+                          sentiment={pl.overall_sentiment}
                         />
                         <PillarIcon
                           icon={Wifi}
@@ -481,6 +488,7 @@ export function VisitorPageLoadsTable({ userId }: VisitorPageLoadsTableProps) {
                           label="Network Issue"
                           okLabel="Network OK"
                           reasons={pl.network_reasons}
+                          sentiment={pl.overall_sentiment}
                         />
                         <PillarIcon
                           icon={Code}
@@ -488,6 +496,7 @@ export function VisitorPageLoadsTable({ userId }: VisitorPageLoadsTableProps) {
                           label="Frontend Issue"
                           okLabel="Frontend OK"
                           reasons={pl.frontend_reasons}
+                          sentiment={pl.overall_sentiment}
                         />
                         <PillarIcon
                           icon={Package}
@@ -495,6 +504,7 @@ export function VisitorPageLoadsTable({ userId }: VisitorPageLoadsTableProps) {
                           label="Payload Issue"
                           okLabel="Payload OK"
                           reasons={pl.payload_reasons}
+                          sentiment={pl.overall_sentiment}
                         />
                       </div>
 

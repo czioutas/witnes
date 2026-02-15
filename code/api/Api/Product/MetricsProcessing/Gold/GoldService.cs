@@ -502,12 +502,13 @@ public class GoldService : IGoldService
             confidenceScores.Add(60);
         }
 
-        // 4. Compression Check (Quick win evidence)
-        // If you have a high count of uncompressed assets in Silver.
-        if (silver.UncompressedCriticalAssetsCount > 0)
+        // 4. Compression Check (optimization tip, not a red flag)
+        // Only meaningful with multiple uncompressed assets; scale confidence by count.
+        if (silver.UncompressedCriticalAssetsCount >= 2)
         {
             reasons.Add(PayloadReason.UncompressedAssets);
-            confidenceScores.Add(90);
+            int compConf = Math.Clamp(silver.UncompressedCriticalAssetsCount * 15, 30, 60);
+            confidenceScores.Add(compConf);
         }
 
         int finalConfidence = confidenceScores.Any() ? confidenceScores.Max() : 0;

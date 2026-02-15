@@ -20,7 +20,11 @@ public class BillingJob(
             var now = timeProvider.GetUtcNow();
             // Bill for the previous month
             var billingMonth = new DateTime(now.Year, now.Month, 1).AddMonths(-1);
-            await billingService.RunMonthlyBillingAsync(billingMonth.Year, billingMonth.Month);
+            var result = await billingService.RunMonthlyBillingAsync(billingMonth.Year, billingMonth.Month);
+            if (result.IsFailure)
+            {
+                logger.LogError("[Billing] Monthly billing run failed: {Error}", result.ErrorModel.Message);
+            }
         }
         catch (Exception ex)
         {
