@@ -20,12 +20,11 @@ export function NoDataState({ projectKey }: NoDataStateProps) {
 </script>
 <script src="https://cdn.witnes.io/w.min.js" async></script>`;
 
-  const identifySnippet = `// Call this after your login logic
-if (window.Witnes) {
-    window.Witnes.identify("customer_id_99");
-} else {
-    window.witnesConfig.userId = "customer_id_99";
-}`;
+  const identifySnippet = `// JavaScript
+window.Witnes?.identify?.("customer_id_99");
+
+// TypeScript (CDN snippet)
+(window as any).Witnes?.identify?.("customer_id_99");`;
 
   return (
     <div className="flex flex-col items-center justify-center py-16 px-4">
@@ -64,11 +63,12 @@ if (window.Witnes) {
             <h3 className="font-semibold">Identify the user</h3>
           </div>
           <p className="text-sm text-muted-foreground mb-3">
-            Call the{" "}
+            Call{" "}
             <code className="text-sm bg-muted px-1.5 py-0.5 rounded">
               identify
             </code>{" "}
-            method after authentication to start tracking events.
+            after authentication. Use the JavaScript or TypeScript version
+            below.
           </p>
           <pre className="bg-muted p-4 rounded-lg overflow-x-auto text-sm">
             <code>{identifySnippet}</code>

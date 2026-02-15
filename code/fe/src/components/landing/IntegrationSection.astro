@@ -42,7 +42,7 @@ import IntegrationButton from "./IntegrationButton";
       <div class="rounded-xl border border-border bg-card overflow-hidden">
         <!-- Tab bar -->
         <div class="flex items-center gap-4 border-b border-border px-5 py-3">
-          <span class="text-xs font-medium text-foreground">app.js</span>
+          <span class="text-xs font-medium text-foreground">app.js / app.ts</span>
           <span class="text-xs text-muted-foreground">index.html</span>
         </div>
 
@@ -57,9 +57,10 @@ import IntegrationButton from "./IntegrationButton";
 <span class="text-red-600 font-medium">&lt;script</span> <span class="text-blue-600 font-medium">src</span><span class="text-foreground">=</span><span class="text-emerald-700">"https://cdn.witnes.io/w.min.js"</span> <span class="text-blue-600 font-medium">async</span><span class="text-red-600 font-medium">&gt;&lt;/script&gt;</span>
 
 <span class="text-muted-foreground italic">// 2. Identify the user on login</span>
-<span class="text-foreground">window.</span><span class="text-blue-600 font-medium">Witnes</span><span class="text-foreground">.</span><span class="text-blue-600 font-medium">identify</span><span class="text-foreground">(</span><span class="text-emerald-700">"user-4821"</span><span class="text-foreground">);</span>
+<span class="text-muted-foreground italic">// TypeScript</span>
+<span class="text-foreground">(window</span> <span class="text-foreground">as</span> <span class="text-foreground">any).</span><span class="text-blue-600 font-medium">Witnes</span><span class="text-foreground">?.</span><span class="text-blue-600 font-medium">identify</span><span class="text-foreground">?.(</span><span class="text-emerald-700">"user-4821"</span><span class="text-foreground">);</span>
 
-<span class="text-muted-foreground italic">// That's it. We handle everything else.</span></code></pre>
+<span class="text-muted-foreground italic">// 👈 For more options, check our guide.</span></code></pre>
         </div>
       </div>
     </div>

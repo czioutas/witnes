@@ -154,6 +154,7 @@ function initAuthState(initial: AuthState): AuthState {
 
     // No tokens = not authenticated
     if (!tokens) {
+      (window as any).Witnes?.identify?.(null, { guest: true });
       return { ...initial, isLoading: false };
     }
 
@@ -276,16 +277,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
         });
 
         // Identify user with Witnes
-        if (typeof window !== "undefined") {
-          if (window.Witnes) {
-            window.Witnes.identify(user.id);
-            console.log("Witnes identified user:", user.id);
-          } else {
-            // If script hasn't loaded yet, queue it in the config
-            window.witnesConfig = window.witnesConfig || { projectKey: "" };
-            window.witnesConfig.userId = user.id;
-          }
-        }
+        (window as any).Witnes?.identify?.(user.id);
+        console.log("Witnes identified user:", user.id);
       }
     } catch (error) {
       console.error("Get current user error:", error);
