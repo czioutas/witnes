@@ -121,10 +121,10 @@ public class BillingService : IBillingService
                 return Result<bool>.Ok(false);
             }
 
-        var monthStart = new DateOnly(year, month, 1);
-        var monthEnd = monthStart.AddMonths(1).AddDays(-1);
+            var monthStart = new DateOnly(year, month, 1);
+            var monthEnd = monthStart.AddMonths(1).AddDays(-1);
 
-        // Get all pricing records that overlap with the billing month
+            // Get all pricing records that overlap with the billing month
             var pricingRecordsResult = await _tenantPricingService.GetTenantPricingForPeriodAsync(monthStart, monthEnd);
             if (pricingRecordsResult.IsFailure)
             {
@@ -146,76 +146,76 @@ public class BillingService : IBillingService
 
             foreach (var pricing in pricingRecords)
             {
-            var tier = pricing.PricingTier;
-            if (tier == null) continue;
+                var tier = pricing.PricingTier;
+                if (tier == null) continue;
 
-            // Calculate the segment this pricing covers within the billing month
-            var segmentStart = pricing.StartDate > monthStart ? pricing.StartDate : monthStart;
-            var segmentEnd = pricing.EndDate.HasValue && pricing.EndDate.Value < monthEnd ? pricing.EndDate.Value : monthEnd;
-            var segmentDays = segmentEnd.DayNumber - segmentStart.DayNumber + 1;
+                // Calculate the segment this pricing covers within the billing month
+                var segmentStart = pricing.StartDate > monthStart ? pricing.StartDate : monthStart;
+                var segmentEnd = pricing.EndDate.HasValue && pricing.EndDate.Value < monthEnd ? pricing.EndDate.Value : monthEnd;
+                var segmentDays = segmentEnd.DayNumber - segmentStart.DayNumber + 1;
 
-            var chargeableDays = segmentDays;
+                var chargeableDays = segmentDays;
 
-            // Handle trial deduction
-            if (pricing.HasTrial && !pricing.HasTrialExpired)
-            {
-                var trialEndDate = pricing.StartDate.AddDays(6); // Last day of 7-day trial (inclusive)
-                var trialStartInSegment = pricing.StartDate > segmentStart ? pricing.StartDate : segmentStart;
-                var trialEndInSegment = trialEndDate < segmentEnd ? trialEndDate : segmentEnd;
-
-                if (trialStartInSegment <= trialEndInSegment)
+                // Handle trial deduction
+                if (pricing.HasTrial && !pricing.HasTrialExpired)
                 {
-                    var trialDaysInSegment = trialEndInSegment.DayNumber - trialStartInSegment.DayNumber + 1;
-                    chargeableDays = segmentDays - trialDaysInSegment;
+                    var trialEndDate = pricing.StartDate.AddDays(6); // Last day of 7-day trial (inclusive)
+                    var trialStartInSegment = pricing.StartDate > segmentStart ? pricing.StartDate : segmentStart;
+                    var trialEndInSegment = trialEndDate < segmentEnd ? trialEndDate : segmentEnd;
+
+                    if (trialStartInSegment <= trialEndInSegment)
+                    {
+                        var trialDaysInSegment = trialEndInSegment.DayNumber - trialStartInSegment.DayNumber + 1;
+                        chargeableDays = segmentDays - trialDaysInSegment;
+                    }
+
+                    // Mark trial as expired if the full 7 days have elapsed by the end of the billing month
+                    if (monthEnd >= pricing.StartDate.AddDays(7))
+                    {
+                        trialExpiredPricingIds.Add(pricing.Id);
+                    }
                 }
 
-                // Mark trial as expired if the full 7 days have elapsed by the end of the billing month
-                if (monthEnd >= pricing.StartDate.AddDays(7))
+                // Calculate amount
+                decimal amount;
+                var isFullMonth = segmentStart == monthStart && segmentEnd == monthEnd;
+
+                if (isFullMonth && chargeableDays == daysInMonth)
                 {
-                    trialExpiredPricingIds.Add(pricing.Id);
+                    // Full month, no trial deduction - use fixed monthly price
+                    amount = tier.PricePerMonth;
                 }
+                else
+                {
+                    // Pro-rated
+                    var dailyRate = tier.PricePerMonth / daysInMonth;
+                    amount = dailyRate * chargeableDays;
+                }
+
+                amount = Math.Round(amount, 2);
+
+                // Build description
+                var description = isFullMonth && chargeableDays == daysInMonth
+                    ? $"{tier.Name} Plan - {monthStart:MMMM yyyy}"
+                    : $"{tier.Name} Plan - {segmentStart:MMM d} to {segmentEnd:MMM d} ({chargeableDays} days)";
+
+                lineItems.Add(new BillingLineItem(
+                    TierName: tier.Name,
+                    Description: description,
+                    UnitPrice: tier.PricePerMonth,
+                    DaysCharged: chargeableDays,
+                    TotalDaysInMonth: daysInMonth,
+                    Amount: amount
+                ));
             }
 
-            // Calculate amount
-            decimal amount;
-            var isFullMonth = segmentStart == monthStart && segmentEnd == monthEnd;
-
-            if (isFullMonth && chargeableDays == daysInMonth)
-            {
-                // Full month, no trial deduction - use fixed monthly price
-                amount = tier.PricePerMonth;
-            }
-            else
-            {
-                // Pro-rated
-                var dailyRate = tier.PricePerMonth / daysInMonth;
-                amount = dailyRate * chargeableDays;
-            }
-
-            amount = Math.Round(amount, 2);
-
-            // Build description
-            var description = isFullMonth && chargeableDays == daysInMonth
-                ? $"{tier.Name} Plan - {monthStart:MMMM yyyy}"
-                : $"{tier.Name} Plan - {segmentStart:MMM d} to {segmentEnd:MMM d} ({chargeableDays} days)";
-
-            lineItems.Add(new BillingLineItem(
-                TierName: tier.Name,
-                Description: description,
-                UnitPrice: tier.PricePerMonth,
-                DaysCharged: chargeableDays,
-                TotalDaysInMonth: daysInMonth,
-                Amount: amount
-            ));
-            }
-
-        // Calculate totals
+            // Calculate totals
             var subtotal = lineItems.Sum(li => li.Amount);
             var discountPercentage = pricingRecords.Last().DiscountPercentage;
             var discountAmount = Math.Round(subtotal * (discountPercentage / 100m), 2);
             var totalAmount = subtotal - discountAmount;
 
-        // Get tenant details for snapshot
+            // Get tenant details for snapshot
             var tenantResult = await _tenantService.GetAsync(_requestTenant.TenantId);
             if (tenantResult.IsFailure)
             {
@@ -242,14 +242,14 @@ public class BillingService : IBillingService
             LineItems: lineItems
         );
 
-        // Create invoice
+            // Create invoice
             var invoiceResult = await _invoiceService.CreateInvoiceAsync(year, month, calculation);
             if (invoiceResult.IsFailure)
             {
                 return invoiceResult.ToErrorResult<bool>();
             }
 
-        // Update trial expired flags
+            // Update trial expired flags
             foreach (var pricingId in trialExpiredPricingIds)
             {
                 var trialResult = await _tenantPricingService.SetTrialExpiredAsync(pricingId);

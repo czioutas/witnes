@@ -5,6 +5,7 @@ import {
   type CreateUserInvitationModel,
   type UpdateUserModel,
   type UserInvitationModel,
+  type PackageInfoModel,
   AccountRoles,
 } from "../../generated/api";
 import { useAuth } from "../../contexts/AuthContext";
@@ -63,6 +64,7 @@ import { Badge } from "../ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import { useApiToast } from "../../hooks/useApiToast";
 import { Alert, AlertDescription } from "../ui/alert";
+import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 
 const api = getWitnesServerAPI();
 
@@ -95,6 +97,7 @@ export function UsersPage() {
   const [editingUser, setEditingUser] =
     useState<SlimApplicationUserModel | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [packageInfo, setPackageInfo] = useState<PackageInfoModel | null>(null);
 
   const inviteForm = useForm<InviteFormValues>({
     resolver: zodResolver(inviteSchema),
@@ -136,12 +139,36 @@ export function UsersPage() {
     }
   };
 
+  const fetchPackageInfo = async () => {
+    try {
+      const response = await api.getV1ProjectKeysPackage();
+      setPackageInfo(response.data);
+    } catch (error) {
+      console.error("Error fetching package info:", error);
+      setPackageInfo(null);
+    }
+  };
+
   useEffect(() => {
     fetchUsers();
     fetchInvitations();
+    fetchPackageInfo();
   }, []);
 
+  const maxTeamMembers = packageInfo?.max_team_members ?? 0;
+  const usedTeamSeats = users.length + invitations.length;
+  const hasTeamMemberLimit = maxTeamMembers > 0;
+  const isInviteLimitReached =
+    hasTeamMemberLimit && usedTeamSeats >= maxTeamMembers;
+  const inviteLimitText = hasTeamMemberLimit
+    ? `Team member limit reached (${usedTeamSeats}/${maxTeamMembers}). Remove a user/invitation or upgrade your plan.`
+    : "Team member limit reached.";
+
   const handleInvite = () => {
+    if (isInviteLimitReached) {
+      return;
+    }
+
     inviteForm.reset();
     setInviteDialogOpen(true);
   };
@@ -170,6 +197,7 @@ export function UsersPage() {
       await api.userDelete(user.id);
       toast.success("User removed successfully");
       fetchUsers();
+      fetchPackageInfo();
     } catch (error) {
       console.error("Error deleting user:", error);
       toast.error("Failed to remove user");
@@ -190,6 +218,7 @@ export function UsersPage() {
       successMessage: "Invitation deleted successfully",
       onSuccess: () => {
         fetchInvitations();
+        fetchPackageInfo();
       },
     });
   };
@@ -211,6 +240,7 @@ export function UsersPage() {
         setInviteDialogOpen(false);
         inviteForm.reset();
         fetchInvitations();
+        fetchPackageInfo();
         setSubmitting(false);
       },
       onError: () => setSubmitting(false),
@@ -267,11 +297,30 @@ export function UsersPage() {
             <p className="text-muted-foreground">
               Invite and manage users for your organization
             </p>
+            {hasTeamMemberLimit && (
+              <p className="text-sm text-muted-foreground mt-1">
+                Team seats used: {usedTeamSeats}/{maxTeamMembers}
+              </p>
+            )}
           </div>
-          <Button onClick={handleInvite}>
-            <UserPlus className="mr-2 h-4 w-4" />
-            Invite User
-          </Button>
+          {isInviteLimitReached ? (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <span className="inline-block">
+                  <Button disabled>
+                    <UserPlus className="mr-2 h-4 w-4" />
+                    Invite User
+                  </Button>
+                </span>
+              </TooltipTrigger>
+              <TooltipContent>{inviteLimitText}</TooltipContent>
+            </Tooltip>
+          ) : (
+            <Button onClick={handleInvite}>
+              <UserPlus className="mr-2 h-4 w-4" />
+              Invite User
+            </Button>
+          )}
         </div>
 
         {/* Info Banner */}
@@ -538,7 +587,7 @@ export function UsersPage() {
                 >
                   Cancel
                 </Button>
-                <Button type="submit" disabled={submitting}>
+                <Button type="submit" disabled={submitting || isInviteLimitReached}>
                   {submitting ? "Sending..." : "Send Invitation"}
                 </Button>
               </DialogFooter>

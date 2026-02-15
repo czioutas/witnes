@@ -3,6 +3,7 @@ using Api.Application.Account.Entities;
 using Api.Application.Account.Models;
 using Api.Application.Authentication;
 using Api.Application.Communication.Services;
+using Api.Application.Pricing.Services;
 using Api.Application.Tenancy.Services;
 using Api.Application.Users;
 using Api.Application.Users.Models;
@@ -41,6 +42,7 @@ public class UsersService : IUsersService
     private readonly TimeProvider _timeProvider;
     private readonly IRequestTenant _requestTenant;
     private readonly ITenantService _tenantService;
+    private readonly ITenantPricingService _tenantPricingService;
     private readonly ILinkResolver _linkResolver;
     private readonly SmtpSettings _smtpSettings;
 
@@ -53,6 +55,7 @@ public class UsersService : IUsersService
         TimeProvider timeProvider,
         IRequestTenant requestTenant,
         ITenantService tenantService,
+        ITenantPricingService tenantPricingService,
         ILinkResolver linkResolver,
         IOptions<SmtpSettings> smtpSettings
     )
@@ -65,6 +68,7 @@ public class UsersService : IUsersService
         _timeProvider = timeProvider ?? throw new ArgumentNullException(nameof(timeProvider));
         _requestTenant = requestTenant ?? throw new ArgumentNullException(nameof(requestTenant));
         _tenantService = tenantService ?? throw new ArgumentNullException(nameof(tenantService));
+        _tenantPricingService = tenantPricingService ?? throw new ArgumentNullException(nameof(tenantPricingService));
         _linkResolver = linkResolver ?? throw new ArgumentNullException(nameof(linkResolver));
         _smtpSettings = smtpSettings?.Value ?? throw new ArgumentNullException(nameof(smtpSettings));
     }
@@ -135,6 +139,13 @@ public class UsersService : IUsersService
     public async Task<Result<UserInvitationModel>> InviteUserAsync(CreateUserInvitationModel inviteUserModel, Guid invitedByUserId)
     {
         var tenantId = _requestTenant.TenantId;
+
+        var limitCheckResult = await EnsureTeamMemberLimitAllowsInviteAsync(tenantId);
+        if (limitCheckResult.IsFailure)
+        {
+            return limitCheckResult.ToErrorResult<UserInvitationModel>();
+        }
+
         var userResult = await FindUserAsync(inviteUserModel.Email, tenantId);
 
         if (!userResult.IsFailure)
@@ -188,6 +199,41 @@ public class UsersService : IUsersService
         }
 
         return new Result<UserInvitationModel>(_mapper.Map<UserInvitationModel>(userInvitationEntity));
+    }
+
+    private async Task<Result<bool>> EnsureTeamMemberLimitAllowsInviteAsync(Guid tenantId)
+    {
+        var currentPricingResult = await _tenantPricingService.GetCurrentTenantPricingAsync();
+        if (currentPricingResult.IsFailure)
+        {
+            return currentPricingResult.ToErrorResult<bool>();
+        }
+
+        var pricingTier = currentPricingResult.GetValue.PricingTier;
+        if (pricingTier == null)
+        {
+            return Result<bool>.BusinessError("PricingTierMissing", "Could not determine current pricing tier for this tenant.");
+        }
+
+        // MaxTeamMembers <= 0 means unlimited.
+        if (pricingTier.MaxTeamMembers <= 0)
+        {
+            return Result<bool>.Ok(true);
+        }
+
+        var activeUsersCount = await _dbContext.Users.CountAsync(u => u.TenantId == tenantId);
+        var pendingInvitationsCount = await _dbContext.UserInvitations
+            .CountAsync(ui => ui.TenantId == tenantId && !ui.Used);
+
+        var usedSeats = activeUsersCount + pendingInvitationsCount;
+        if (usedSeats >= pricingTier.MaxTeamMembers)
+        {
+            return Result<bool>.BusinessError(
+                "TeamMemberLimitReached",
+                $"You have reached your team member limit ({usedSeats}/{pricingTier.MaxTeamMembers}). Remove a user/invitation or upgrade your plan to invite more users.");
+        }
+
+        return Result<bool>.Ok(true);
     }
 
     private async Task<bool> SendInvitationEmailAsync(CreateUserInvitationModel invitationModel, Guid tenantId, string invitationCode, string inviterName)

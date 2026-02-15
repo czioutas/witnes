@@ -1216,6 +1216,9 @@ The response is lightweight and does not perform any complex operations or datab
     });
   };
 
+  /**
+   * @summary Gets all invoices for the current tenant.
+   */
   const getV1Invoice = () => {
     return customInstance<InvoiceModel[]>({
       url: `/v1/invoice`,
@@ -1223,6 +1226,9 @@ The response is lightweight and does not perform any complex operations or datab
     });
   };
 
+  /**
+   * @summary Gets a single invoice by its identifier.
+   */
   const getV1InvoiceInvoiceId = (invoiceId: number) => {
     return customInstance<InvoiceModel>({
       url: `/v1/invoice/${invoiceId}`,
