@@ -1,15 +1,15 @@
-import { Button } from './ui/button';
+import { Button } from "./ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from './ui/dropdown-menu';
-import { Avatar, AvatarFallback } from './ui/avatar';
-import { Settings, LogOut } from 'lucide-react';
-import { useAuth } from '../contexts/AuthContext';
-import { useState, useEffect } from 'react';
+} from "./ui/dropdown-menu";
+import { Avatar, AvatarFallback } from "./ui/avatar";
+import { Settings, LogOut } from "lucide-react";
+import { useAuth } from "../contexts/AuthContext";
+import { useState, useEffect } from "react";
 
 interface AuthActionsProps {
   className?: string;
@@ -25,7 +25,7 @@ export function AuthActions({ className }: AuthActionsProps) {
 
   const handleLogout = async () => {
     await logout();
-    window.location.href = '/';
+    window.location.href = "/";
   };
 
   if (!isClient || !isAuthenticated) {
@@ -51,7 +51,9 @@ export function AuthActions({ className }: AuthActionsProps) {
               <Button variant="ghost" className="relative h-8 w-8 rounded-full">
                 <Avatar className="h-8 w-8">
                   <AvatarFallback>
-                    {user ? `${user.firstName[0]}${user.lastName[0]}`.toUpperCase() : 'U'}
+                    {user
+                      ? `${user.firstName[0]}${user.lastName[0]}`.toUpperCase()
+                      : "U"}
                   </AvatarFallback>
                 </Avatar>
               </Button>
@@ -59,7 +61,11 @@ export function AuthActions({ className }: AuthActionsProps) {
             <DropdownMenuContent className="w-56" align="end" forceMount>
               <div className="flex items-center justify-start gap-2 p-2">
                 <div className="flex flex-col space-y-1 leading-none">
-                  {user && <p className="font-medium">{user.firstName} {user.lastName}</p>}
+                  {user && (
+                    <p className="font-medium">
+                      {user.firstName} {user.lastName}
+                    </p>
+                  )}
                   {user?.email && (
                     <p className="w-[200px] truncate text-sm text-muted-foreground">
                       {user.email}
@@ -69,9 +75,9 @@ export function AuthActions({ className }: AuthActionsProps) {
               </div>
               <DropdownMenuSeparator />
               <DropdownMenuItem asChild>
-                <a href="/dashboard/settings">
+                <a href="/dashboard/user-profile">
                   <Settings className="mr-2 h-4 w-4" />
-                  <span>Settings</span>
+                  <span>Profile</span>
                 </a>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
