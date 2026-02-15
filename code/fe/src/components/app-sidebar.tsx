@@ -14,6 +14,7 @@ import {
 import { NavMain } from "@/components/nav-main";
 import { NavSecondary } from "@/components/nav-secondary";
 import { NavUser } from "@/components/nav-user";
+import { hasRole } from "@/contexts/AuthContext";
 import { useFeatures } from "@/contexts/FeatureContext";
 import {
   Sidebar,
@@ -25,6 +26,7 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { AccountRoles, FeatureKey } from "@/generated/api";
+import type { User } from "@/types/auth";
 
 const data = {
   navMain: [
@@ -99,22 +101,13 @@ export function AppSidebar({
   onLogout,
   ...props
 }: React.ComponentProps<typeof Sidebar> & {
-  user?: {
-    name: string;
-    email: string;
-    initials?: string;
-    roles?: AccountRoles[];
-  };
+  user?: User;
   onLogout?: () => void;
 }) {
   const { isFeatureEnabled } = useFeatures();
 
   // Helper function to check if user has admin role
-  const isAdmin =
-    user?.roles &&
-    (Array.isArray(user.roles)
-      ? user.roles.includes(AccountRoles.AdminUserRole)
-      : user.roles === AccountRoles.AdminUserRole);
+  const isAdmin = hasRole(user ?? null, AccountRoles.AdminUserRole);
 
   // Filter main nav groups and items based on feature flags
   const filteredNavMain = data.navMain
@@ -133,7 +126,12 @@ export function AppSidebar({
   // Filter secondary nav items based on role
   const filteredNavSecondary = data.navSecondary.filter((item) => {
     // Only show admin-only pages to admins
-    const adminOnlyPages = ["Users", "Usage", "Billing", "Organization Settings"];
+    const adminOnlyPages = [
+      "Users",
+      "Usage",
+      "Billing",
+      "Organization Settings",
+    ];
     if (adminOnlyPages.includes(item.title)) {
       return isAdmin;
     }

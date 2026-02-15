@@ -17,6 +17,7 @@ namespace Usersr.API.Users.Controllers;
 [ApiExplorerSettings(GroupName = "v1", IgnoreApi = true)]
 #endif  
 [ApiController]
+[Authorize(Roles = nameof(AccountRoles.AdminUserRole))]
 public class UserController : ControllerBase
 {
     private readonly IUsersService _service;
@@ -29,7 +30,6 @@ public class UserController : ControllerBase
     }
 
     [HttpPut("{id}", Name = "UserUpdate")]
-    [Authorize(Roles = nameof(AccountRoles.AdminUserRole))]
     [ProducesResponseType(typeof(SlimApplicationUserModel), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ApplicationProblemDetailsModel), StatusCodes.Status401Unauthorized)]
@@ -53,7 +53,6 @@ public class UserController : ControllerBase
     }
 
     [HttpGet(Name = "UserGetAll")]
-    [Authorize(Roles = nameof(AccountRoles.AdminUserRole))]
     [ProducesResponseType(typeof(List<SlimApplicationUserModel>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ApplicationProblemDetailsModel), StatusCodes.Status401Unauthorized)]
@@ -67,7 +66,6 @@ public class UserController : ControllerBase
     }
 
     [HttpGet("{id}", Name = "UserGet")]
-    [Authorize(Roles = nameof(AccountRoles.AdminUserRole))]
     [ProducesResponseType(typeof(SlimApplicationUserModel), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ApplicationProblemDetailsModel), StatusCodes.Status401Unauthorized)]
@@ -90,7 +88,6 @@ public class UserController : ControllerBase
 
 
     [HttpGet("invitations", Name = "UserInvitationsPendingGetAll")]
-    [Authorize(Roles = nameof(AccountRoles.AdminUserRole))]
     [ProducesResponseType(typeof(List<UserInvitationModel>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ApplicationProblemDetailsModel), StatusCodes.Status401Unauthorized)]
@@ -103,7 +100,6 @@ public class UserController : ControllerBase
     }
 
     [HttpPost(Name = "UserInvite")]
-    [Authorize(Roles = nameof(AccountRoles.AdminUserRole))]
     [ProducesResponseType(typeof(UserInvitationModel), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ApplicationProblemDetailsModel), StatusCodes.Status401Unauthorized)]
@@ -124,7 +120,6 @@ public class UserController : ControllerBase
     }
 
     [HttpDelete("{id}", Name = "UserDelete")]
-    [Authorize(Roles = nameof(AccountRoles.AdminUserRole))]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ApplicationProblemDetailsModel), StatusCodes.Status401Unauthorized)]
@@ -143,7 +138,6 @@ public class UserController : ControllerBase
     }
 
     [HttpDelete("invitations/{id}", Name = "UserInvitationDelete")]
-    [Authorize(Roles = nameof(AccountRoles.AdminUserRole))]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ApplicationProblemDetailsModel), StatusCodes.Status401Unauthorized)]

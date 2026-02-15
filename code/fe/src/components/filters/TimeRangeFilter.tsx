@@ -23,6 +23,7 @@ export interface TimeRange {
 interface TimeRangeFilterProps {
   value: TimeRange;
   onChange: (value: TimeRange) => void;
+  showQuickPresets?: boolean;
 }
 
 const getPresetLabel = (preset: TimeRangePreset, range?: TimeRange): string => {
@@ -52,7 +53,11 @@ const getPresetLabel = (preset: TimeRangePreset, range?: TimeRange): string => {
   }
 };
 
-export function TimeRangeFilter({ value, onChange }: TimeRangeFilterProps) {
+export function TimeRangeFilter({
+  value,
+  onChange,
+  showQuickPresets = true,
+}: TimeRangeFilterProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [customStart, setCustomStart] = useState(
     value.startDate?.toISOString().slice(0, 16) || ''
@@ -131,32 +136,36 @@ export function TimeRangeFilter({ value, onChange }: TimeRangeFilterProps) {
           <div className="text-sm font-medium mb-3">Select Time Range</div>
 
           {/* Preset options */}
-          <button
-            onClick={() => handlePresetChange('last_24h')}
-            className={`w-full text-left px-3 py-2 text-sm rounded-md hover:bg-accent transition-colors ${
-              value.preset === 'last_24h' ? 'bg-accent' : ''
-            }`}
-          >
-            Last 24 Hours
-          </button>
+          {showQuickPresets && (
+            <>
+              <button
+                onClick={() => handlePresetChange('last_24h')}
+                className={`w-full text-left px-3 py-2 text-sm rounded-md hover:bg-accent transition-colors ${
+                  value.preset === 'last_24h' ? 'bg-accent' : ''
+                }`}
+              >
+                Last 24 Hours
+              </button>
 
-          <button
-            onClick={() => handlePresetChange('last_7d')}
-            className={`w-full text-left px-3 py-2 text-sm rounded-md hover:bg-accent transition-colors ${
-              value.preset === 'last_7d' ? 'bg-accent' : ''
-            }`}
-          >
-            Last 7 Days
-          </button>
+              <button
+                onClick={() => handlePresetChange('last_7d')}
+                className={`w-full text-left px-3 py-2 text-sm rounded-md hover:bg-accent transition-colors ${
+                  value.preset === 'last_7d' ? 'bg-accent' : ''
+                }`}
+              >
+                Last 7 Days
+              </button>
 
-          <button
-            onClick={() => handlePresetChange('last_30d')}
-            className={`w-full text-left px-3 py-2 text-sm rounded-md hover:bg-accent transition-colors ${
-              value.preset === 'last_30d' ? 'bg-accent' : ''
-            }`}
-          >
-            Last 30 Days
-          </button>
+              <button
+                onClick={() => handlePresetChange('last_30d')}
+                className={`w-full text-left px-3 py-2 text-sm rounded-md hover:bg-accent transition-colors ${
+                  value.preset === 'last_30d' ? 'bg-accent' : ''
+                }`}
+              >
+                Last 30 Days
+              </button>
+            </>
+          )}
 
           <button
             onClick={() => handlePresetChange('all')}

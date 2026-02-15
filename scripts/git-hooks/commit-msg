@@ -1,0 +1,39 @@
+#!/bin/bash
+
+commit_msg_file=$1
+commit_msg=$(cat "$commit_msg_file")
+
+# Define the pattern based on GitVersion.yml
+pattern="^type:\s?(breaking|major|feature|minor|fix|patch|none|skip)"
+
+if ! echo "$commit_msg" | grep -qE "$pattern"; then
+    echo ""
+    echo "❌ ERROR: Commit message does not follow the required format!"
+    echo ""
+    echo "Your commit message must start with one of these types:"
+    echo ""
+    echo "  Major version bump:"
+    echo "    - type: breaking"
+    echo "    - type: major"
+    echo ""
+    echo "  Minor version bump:"
+    echo "    - type: feature"
+    echo "    - type: minor"
+    echo ""
+    echo "  Patch version bump:"
+    echo "    - type: fix"
+    echo "    - type: patch"
+    echo ""
+    echo "  No version bump:"
+    echo "    - type: none"
+    echo "    - type: skip"
+    echo ""
+    echo "Examples:"
+    echo "  type: feature - Add new dashboard component"
+    echo "  type: fix - Resolve authentication token refresh issue"
+    echo "  type: breaking - Remove deprecated API endpoints"
+    echo ""
+    exit 1
+fi
+
+exit 0

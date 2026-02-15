@@ -1,3 +1,4 @@
+using Api.Application.Authentication;
 using Api.Application.ProjectKeys.Models;
 using Api.Application.ProjectKeys.Services;
 using Api.Application.Tenancy.Services;
@@ -53,6 +54,7 @@ public class ProjectKeysController : ControllerBase
     [HttpPost]
     [ProducesResponseType(typeof(ProjectKeyModel), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [Authorize(Roles = nameof(AccountRoles.AdminUserRole))]
     public async Task<ActionResult<ProjectKeyModel>> Create([FromBody] CreateProjectKeyRequest request)
     {
         var result = await _projectKeyService.CreateAsync(_requestTenant.TenantId, request);
@@ -69,6 +71,7 @@ public class ProjectKeysController : ControllerBase
     [ProducesResponseType(typeof(ProjectKeyModel), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [Authorize(Roles = nameof(AccountRoles.AdminUserRole))]
     public async Task<ActionResult<ProjectKeyModel>> Update(Guid id, [FromBody] UpdateProjectKeyRequest request)
     {
         var tenantId = _requestTenant.TenantId;
@@ -85,6 +88,7 @@ public class ProjectKeysController : ControllerBase
     [HttpDelete("{id}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [Authorize(Roles = nameof(AccountRoles.AdminUserRole))]
     public async Task<ActionResult> Delete(Guid id)
     {
         var tenantId = _requestTenant.TenantId;
@@ -98,6 +102,7 @@ public class ProjectKeysController : ControllerBase
     /// <returns>Usage statistics including total and current month page loads</returns>
     [HttpGet("usage")]
     [ProducesResponseType(typeof(UsageStatsModel), StatusCodes.Status200OK)]
+    [Authorize(Roles = nameof(AccountRoles.AdminUserRole))]
     public async Task<ActionResult<UsageStatsModel>> GetUsageStats()
     {
         var tenantId = _requestTenant.TenantId;
@@ -141,6 +146,7 @@ public class ProjectKeysController : ControllerBase
     [HttpGet("package")]
     [ProducesResponseType(typeof(PackageInfoModel), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [Authorize(Roles = nameof(AccountRoles.AdminUserRole))]
     public async Task<ActionResult<PackageInfoModel>> GetPackageInfo()
     {
         var tenantId = _requestTenant.TenantId;

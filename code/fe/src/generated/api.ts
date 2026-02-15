@@ -733,6 +733,9 @@ export interface MetadataModel {
   navigation_id?: string;
   page_requested_at_by_visitor?: string;
   pk?: string;
+  /** @nullable */
+  tab_visible_at_ms?: number | null;
+  was_background_tab?: boolean;
 }
 
 export interface LoginModel {

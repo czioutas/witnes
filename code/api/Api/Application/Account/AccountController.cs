@@ -1,10 +1,7 @@
 using Api.Application.Account.Models;
-using Api.Application.Account.Services;
 using Api.Application.Account.Services.Interfaces;
 using Api.Application.Extensions;
 using Api.Application.Models;
-using Libs.Exceptions;
-using Libs.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

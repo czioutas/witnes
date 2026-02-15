@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+GIT_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || true)"
+if [ -z "$GIT_ROOT" ]; then
+  echo "Error: Not in a git repository"
+  exit 1
+fi
+
+"$GIT_ROOT/scripts/pre-push.sh"

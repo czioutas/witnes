@@ -17,7 +17,6 @@ namespace API.Data;
 public class Seed
 {
     private static Random random = new Random();
-    private static readonly string password = "aA!1aA!1aA!1";
     /// <summary>
     /// Seed used for any environment
     /// </summary>
@@ -71,7 +70,7 @@ public class Seed
             return;
         }
 
-        var demoUserEmail = "mamaslittlebakery@witnes.io";
+        var demoUserEmail = "adminemailfordemo@witnes.io";
         var existingUser = await accountService.FindByEmailAsync(demoUserEmail);
         if (existingUser != null)
         {
@@ -82,10 +81,10 @@ public class Seed
         var registerModel = new RegisterModel
         {
             Email = demoUserEmail,
-            Password = "witnesDemoAa1!",
+            Password = "AS3ri2hrias1!witnesDemoAa1!",
             FirstName = "Bob",
             LastName = "Ross",
-            NormalizedTenantIdentifier = "Mama's Little Bakery",
+            NormalizedTenantIdentifier = "ACME Inc",
         };
 
         var result = await accountService.RegisterAsync(registerModel, new[] { AccountRoles.AdminUserRole }, false);
@@ -144,7 +143,7 @@ public class Seed
         }
 
         // Get the demo admin user to use the same tenant
-        var adminUser = await accountService.FindByEmailAsync("mamaslittlebakery@witnes.io");
+        var adminUser = await accountService.FindByEmailAsync("adminemailfordemo@witnes.io");
         if (adminUser == null)
         {
             Console.WriteLine("Demo admin user not found. Cannot create non-admin user. Skipping seeding.");
@@ -157,7 +156,7 @@ public class Seed
             Password = "witnesDemoAa1!",
             FirstName = "Jane",
             LastName = "Smith",
-            NormalizedTenantIdentifier = "Mama's Little Bakery",
+            NormalizedTenantIdentifier = "ACME Inc",
         };
 
         var result = await accountService.RegisterAsync(registerModel, new[] { AccountRoles.DefaultUserRole }, bypassTenantCheck: true);

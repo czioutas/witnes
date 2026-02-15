@@ -4,6 +4,7 @@ import {
   LogOut,
   User,
 } from "lucide-react"
+import type { User as AuthUser } from "@/types/auth"
 
 import {
   Avatar,
@@ -29,14 +30,14 @@ export function NavUser({
   user,
   onLogout,
 }: {
-  user: {
-    name: string
-    email: string
-    initials?: string
-  }
+  user: AuthUser
   onLogout?: () => void
 }) {
   const { isMobile } = useSidebar()
+  const displayName = `${user.firstName || ""} ${user.lastName || ""}`.trim() || "User"
+  const initials =
+    `${user.firstName?.charAt(0) || ""}${user.lastName?.charAt(0) || ""}`.toUpperCase() ||
+    displayName.substring(0, 2).toUpperCase()
 
   return (
     <SidebarMenu>
@@ -49,11 +50,11 @@ export function NavUser({
             >
               <Avatar className="h-8 w-8 rounded-lg">
                 <AvatarFallback className="rounded-lg">
-                  {user.initials || user.name.substring(0, 2).toUpperCase()}
+                  {initials}
                 </AvatarFallback>
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-semibold">{user.name}</span>
+                <span className="truncate font-semibold">{displayName}</span>
                 <span className="truncate text-xs text-muted-foreground">
                   {user.email}
                 </span>
@@ -70,11 +71,11 @@ export function NavUser({
               <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                 <Avatar className="h-8 w-8 rounded-lg">
                   <AvatarFallback className="rounded-lg">
-                    {user.initials || user.name.substring(0, 2).toUpperCase()}
+                    {initials}
                   </AvatarFallback>
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-semibold">{user.name}</span>
+                  <span className="truncate font-semibold">{displayName}</span>
                   <span className="truncate text-xs text-muted-foreground">
                     {user.email}
                   </span>

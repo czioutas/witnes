@@ -70,7 +70,7 @@ function AuthenticatedDashboard({
   const auth = useRequireAuth();
 
   // Pages that require admin role
-  const adminOnlyPages = ["users", "accounting", "organization-settings", "billing"];
+  const adminOnlyPages = ["users", "usage", "organization-settings", "billing"];
   const isAdminOnlyPage = adminOnlyPages.includes(page);
 
   // Use role-based auth for admin-only pages
@@ -92,18 +92,6 @@ function AuthenticatedDashboard({
     await auth.logout();
     window.location.href = "/authenticate/login";
   };
-
-  const sidebarUser = auth.user
-    ? {
-        name:
-          `${auth.user.firstName || ""} ${auth.user.lastName || ""}`.trim() ||
-          "User",
-        email: auth.user.email || "",
-        initials:
-          `${auth.user.firstName?.charAt(0) || ""}${auth.user.lastName?.charAt(0) || ""}`.toUpperCase(),
-        roles: auth.user.roles || [],
-      }
-    : undefined;
 
   // Render page content based on page type
   const renderPageContent = () => {
@@ -142,7 +130,7 @@ function AuthenticatedDashboard({
   return (
     <SidebarProvider>
       <Toaster position="top-right" richColors />
-      <AppSidebar user={sidebarUser} onLogout={handleLogout} />
+      <AppSidebar user={auth.user || undefined} onLogout={handleLogout} />
       <SidebarInset className="w-full">
         <SiteHeader title={title} breadcrumbs={breadcrumbs} />
         <div className="flex flex-1 flex-col gap-8 p-8 pt-10 text-[17px]">

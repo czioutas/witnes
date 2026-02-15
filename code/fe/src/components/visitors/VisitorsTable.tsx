@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useApiToast } from "../../hooks/useApiToast";
 import {
   getWitnesServerAPI,
@@ -31,16 +31,26 @@ export function VisitorsTable() {
   const [timeRange, setTimeRange] = useState<TimeRange>({ preset: "all" });
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 20;
+  const hasActiveFilter =
+    userIdSearch.trim().length > 0 ||
+    timeRange.preset !== "all" ||
+    !!timeRange.startDate ||
+    !!timeRange.endDate ||
+    !!timeRange.aroundTime;
 
-  const fetchVisitors = async (page: number = currentPage) => {
+  const fetchVisitors = async (
+    page: number = currentPage,
+    range: TimeRange = timeRange,
+    search: string = userIdSearch,
+  ) => {
     setLoading(true);
     const api = getWitnesServerAPI();
     await handleApiCall({
       apiCall: async () => {
         const response = await api.getV1Visitors({
-          UserIdSearch: userIdSearch || undefined,
-          StartDate: timeRange.startDate?.toISOString(),
-          EndDate: timeRange.endDate?.toISOString(),
+          UserIdSearch: search || undefined,
+          StartDate: range.startDate?.toISOString(),
+          EndDate: range.endDate?.toISOString(),
           PageNumber: page,
           PageSize: pageSize,
         });
@@ -57,20 +67,27 @@ export function VisitorsTable() {
 
   const handleSearch = () => {
     setCurrentPage(1);
-    fetchVisitors(1);
+    fetchVisitors(1, timeRange, userIdSearch);
   };
 
   const handleTimeRangeChange = (newRange: TimeRange) => {
     setTimeRange(newRange);
     setCurrentPage(1);
-    // Auto-fetch when time range changes
-    setTimeout(() => fetchVisitors(1), 100);
+    fetchVisitors(1, newRange, userIdSearch);
+  };
+
+  const handleClearFilter = () => {
+    const resetRange: TimeRange = { preset: "all" };
+    setUserIdSearch("");
+    setTimeRange(resetRange);
+    setCurrentPage(1);
+    fetchVisitors(1, resetRange, "");
   };
 
   // Initial load
-  useState(() => {
+  useEffect(() => {
     fetchVisitors();
-  });
+  }, []);
 
   return (
     <div className="space-y-4">
@@ -91,7 +108,11 @@ export function VisitorsTable() {
             Search
           </Button>
         </div>
-        <TimeRangeFilter value={timeRange} onChange={handleTimeRangeChange} />
+        <TimeRangeFilter
+          value={timeRange}
+          onChange={handleTimeRangeChange}
+          showQuickPresets={false}
+        />
       </div>
 
       {/* Table */}
@@ -120,11 +141,20 @@ export function VisitorsTable() {
               visitors.data &&
               visitors.data.length === 0 && (
                 <TableRow>
-                  <TableCell
-                    colSpan={6}
-                    className="text-center py-8 text-muted-foreground"
-                  >
-                    No visitors found
+                  <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                    <span>No visitors found</span>
+                    {hasActiveFilter && (
+                      <>
+                        <span className="mx-2">•</span>
+                        <button
+                          type="button"
+                          onClick={handleClearFilter}
+                          className="underline underline-offset-4 hover:text-foreground"
+                        >
+                          Clear filter
+                        </button>
+                      </>
+                    )}
                   </TableCell>
                 </TableRow>
               )}

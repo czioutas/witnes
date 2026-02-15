@@ -36,7 +36,7 @@ function LoginFormContent() {
   };
 
   const handleDemoLogin = async () => {
-    const email = "mamaslittlebakery@witnes.io";
+    const email = "employee@witnes.io";
     const password = "witnesDemoAa1!";
 
     clearError();

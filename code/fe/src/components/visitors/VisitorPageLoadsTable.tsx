@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useApiToast } from "../../hooks/useApiToast";
 import {
   getWitnesServerAPI,
@@ -224,14 +224,17 @@ export function VisitorPageLoadsTable({ userId }: VisitorPageLoadsTableProps) {
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 20;
 
-  const fetchPageLoads = async (page: number = currentPage) => {
+  const fetchPageLoads = async (
+    page: number = currentPage,
+    range: TimeRange = timeRange,
+  ) => {
     setLoading(true);
     const api = getWitnesServerAPI();
     await handleApiCall({
       apiCall: async () => {
         const response = await api.getV1VisitorsUserIdPageLoads(userId, {
-          startDate: timeRange.startDate?.toISOString(),
-          endDate: timeRange.endDate?.toISOString(),
+          startDate: range.startDate?.toISOString(),
+          endDate: range.endDate?.toISOString(),
           pageNumber: page,
           pageSize: pageSize,
         });
@@ -249,22 +252,38 @@ export function VisitorPageLoadsTable({ userId }: VisitorPageLoadsTableProps) {
   const handleTimeRangeChange = (newRange: TimeRange) => {
     setTimeRange(newRange);
     setCurrentPage(1);
-    setTimeout(() => fetchPageLoads(1), 100);
+    fetchPageLoads(1, newRange);
+  };
+
+  const handleClearFilter = () => {
+    const resetRange: TimeRange = { preset: "all" };
+    setTimeRange(resetRange);
+    setCurrentPage(1);
+    fetchPageLoads(1, resetRange);
   };
 
   // Initial load
-  useState(() => {
+  useEffect(() => {
     fetchPageLoads();
-  });
+  }, [userId]);
 
   const items = pageLoads?.data ?? [];
   const grouped = groupByDay(items);
+  const hasActiveFilter =
+    timeRange.preset !== "all" ||
+    !!timeRange.startDate ||
+    !!timeRange.endDate ||
+    !!timeRange.aroundTime;
 
   return (
     <div className="space-y-4">
       {/* Filters */}
       <div className="flex items-center justify-end">
-        <TimeRangeFilter value={timeRange} onChange={handleTimeRangeChange} />
+        <TimeRangeFilter
+          value={timeRange}
+          onChange={handleTimeRangeChange}
+          showQuickPresets={false}
+        />
       </div>
 
       {/* Timeline */}
@@ -274,7 +293,19 @@ export function VisitorPageLoadsTable({ userId }: VisitorPageLoadsTableProps) {
 
       {!loading && items.length === 0 && (
         <div className="text-center py-8 text-muted-foreground">
-          No page loads found
+          <span>No page loads found</span>
+          {hasActiveFilter && (
+            <>
+              <span className="mx-2">•</span>
+              <button
+                type="button"
+                onClick={handleClearFilter}
+                className="underline underline-offset-4 hover:text-foreground"
+              >
+                Clear filter
+              </button>
+            </>
+          )}
         </div>
       )}
 
