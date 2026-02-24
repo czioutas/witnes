@@ -172,6 +172,14 @@ public class Startup
 
         app.UseCors();
 
+        // Allow browsers to expose Resource Timing data (transferSize, TTFB, etc.)
+        // to JavaScript on any origin. Required for w.js waterfall collection.
+        app.Use(async (context, next) =>
+        {
+            context.Response.Headers["Timing-Allow-Origin"] = "*";
+            await next();
+        });
+
         app.UseAuthentication();
         app.UseAuthorization();
 
