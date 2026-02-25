@@ -54,10 +54,25 @@ public class SilverService : ISilverService
         var waterfall = performance.Waterfall ?? [];
         var initialLoad = performance.InitialLoad;
         var jankList = performance.Jank ?? new List<JankMetric>();
+        var isSpaNav = metadata?.Event == "SPA_NAV";
 
-        // Compute Network Baselines
-        var baselineNetworkTtfb = CalculateNetworkBaseline(waterfall);
-        var initialDocTtfb = initialLoad?.Latency?.Ttfb ?? 0;
+        // Server-side CLS delta: sum all clsEvents for this navigation
+        // For LOAD events, all shifts belong to this nav.
+        // For SPA_NAV events, the tracker already sends only post-route-change shifts
+        // via the global accumulator, but we sum them all here regardless.
+        var clsEvents = performance.ClsEvents ?? [];
+        var cumulativeLayoutShift = clsEvents.Sum(e => e.V);
+
+        // Server-side Incomplete derivation:
+        // A record is incomplete when loadEventFiredAt is null AND:
+        //   - For SPA_NAV: finalizeReason == 'spa_nav' means cut short by another route change
+        //   - For LOAD: finalizeReason != 'idle' means the page never settled
+        var incomplete = metadata?.LoadEventFiredAt == null
+            && metadata?.FinalizeReason is not "idle";
+
+        // Compute Network Baselines (skip for SPA navs — no initial document fetch)
+        var baselineNetworkTtfb = isSpaNav ? 0 : CalculateNetworkBaseline(waterfall);
+        var initialDocTtfb = isSpaNav ? 0 : (initialLoad?.Latency?.Ttfb ?? 0);
 
         // ---------------------------------------------------------
         // 2. Map Silver Entity (The Flat Record)
@@ -72,9 +87,18 @@ public class SilverService : ISilverService
             Url = bronze.Url,
             PageRequestedAtByVisitor = metadata!.PageRequestedAtByVisitor,
             PageLoadDurationMs = metadata?.PageLoadDurationMs ?? 0,
-            Incomplete = metadata?.Incomplete ?? false,
+            Incomplete = incomplete,
             FinalizeReason = metadata?.FinalizeReason,
             IdentifyDelayMs = metadata?.IdentifyDelayMs ?? 0,
+
+            // SPA Navigation Support
+            EventType = metadata?.Event ?? "LOAD",
+            NavigationId = metadata?.NavigationId,
+            ParentNavigationId = metadata?.ParentNavigationId,
+
+            // Session Stitching
+            SessionRef = bronze.Session?.Ref,
+
             WasBackgroundTab = metadata?.WasBackgroundTab ?? false,
             BackgroundDurationMs = metadata?.TabVisibleAtMs ?? 0,
 
@@ -82,7 +106,7 @@ public class SilverService : ISilverService
             EffectiveType = network?.EffectiveType ?? "unknown",
             Rtt = ParseIntMetric(network?.Rtt, "ms"),
             DownlinkInMbs = network?.DownlinkInMbs ?? 0,
-            Protocol = initialLoad?.Protocol ?? "h2",
+            Protocol = isSpaNav ? "spa" : (initialLoad?.Protocol ?? "h2"),
 
             // Device Context
             UserAgent = device?.UserAgent ?? "Unknown",
@@ -92,6 +116,7 @@ public class SilverService : ISilverService
             // Waterfall Processing
             Waterfall = [.. waterfall.Select(r => new ProcessedResource
             {
+                StartMs = r.Start ?? 0,
                 Label = $"{(r.Initiator ?? "OTHER").ToUpper()} | {r.Name ?? "Unknown"}",
                 FullUrl = r.FullUrl ?? "N/A",
                 Protocol = r.Protocol ?? "N/A",
@@ -112,17 +137,17 @@ public class SilverService : ISilverService
 
             // Infrastructure & Efficiency Baseline
             BaselineNetworkTtfbMs = baselineNetworkTtfb,
-            CdnBaselineTtfbMs = performance.CdnBaseline?.TtfbMs ?? 0,
+            CdnBaselineTtfbMs = isSpaNav ? 0 : (performance.CdnBaseline?.TtfbMs ?? 0),
             InitialDocTtfbMs = initialDocTtfb,
-            ServerEfficiencyRatio = baselineNetworkTtfb > 0 ? (double)initialDocTtfb / baselineNetworkTtfb : 1.0,
+            ServerEfficiencyRatio = isSpaNav ? 1.0 : (baselineNetworkTtfb > 0 ? (double)initialDocTtfb / baselineNetworkTtfb : 1.0),
             TotalCriticalStalledMs = CalculateTotalCriticalStalled(waterfall),
             MaxConcurrentRequests = CalculateMaxConcurrency(waterfall),
             // ---------------------------------------------------------
             // 3. Frontend Symptoms (The "What Happened?")
             // ---------------------------------------------------------
             AbsoluteLcpMs = performance.Vitals.WebVitals.Lcp,
-            FcpMs = performance.Vitals.WebVitals.Fcp,
-            CumulativeLayoutShift = performance.Vitals.WebVitals.Cls,
+            FcpMs = isSpaNav ? 0 : performance.Vitals.WebVitals.Fcp,
+            CumulativeLayoutShift = cumulativeLayoutShift,
             TotalJankCount = jankList.Count,
 
             // Settled Time: Null if we didn't finish cleanly
@@ -133,31 +158,36 @@ public class SilverService : ISilverService
             // ---------------------------------------------------------
             // 4. Interactive Duo & Functional Logic
             // ---------------------------------------------------------
-            TechnicalInteractiveMs = performance.Vitals.PageLoad.Interactive
+            TechnicalInteractiveMs = isSpaNav ? 0 : performance.Vitals.PageLoad.Interactive
         };
 
         // Find the last long task that effectively extended the "Hydration/Init" phase
         // We look for tasks starting near TechnicalInteractive and up to 3s after.
-        var hydrationJank = silverEntity.JankReports
-            .Where(j => j.S >= silverEntity.TechnicalInteractiveMs - 500 &&
-                        j.S <= silverEntity.TechnicalInteractiveMs + 3000)
-            .OrderByDescending(j => (j.S ?? 0) + (j.D ?? 0))
-            .FirstOrDefault();
+        // Skip for SPA navs — no hydration phase.
+        if (!isSpaNav)
+        {
+            var hydrationJank = silverEntity.JankReports
+                .Where(j => j.S >= silverEntity.TechnicalInteractiveMs - 500 &&
+                            j.S <= silverEntity.TechnicalInteractiveMs + 3000)
+                .OrderByDescending(j => (j.S ?? 0) + (j.D ?? 0))
+                .FirstOrDefault();
 
-        silverEntity.FunctionalInteractiveMs = hydrationJank != null
-            ? (hydrationJank.S ?? 0) + (hydrationJank.D ?? 0)
-            : silverEntity.TechnicalInteractiveMs;
+            silverEntity.FunctionalInteractiveMs = hydrationJank != null
+                ? (hydrationJank.S ?? 0) + (hydrationJank.D ?? 0)
+                : silverEntity.TechnicalInteractiveMs;
+        }
 
         // ---------------------------------------------------------
         // 5. Fault Evidence (The Calculated Gaps)
         // ---------------------------------------------------------
-        // Why was it slow?
-        silverEntity.ShellToContentGapMs = Math.Max(0, silverEntity.AbsoluteLcpMs - silverEntity.FcpMs);
-        silverEntity.InteractionDeadZoneMs = silverEntity.FunctionalInteractiveMs - silverEntity.TechnicalInteractiveMs;
-
-        // Legacy mapping for InteractiveMs (using Technical as the baseline)
-        silverEntity.InteractiveMs = silverEntity.TechnicalInteractiveMs;
-        silverEntity.FrozenUiGapMs = Math.Max(0, silverEntity.TechnicalInteractiveMs - silverEntity.AbsoluteLcpMs);
+        // For SPA navs, these gaps are meaningless (FCP=0, Interactive=0) — leave at 0.
+        if (!isSpaNav)
+        {
+            silverEntity.ShellToContentGapMs = Math.Max(0, silverEntity.AbsoluteLcpMs - silverEntity.FcpMs);
+            silverEntity.InteractionDeadZoneMs = silverEntity.FunctionalInteractiveMs - silverEntity.TechnicalInteractiveMs;
+            silverEntity.InteractiveMs = silverEntity.TechnicalInteractiveMs;
+            silverEntity.FrozenUiGapMs = Math.Max(0, silverEntity.TechnicalInteractiveMs - silverEntity.AbsoluteLcpMs);
+        }
 
         var resources = silverEntity.Waterfall;
 
@@ -231,6 +261,7 @@ public class SilverService : ISilverService
         bool IsImageExtension(string url) =>
             url.EndsWith(".png") || url.EndsWith(".jpg") || url.EndsWith(".jpeg") || url.EndsWith(".webp") || url.EndsWith(".svg");
 
+        // Network fingerprint still valuable for SPA navs (XHR/fetch resources give signal)
         silverEntity = BuildNetworkFingerprint(bronze, silverEntity);
 
         // ---------------------------------------------------------
@@ -247,7 +278,7 @@ public class SilverService : ISilverService
         // ---------------------------------------------------------
         // 8. CDN Baseline Verdict
         // ---------------------------------------------------------
-        silverEntity.CdnBaselineVerdict = silverEntity.CdnBaselineTtfbMs switch
+        silverEntity.CdnBaselineVerdict = isSpaNav ? "unknown" : silverEntity.CdnBaselineTtfbMs switch
         {
             0 => "unknown",   // No CDN data available
             <= 50 => "normal",
@@ -276,6 +307,11 @@ public class SilverService : ISilverService
             silverEntity.SlowestApiTtfbMs = slowest.TotalMs;
             silverEntity.SlowestApiUrl = slowest.FullUrl;
         }
+
+        // ---------------------------------------------------------
+        // 11. Session Stitching — assign SessionId at ingestion time
+        // ---------------------------------------------------------
+        silverEntity.SessionId = await ResolveSessionIdAsync(silverEntity, tenantId);
 
         await _context.MetricsSilver.AddAsync(silverEntity);
         await _context.SaveChangesAsync();
@@ -384,6 +420,66 @@ public class SilverService : ISilverService
         }
 
         return silver;
+    }
+
+    /// <summary>
+    /// Resolves the SessionId for a Silver record at ingestion time.
+    /// 1. SPA_NAV with ParentNavigationId → inherit SessionId from parent
+    /// 2. LOAD with same-domain SessionRef → inherit SessionId from most recent record for same user
+    /// 3. Otherwise → new session root, SessionId = own NavigationId
+    /// </summary>
+    private async Task<string?> ResolveSessionIdAsync(MetricSilverEntity silver, Guid tenantId)
+    {
+        // Case 1: SPA_NAV — inherit from parent LOAD via ParentNavigationId
+        if (!string.IsNullOrEmpty(silver.ParentNavigationId))
+        {
+            var parentSessionId = await _context.MetricsSilver
+                .Where(s => s.TenantId == tenantId && s.NavigationId == silver.ParentNavigationId)
+                .Select(s => s.SessionId)
+                .FirstOrDefaultAsync();
+
+            if (parentSessionId != null)
+                return parentSessionId;
+        }
+
+        // Case 2: LOAD with same-domain ref → continues existing session
+        if (!string.IsNullOrEmpty(silver.SessionRef) && IsSameDomainRef(silver.SessionRef, silver.Url))
+        {
+            // Find the most recent Silver record for the same user
+            var query = _context.MetricsSilver
+                .Where(s => s.TenantId == tenantId && s.PageRequestedAtByVisitor < silver.PageRequestedAtByVisitor);
+
+            if (silver.UserId != null)
+                query = query.Where(s => s.UserId == silver.UserId);
+            else if (silver.GuestId != null)
+                query = query.Where(s => s.GuestId == silver.GuestId);
+            else
+                return silver.NavigationId; // No user identity — new session
+
+            var previousSessionId = await query
+                .OrderByDescending(s => s.PageRequestedAtByVisitor)
+                .Select(s => s.SessionId)
+                .FirstOrDefaultAsync();
+
+            if (previousSessionId != null)
+                return previousSessionId;
+        }
+
+        // Case 3: New session root — external ref, direct, or null ref
+        return silver.NavigationId;
+    }
+
+    /// <summary>
+    /// Checks if a referrer URL is from the same domain as the page URL.
+    /// </summary>
+    private static bool IsSameDomainRef(string refUrl, string pageUrl)
+    {
+        if (Uri.TryCreate(refUrl, UriKind.Absolute, out var refUri) &&
+            Uri.TryCreate(pageUrl, UriKind.Absolute, out var pageUri))
+        {
+            return string.Equals(refUri.Host, pageUri.Host, StringComparison.OrdinalIgnoreCase);
+        }
+        return false;
     }
 
     private static double MedianOrDefault(List<int> values)

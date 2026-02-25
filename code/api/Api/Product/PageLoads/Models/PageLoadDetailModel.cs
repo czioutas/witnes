@@ -11,6 +11,11 @@ public class PageLoadDetailModel
     public Guid Id { get; set; }
 
     /// <summary>
+    /// Navigation type: LOAD or SPA_NAV
+    /// </summary>
+    public string EventType { get; set; } = "LOAD";
+
+    /// <summary>
     /// User ID who triggered this page load
     /// </summary>
     public string UserId { get; set; } = null!;
@@ -49,6 +54,56 @@ public class PageLoadDetailModel
     /// Jank reports - performance issues detected
     /// </summary>
     public List<string> JankReports { get; set; } = new();
+
+    /// <summary>
+    /// First Contentful Paint in milliseconds (hard nav only, 0 for SPA nav)
+    /// </summary>
+    public int FcpMs { get; set; }
+
+    /// <summary>
+    /// DOM Interactive in milliseconds (hard nav only, 0 for SPA nav)
+    /// </summary>
+    public int DomInteractiveMs { get; set; }
+
+    /// <summary>
+    /// Why data collection stopped (idle, spa_nav, timeout, pagehide)
+    /// </summary>
+    public string? FinalizeReason { get; set; }
+
+    /// <summary>
+    /// Whether this record is incomplete (user navigated away before load settled)
+    /// </summary>
+    public bool Incomplete { get; set; }
+
+    /// <summary>
+    /// Silver ID of the parent hard nav (for SPA navs linking back to their origin)
+    /// </summary>
+    public Guid? ParentPageLoadId { get; set; }
+
+    /// <summary>
+    /// Whether this hard nav has SPA nav children (shell resources were reused)
+    /// </summary>
+    public bool HasSpaChildren { get; set; }
+
+    /// <summary>
+    /// Silver ID of the previous page load in session (for prev/next navigation)
+    /// </summary>
+    public Guid? PreviousPageLoadId { get; set; }
+
+    /// <summary>
+    /// Silver ID of the next page load in session (for prev/next navigation)
+    /// </summary>
+    public Guid? NextPageLoadId { get; set; }
+
+    /// <summary>
+    /// URL of the previous page load (for tooltip display)
+    /// </summary>
+    public string? PreviousUrl { get; set; }
+
+    /// <summary>
+    /// URL of the next page load (for tooltip display)
+    /// </summary>
+    public string? NextUrl { get; set; }
 }
 
 /// <summary>

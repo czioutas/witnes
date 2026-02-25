@@ -2,10 +2,14 @@ using System.ComponentModel.DataAnnotations.Schema;
 using Api.Application.Tenancy.Entities;
 using Api.Product.Ingestion.Models;
 using Libs.Domain;
+using Microsoft.EntityFrameworkCore;
 
 namespace Api.Product.MetricsProcessing.Silver;
 
 [Table("metrics_silver")]
+[Index(nameof(NavigationId))]
+[Index(nameof(UserId), nameof(PageRequestedAtByVisitor))]
+[Index(nameof(GuestId), nameof(PageRequestedAtByVisitor))]
 public class MetricSilverEntity : TenantAwareEntity
 {
     public Guid BronzeId { get; set; }
@@ -17,6 +21,15 @@ public class MetricSilverEntity : TenantAwareEntity
     public int EmittedAt { get; set; }
     public string? FinalizeReason { get; set; }
     public int IdentifyDelayMs { get; set; }
+
+    // --- SPA Navigation Support ---
+    public string EventType { get; set; } = "LOAD"; // LOAD or SPA_NAV
+    public string? NavigationId { get; set; }
+    public string? ParentNavigationId { get; set; }
+
+    // --- Session Stitching ---
+    public string? SessionId { get; set; }  // NavigationId of the first LOAD in the session
+    public string? SessionRef { get; set; } // Referrer URL from session.ref
 
     // --- NEW: Connection Context (Missing from your snippet) ---
     public int Rtt { get; set; }               // Round-trip time (latency)
@@ -156,6 +169,7 @@ public class MetricSilverEntity : TenantAwareEntity
 public class ProcessedResource
 {
     public int Id { get; set; }
+    public int StartMs { get; set; }
     public string Label { get; set; } = null!;
     public string FullUrl { get; set; } = null!;
     public string Protocol { get; set; } = null!;

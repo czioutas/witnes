@@ -6,6 +6,7 @@ using Api.Product.Ingestion.Models;
 using Libs.Domain;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -14,9 +15,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Api.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260225061852_AddSpaNavigationSupport")]
+    partial class AddSpaNavigationSupport
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1121,9 +1124,6 @@ namespace Api.Migrations
                     b.Property<bool>("IsPayloadIssue")
                         .HasColumnType("boolean");
 
-                    b.Property<string>("NavigationId")
-                        .HasColumnType("text");
-
                     b.Property<int>("NetworkConfidence")
                         .HasColumnType("integer");
 
@@ -1149,12 +1149,6 @@ namespace Api.Migrations
 
                     b.Property<int>("Rtt")
                         .HasColumnType("integer");
-
-                    b.Property<string>("SessionId")
-                        .HasColumnType("text");
-
-                    b.Property<string>("SessionRef")
-                        .HasColumnType("text");
 
                     b.Property<int?>("SettledTimeMs")
                         .HasColumnType("integer");
@@ -1184,10 +1178,6 @@ namespace Api.Migrations
                         .HasColumnType("text");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("NavigationId");
-
-                    b.HasIndex("SessionId");
 
                     b.HasIndex("TenantId");
 
@@ -1361,12 +1351,6 @@ namespace Api.Migrations
                     b.Property<double>("ServerEfficiencyRatio")
                         .HasColumnType("double precision");
 
-                    b.Property<string>("SessionId")
-                        .HasColumnType("text");
-
-                    b.Property<string>("SessionRef")
-                        .HasColumnType("text");
-
                     b.Property<int?>("SettledTimeMs")
                         .HasColumnType("integer");
 
@@ -1449,13 +1433,7 @@ namespace Api.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("NavigationId");
-
                     b.HasIndex("TenantId");
-
-                    b.HasIndex("GuestId", "PageRequestedAtByVisitor");
-
-                    b.HasIndex("UserId", "PageRequestedAtByVisitor");
 
                     b.ToTable("metrics_silver", (string)null);
                 });

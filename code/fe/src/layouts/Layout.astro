@@ -35,7 +35,7 @@ const trackingDebug = import.meta.env.PUBLIC_WITNES_DEBUG_MODE === "false";
     <script is:inline define:vars={{ projectKey, trackingDebug }}>
       window.witnesConfig = {
         projectKey: projectKey,
-        debug: trackingDebug,
+        debug: true,
       };
     </script>
     <script src={trackingUrl} async is:inline></script>

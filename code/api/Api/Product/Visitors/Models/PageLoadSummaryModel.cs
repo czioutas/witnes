@@ -11,6 +11,7 @@ public class PageLoadSummaryModel
     // --- Identifiers ---
     public Guid Id { get; set; }
     public Guid SilverId { get; set; }
+    public string EventType { get; set; } = "LOAD";
     public string UserId { get; set; } = null!;
     public string UrlPath { get; set; } = null!;
 
@@ -53,6 +54,10 @@ public class PageLoadSummaryModel
     public decimal ClsScore { get; set; }
     public int TotalJankCount { get; set; }
     public int InteractionDeadZoneMs { get; set; }
+
+    // --- Session Stitching ---
+    public string? SessionId { get; set; }
+    public string? SessionRef { get; set; }
 
     // --- Overall Verdict ---
     public OverallSentiment OverallSentiment { get; set; }

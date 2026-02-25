@@ -15,6 +15,7 @@ public class VisitorsMapper : Profile
         CreateMap<MetricGoldEntity, PageLoadSummaryModel>()
                     .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
                     .ForMember(dest => dest.SilverId, opt => opt.MapFrom(src => src.SilverId))
+                    .ForMember(dest => dest.EventType, opt => opt.MapFrom(src => src.EventType))
                     .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.UserId ?? src.GuestId ?? "Anonymous"))
                     .ForMember(dest => dest.UrlPath, opt => opt.MapFrom(src => src.UrlPath))
                     .ForMember(dest => dest.DeviceIcon, opt => opt.MapFrom(src => src.DeviceIcon))
@@ -55,6 +56,10 @@ public class VisitorsMapper : Profile
                     .ForMember(dest => dest.ClsScore, opt => opt.MapFrom(src => src.ClsScore))
                     .ForMember(dest => dest.TotalJankCount, opt => opt.MapFrom(src => src.TotalJankCount))
                     .ForMember(dest => dest.InteractionDeadZoneMs, opt => opt.MapFrom(src => src.InteractionDeadZoneMs))
+
+                    // Session Stitching
+                    .ForMember(dest => dest.SessionId, opt => opt.MapFrom(src => src.SessionId))
+                    .ForMember(dest => dest.SessionRef, opt => opt.MapFrom(src => src.SessionRef))
 
                     // Overall Verdict
                     .ForMember(dest => dest.OverallSentiment, opt => opt.MapFrom(src => src.OverallSentiment))

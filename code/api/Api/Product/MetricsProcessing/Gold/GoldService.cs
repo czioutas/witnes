@@ -117,6 +117,8 @@ public class GoldService : IGoldService
 
     public static MetricGoldEntity TransformToGold(MetricSilverEntity silver)
     {
+        bool isSpaNav = silver.EventType == "SPA_NAV";
+
         // Background tab adjustment: browser defers painting until tab is visible,
         // inflating LCP and settling times with idle wait time. Subtract it out.
         int bgOffset = silver.WasBackgroundTab ? silver.BackgroundDurationMs : 0;
@@ -126,10 +128,10 @@ public class GoldService : IGoldService
             : null;
 
         var connection = AnalyzeConnection(silver);
-        var backend = AnalyzeBackend(silver);
+        var backend = AnalyzeBackend(silver, isSpaNav);
         var payload = AnalyzePayload(silver);
-        var frontend = AnalyzeFrontend(silver);
-        var experience = AnalyzeExperience(silver, effectiveLcpMs);
+        var frontend = AnalyzeFrontend(silver, isSpaNav);
+        var experience = AnalyzeExperience(silver, effectiveLcpMs, isSpaNav);
 
         return new MetricGoldEntity
         {
@@ -138,6 +140,15 @@ public class GoldService : IGoldService
             GuestId = silver.GuestId,
             UrlPath = ExtractPath(silver.Url),
             PageRequestedAtByVisitor = silver.PageRequestedAtByVisitor,
+
+            // SPA Navigation Support
+            EventType = silver.EventType,
+            NavigationId = silver.NavigationId,
+            ParentNavigationId = silver.ParentNavigationId,
+
+            // Session Stitching
+            SessionId = silver.SessionId,
+            SessionRef = silver.SessionRef,
 
             // --- 1. Backend Pillar ---
             IsBackendIssue = backend.IsIssue,
@@ -177,11 +188,11 @@ public class GoldService : IGoldService
             Incomplete = silver.Incomplete,
             DeviceIcon = silver.DeviceType,
             BrowserIcon = silver.BrowserName,
-            TotalInitialLoadMs = silver.InitialDocTtfbMs + (silver.Waterfall?.Any() == true ? silver.Waterfall.Max(x => x.TotalMs) : 0)
+            TotalInitialLoadMs = isSpaNav ? 0 : silver.InitialDocTtfbMs + (silver.Waterfall?.Any() == true ? silver.Waterfall.Max(x => x.TotalMs) : 0)
         };
     }
 
-    private static (bool IsIssue, ExperienceSymptom[] Symptoms) AnalyzeExperience(MetricSilverEntity silver, int effectiveLcpMs)
+    private static (bool IsIssue, ExperienceSymptom[] Symptoms) AnalyzeExperience(MetricSilverEntity silver, int effectiveLcpMs, bool isSpaNav)
     {
         var symptoms = new List<ExperienceSymptom>();
 
@@ -194,37 +205,38 @@ public class GoldService : IGoldService
         // 3. Smoothness
         if (silver.TotalJankCount > 5) symptoms.Add(ExperienceSymptom.StutteringUI);
 
-        // 4. The "Zombie UI" (Functional vs Technical)
-        if (silver.InteractionDeadZoneMs > 1500) symptoms.Add(ExperienceSymptom.DelayedFunctionalReady);
+        // 4. The "Zombie UI" (Functional vs Technical) — skip for SPA navs (InteractionDeadZone is 0)
+        if (!isSpaNav && silver.InteractionDeadZoneMs > 1500) symptoms.Add(ExperienceSymptom.DelayedFunctionalReady);
 
         // 5. Termination Issues — only flag if the page wasn't already usable.
         // A fast page that didn't "settle" because of a trailing background request
         // or because the user simply navigated away is not a bad experience.
-        if (silver.SettledTimeMs == null)
+        // For SPA navs finalized by 'spa_nav', this is normal — user navigated to another route.
+        if (silver.SettledTimeMs == null && silver.FinalizeReason != "spa_nav")
         {
             bool pageWasUsable = effectiveLcpMs <= 2500
-                && silver.InteractionDeadZoneMs <= 1500;
+                && (isSpaNav || silver.InteractionDeadZoneMs <= 1500);
 
             if (!pageWasUsable)
             {
                 if (silver.FinalizeReason == "timeout") symptoms.Add(ExperienceSymptom.InfiniteWaterfall);
-                if (silver.FinalizeReason == "pagehide") symptoms.Add(ExperienceSymptom.RageQuit);
+                if (silver.FinalizeReason is "pagehide" or "beforeunload" or "visibilitychange") symptoms.Add(ExperienceSymptom.RageQuit);
             }
         }
 
         return (symptoms.Any(), symptoms.ToArray());
     }
 
-    private static (bool IsIssue, int Confidence, FrontendReason[] Reasons) AnalyzeFrontend(MetricSilverEntity silver)
+    private static (bool IsIssue, int Confidence, FrontendReason[] Reasons) AnalyzeFrontend(MetricSilverEntity silver, bool isSpaNav)
     {
         var reasons = new List<FrontendReason>();
         var confidenceScores = new List<int>();
 
-        // 1. The "Heavy App" Check (Shell to Content)
-        if (silver.ShellToContentGapMs > 1500)
+        // 1. The "Heavy App" Check (Shell to Content) — skip for SPA navs (FCP=0, gap is meaningless)
+        if (!isSpaNav && silver.ShellToContentGapMs > 1500)
         {
-            bool isHighLatency = (silver.Rtt > 400); // Using the flat property from Silver
-            bool isWaitingForBigAssets = silver.TotalPayloadBytes > 2 * 1024 * 1024; // > 2MB
+            bool isHighLatency = (silver.Rtt > 400);
+            bool isWaitingForBigAssets = silver.TotalPayloadBytes > 2 * 1024 * 1024;
 
             if (!isHighLatency && !isWaitingForBigAssets)
             {
@@ -234,37 +246,36 @@ public class GoldService : IGoldService
             }
         }
 
-        // 2. The "Zombie UI" Check (Interaction Dead Zone)
-        // If there is a massive gap between Technical and Functional interactive
-        if (silver.InteractionDeadZoneMs > 1200)
+        // 2. The "Zombie UI" Check (Interaction Dead Zone) — skip for SPA navs (InteractionDeadZone=0)
+        if (!isSpaNav && silver.InteractionDeadZoneMs > 1200)
         {
             reasons.Add(FrontendReason.ZombieUI);
             confidenceScores.Add(80);
         }
 
-        // 3. Hydration/Frozen UI Check
-        // If the main thread was locked for a long time specifically after LCP
-        if (silver.FrozenUiGapMs > 1000)
+        // 3. Hydration/Frozen UI Check — skip for SPA navs (FrozenUiGap=0)
+        if (!isSpaNav && silver.FrozenUiGapMs > 1000)
         {
             reasons.Add(FrontendReason.HydrationLockup);
             confidenceScores.Add(70);
         }
 
-        // 4. Implementation Quality (Layout Shift)
-        // CLS is almost always a frontend implementation issue (missing aspect ratios, etc.)
+        // 4. Implementation Quality (Layout Shift) — valid for both LOAD and SPA navs
         if (silver.CumulativeLayoutShift > 0.15m)
         {
             reasons.Add(FrontendReason.ImplementationLayoutShift);
             confidenceScores.Add(90);
         }
 
-        // 5. Unoptimized Boot Sequence
-        // If we have jank (long tasks) specifically happening before the page is usable
-        int bootJanks = silver.JankReports?.Count(j => j.S < silver.TechnicalInteractiveMs) ?? 0;
-        if (bootJanks > 3)
+        // 5. Unoptimized Boot Sequence — skip for SPA navs (TechnicalInteractiveMs=0)
+        if (!isSpaNav)
         {
-            reasons.Add(FrontendReason.UnoptimizedBootSequence);
-            confidenceScores.Add(60);
+            int bootJanks = silver.JankReports?.Count(j => j.S < silver.TechnicalInteractiveMs) ?? 0;
+            if (bootJanks > 3)
+            {
+                reasons.Add(FrontendReason.UnoptimizedBootSequence);
+                confidenceScores.Add(60);
+            }
         }
 
         int finalConfidence = confidenceScores.Any() ? confidenceScores.Max() : 0;
@@ -280,7 +291,7 @@ public class GoldService : IGoldService
     // backend confidence because the "slow TTFB" might just be the pipe.
     // =========================================================================
 
-    private static (bool IsIssue, int Confidence, BackendReason[] Reasons) AnalyzeBackend(MetricSilverEntity silver)
+    private static (bool IsIssue, int Confidence, BackendReason[] Reasons) AnalyzeBackend(MetricSilverEntity silver, bool isSpaNav)
     {
         var reasons = new List<BackendReason>();
         var confidenceScores = new List<int>();
@@ -290,7 +301,7 @@ public class GoldService : IGoldService
             || silver.NavigatorReportsBadConnection;
 
         // ---------------------------------------------------------------
-        // PRIMARY: Slow API calls (absolute, always works)
+        // PRIMARY: Slow API calls (absolute, always works — valid for both LOAD and SPA navs)
         // SlowestApiTtfbMs = max TotalMs across all FETCH/XHR entries.
         // TotalMs (duration) is always accurate, even cross-origin.
         // ---------------------------------------------------------------
@@ -310,9 +321,9 @@ public class GoldService : IGoldService
         }
 
         // ---------------------------------------------------------------
-        // Slow initial HTML document
+        // Slow initial HTML document — skip for SPA navs (no document fetch)
         // ---------------------------------------------------------------
-        if (silver.InitialDocTtfbMs > 400)
+        if (!isSpaNav && silver.InitialDocTtfbMs > 400)
         {
             reasons.Add(BackendReason.SlowInitialDocument);
             int conf = Math.Clamp(silver.InitialDocTtfbMs / 10, 40, 100);
@@ -340,9 +351,9 @@ public class GoldService : IGoldService
         }
 
         // ---------------------------------------------------------------
-        // Server Processing Gap (TTFB - RTT > 300ms)
+        // Server Processing Gap (TTFB - RTT > 300ms) — skip for SPA navs (InitialDocTtfb=0)
         // ---------------------------------------------------------------
-        if (silver.Rtt > 0 && silver.InitialDocTtfbMs - silver.Rtt > 300)
+        if (!isSpaNav && silver.Rtt > 0 && silver.InitialDocTtfbMs - silver.Rtt > 300)
         {
             reasons.Add(BackendReason.ServerProcessingGap);
             int gapConf = Math.Clamp((silver.InitialDocTtfbMs - silver.Rtt) / 10, 40, 95);

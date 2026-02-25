@@ -15,11 +15,12 @@ public record IngestMetricRequestModel(
 public record MetadataModel(
     [property: JsonPropertyName("durationMs")] int PageLoadDurationMs, // time difference between pageRequestedAtByVisitor and last activity (not including the 2s delay)
     [property: JsonPropertyName("emittedAt")] DateTimeOffset EmittedAt, // when the api call was made
-    [property: JsonPropertyName("loadEventFiredAt")] int LoadEventFiredAt, // when the load event fired
-    [property: JsonPropertyName("event")][Required] string Event,
+    [property: JsonPropertyName("loadEventFiredAt")] int? LoadEventFiredAt, // when the load event fired (null for SPA navs before load)
+    [property: JsonPropertyName("event")][Required] string Event, // LOAD or SPA_NAV
     [property: JsonPropertyName("finalizeReason")] string? FinalizeReason,
     [property: JsonPropertyName("identifyDelayMs")] int IdentifyDelayMs, // Time from pageRequestedAtByVisitor to when identify() was called
     [property: JsonPropertyName("navigationId")] string NavigationId,
+    [property: JsonPropertyName("parentNavigationId")] string? ParentNavigationId, // For SPA navs: the initial LOAD's navigationId
     [property: JsonPropertyName("pageRequestedAtByVisitor")] DateTimeOffset PageRequestedAtByVisitor,
     [property: JsonPropertyName("incomplete")] bool Incomplete,
     [property: JsonPropertyName("wasBackgroundTab")] bool WasBackgroundTab,
@@ -35,9 +36,10 @@ public record SessionModel(
 
 public record PerformanceModel(
     [property: JsonPropertyName("vitals")] VitalsModel Vitals,
-    [property: JsonPropertyName("initialLoad")] InitialLoadModel InitialLoad,
+    [property: JsonPropertyName("initialLoad")] InitialLoadModel? InitialLoad, // null for SPA navs
     [property: JsonPropertyName("cdnBaseline")] CdnBaselineModel? CdnBaseline,
-    [property: JsonPropertyName("waterfall")] List<WaterfallResource>? Waterfall, // Optional list
+    [property: JsonPropertyName("waterfall")] List<WaterfallResource>? Waterfall,
+    [property: JsonPropertyName("clsEvents")] List<ClsEvent>? ClsEvents, // Raw CLS shift events with timestamps
     [property: JsonPropertyName("jank")] List<JankMetric>? Jank
 );
 
@@ -88,8 +90,12 @@ public record VitalsModel(
 
 public record WebVitals(
     [property: JsonPropertyName("fcp")] int Fcp,
-    [property: JsonPropertyName("lcp")] int Lcp,
-    [property: JsonPropertyName("cls")] decimal Cls
+    [property: JsonPropertyName("lcp")] int Lcp
+);
+
+public record ClsEvent(
+    [property: JsonPropertyName("t")] int T, // Timestamp (ms, relative to performance.timeOrigin)
+    [property: JsonPropertyName("v")] decimal V // Shift value
 );
 
 public record MetricsAtIdentify(

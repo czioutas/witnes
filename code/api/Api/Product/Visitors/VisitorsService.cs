@@ -156,12 +156,30 @@ public class VisitorsService : IVisitorsService
         // Get total count before pagination
         var totalCount = await query.CountAsync();
 
-        // Apply ordering (most recent first) and pagination
+        // Session-aware pagination: fetch ~pageSize records, then complete the last session
         var pageLoads = await query
             .OrderByDescending(m => m.PageRequestedAtByVisitor)
             .Skip(request.Skip)
             .Take(request.Take)
             .ToListAsync();
+
+        // If the last record is mid-session, fetch remaining records for that session
+        if (pageLoads.Count > 0)
+        {
+            var lastRecord = pageLoads[^1];
+            if (!string.IsNullOrEmpty(lastRecord.SessionId))
+            {
+                var lastTimestamp = lastRecord.PageRequestedAtByVisitor;
+                var sessionTail = await query
+                    .Where(m => m.SessionId == lastRecord.SessionId
+                        && m.PageRequestedAtByVisitor < lastTimestamp)
+                    .OrderByDescending(m => m.PageRequestedAtByVisitor)
+                    .ToListAsync();
+
+                if (sessionTail.Count > 0)
+                    pageLoads.AddRange(sessionTail);
+            }
+        }
 
         var pageLoadsModel = _mapper.Map<List<PageLoadSummaryModel>>(pageLoads);
 

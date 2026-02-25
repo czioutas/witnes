@@ -7,6 +7,8 @@ namespace Api.Product.MetricsProcessing.Gold;
 
 [Table("metrics_gold")]
 [Index(nameof(UserId), nameof(PageRequestedAtByVisitor))]
+[Index(nameof(NavigationId))]
+[Index(nameof(SessionId))]
 public class MetricGoldEntity : TenantAwareEntity
 {
     public Guid SilverId { get; set; }
@@ -14,6 +16,15 @@ public class MetricGoldEntity : TenantAwareEntity
     public string? GuestId { get; set; }
     public string UrlPath { get; set; } = null!;
     public DateTimeOffset PageRequestedAtByVisitor { get; set; }
+
+    // --- SPA Navigation Support ---
+    public string EventType { get; set; } = "LOAD"; // LOAD or SPA_NAV
+    public string? NavigationId { get; set; }
+    public string? ParentNavigationId { get; set; }
+
+    // --- Session Stitching ---
+    public string? SessionId { get; set; }  // NavigationId of the first LOAD in the session
+    public string? SessionRef { get; set; } // Referrer URL from session.ref
 
     // Connection Quality (from Network Pillar)
     public string ConnectionQuality { get; set; } = "Good";

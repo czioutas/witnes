@@ -49,7 +49,6 @@ export type GetV1RequestResetPasswordParams = {
 };
 
 export interface WebVitals {
-  cls?: number;
   fcp?: number;
   lcp?: number;
 }
@@ -539,18 +538,12 @@ export interface ProblemDetails {
 /**
  * @nullable
  */
-export type PerformanceModelCdnBaseline = CdnBaselineModel | null;
+export type PerformanceModelInitialLoad = InitialLoadModel | null;
 
-export interface PerformanceModel {
-  /** @nullable */
-  cdn_baseline?: PerformanceModelCdnBaseline;
-  initial_load?: InitialLoadModel;
-  /** @nullable */
-  jank?: JankMetric[] | null;
-  vitals?: VitalsModel;
-  /** @nullable */
-  waterfall?: WaterfallResource[] | null;
-}
+/**
+ * @nullable
+ */
+export type PerformanceModelCdnBaseline = CdnBaselineModel | null;
 
 export type PayloadReason = (typeof PayloadReason)[keyof typeof PayloadReason];
 
@@ -563,16 +556,6 @@ export const PayloadReason = {
   ConcurrencyBottleneck: "ConcurrencyBottleneck",
 } as const;
 
-export interface PageLoadSummaryModelPagedResult {
-  data?: PageLoadSummaryModel[];
-  readonly has_next_page?: boolean;
-  readonly has_previous_page?: boolean;
-  page_number?: number;
-  page_size?: number;
-  total_count?: number;
-  readonly total_pages?: number;
-}
-
 /**
  * Detailed model for a page load including waterfall and jank data
  */
@@ -581,12 +564,52 @@ export interface PageLoadDetailModel {
   avg_ttfb_ms?: number;
   /** Cumulative Layout Shift score */
   cls?: number;
+  /** DOM Interactive in milliseconds (hard nav only, 0 for SPA nav) */
+  dom_interactive_ms?: number;
+  /** Navigation type: LOAD or SPA_NAV */
+  event_type?: string;
+  /** First Contentful Paint in milliseconds (hard nav only, 0 for SPA nav) */
+  fcp_ms?: number;
+  /**
+   * Why data collection stopped (idle, spa_nav, timeout, pagehide)
+   * @nullable
+   */
+  finalize_reason?: string | null;
+  /** Whether this hard nav has SPA nav children (shell resources were reused) */
+  has_spa_children?: boolean;
   /** Unique identifier for this page load (Silver layer ID) */
   id?: string;
+  /** Whether this record is incomplete (user navigated away before load settled) */
+  incomplete?: boolean;
   /** Jank reports - performance issues detected */
   jank_reports?: string[];
   /** Largest Contentful Paint in milliseconds */
   lcp_ms?: number;
+  /**
+   * Silver ID of the next page load in session (for prev/next navigation)
+   * @nullable
+   */
+  next_page_load_id?: string | null;
+  /**
+   * URL of the next page load (for tooltip display)
+   * @nullable
+   */
+  next_url?: string | null;
+  /**
+   * Silver ID of the parent hard nav (for SPA navs linking back to their origin)
+   * @nullable
+   */
+  parent_page_load_id?: string | null;
+  /**
+   * Silver ID of the previous page load in session (for prev/next navigation)
+   * @nullable
+   */
+  previous_page_load_id?: string | null;
+  /**
+   * URL of the previous page load (for tooltip display)
+   * @nullable
+   */
+  previous_url?: string | null;
   /** When the page load occurred */
   timestamp?: string;
   /** URL of the page */
@@ -675,6 +698,7 @@ export interface PageLoadSummaryModel {
   cls_score?: number;
   connection_quality?: string;
   device_icon?: string;
+  event_type?: string;
   experience_symptoms?: ExperienceSymptom[];
   frontend_confidence?: number;
   frontend_reasons?: FrontendReason[];
@@ -694,6 +718,10 @@ export interface PageLoadSummaryModel {
   payload_confidence?: number;
   payload_reasons?: PayloadReason[];
   /** @nullable */
+  session_id?: string | null;
+  /** @nullable */
+  session_ref?: string | null;
+  /** @nullable */
   settled_time_ms?: number | null;
   silver_id?: string;
   total_initial_load_ms?: number;
@@ -701,6 +729,16 @@ export interface PageLoadSummaryModel {
   url_path?: string;
   user_id?: string;
   user_left_early?: boolean;
+}
+
+export interface PageLoadSummaryModelPagedResult {
+  data?: PageLoadSummaryModel[];
+  readonly has_next_page?: boolean;
+  readonly has_previous_page?: boolean;
+  page_number?: number;
+  page_size?: number;
+  total_count?: number;
+  readonly total_pages?: number;
 }
 
 export interface NetworkModel {
@@ -729,9 +767,12 @@ export interface MetadataModel {
   finalize_reason?: string | null;
   identify_delay_ms?: number;
   incomplete?: boolean;
-  load_event_fired_at?: number;
+  /** @nullable */
+  load_event_fired_at?: number | null;
   navigation_id?: string;
   page_requested_at_by_visitor?: string;
+  /** @nullable */
+  parent_navigation_id?: string | null;
   pk?: string;
   /** @nullable */
   tab_visible_at_ms?: number | null;
@@ -945,6 +986,25 @@ export interface CreateProjectKeyRequest {
    * @maxLength 200
    */
   name: string;
+}
+
+export interface ClsEvent {
+  t?: number;
+  v?: number;
+}
+
+export interface PerformanceModel {
+  /** @nullable */
+  cdn_baseline?: PerformanceModelCdnBaseline;
+  /** @nullable */
+  cls_events?: ClsEvent[] | null;
+  /** @nullable */
+  initial_load?: PerformanceModelInitialLoad;
+  /** @nullable */
+  jank?: JankMetric[] | null;
+  vitals?: VitalsModel;
+  /** @nullable */
+  waterfall?: WaterfallResource[] | null;
 }
 
 export interface CheckFeatureResponse {
